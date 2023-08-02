@@ -24,7 +24,7 @@ export type InsertLeadRequestDTO = {
     content: string | null;
     term: string | null;
   };
-  courses: string[] | null;
+  courses?: string[];
 };
 
 const insertLeadRequestSchema: yup.ISchema<InsertLeadRequestDTO> = yup.object({
@@ -47,7 +47,7 @@ const insertLeadRequestSchema: yup.ISchema<InsertLeadRequestDTO> = yup.object({
     content: yup.string().nullable().defined(),
     term: yup.string().nullable().defined(),
   }),
-  courses: yup.array().of(yup.string().defined()).nullable().defined(),
+  courses: yup.array().of(yup.string().defined()),
 });
 
 export const validateInsertLeadRequest = async (o: unknown): Promise<ResultType<InsertLeadRequestDTO>> => {

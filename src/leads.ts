@@ -32,7 +32,7 @@ type InsertLeadRequest = {
     content: string | null;
     term: string | null;
   };
-  courses: string[] | null;
+  courses?: string[];
 };
 
 export const insertLead = async (request: InsertLeadRequest): Promise<ResultType<void>> => {
