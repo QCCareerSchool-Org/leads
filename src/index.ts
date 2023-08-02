@@ -11,14 +11,17 @@ import { logInfo } from './logger';
 import { ipAddressMiddleware } from './middleware/ipAddress';
 
 const corsOptions: CorsOptions = {
-  origin: [
-    /\.qccareerschool\.com$/iu,
-    /\.qcmakeupacademy\.com$/iu,
-    /\.qcdesignschool\.com$/iu,
-    /\.qceventplanning\.com$/iu,
-    /\.qcpetstudies\.com$/iu,
-    /\.qcwellnessstudies\.com$/iu,
-  ],
+  origin: process.env.NODE_ENV === 'production'
+    ? [
+      /\.qccareerschool\.com$/iu,
+      /\.qcmakeupacademy\.com$/iu,
+      /\.qcdesignschool\.com$/iu,
+      /\.qceventplanning\.com$/iu,
+      /\.qcpetstudies\.com$/iu,
+      /\.qcwellnessstudies\.com$/iu,
+      /\.winghill\.com$/iu,
+    ]
+    : '*',
 };
 
 const app = express();
