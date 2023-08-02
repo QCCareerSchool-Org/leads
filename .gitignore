@@ -1,0 +1,9 @@
+node_modules
+.env
+dist
+combined.log
+error.log
+mysql-ca.crt
+mysql-client.crt
+mysql-client.key
+mysql-client.pfx

@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  schemas = [ "general", "leads" ]
+}
+
+model Country {
+  code              String      @id @default("") @db.Char(2)
+  name              String      @default("") @db.VarChar(255)
+  longName          String      @db.VarChar(255) @map("long_name")
+  frenchName        String      @db.VarChar(255) @map("fr_name")
+  iso3166           Int?        @unique(map: "iso 3166-1") @map("iso 3166-1") @db.SmallInt
+  eu                Boolean     @default(false)
+  ofac              Boolean     @default(false)
+  priceDisplayOrder Int         @db.SmallInt @map("price_display_order")
+  lastUpdate        String?     @db.VarChar(255) @map("last_update")
+  noShipping        Boolean     @default(false) @map("no_shipping")
+  provinces         Province[]
+  regions           Region[]
+  leads             Lead[]
+
+  @@map("countries")
+  @@schema("general")
+}
+
+model Course {
+  code        String           @id @db.Char(2)
+  name        String           @db.VarChar(255)
+  schoolName  String?          @db.VarChar(50) @map("school_name")
+  order       Int              @default(99)
+  combination Boolean          @default(false)
+  enabled     Boolean          @default(true)
+  schools     School?          @relation(fields: [schoolName], references: [name], onDelete: Restrict, map: "courses_ibfk_1")
+  leads       LeadsOnCourses[]
+  
+  @@map("courses")
+  @@schema("general")
+  @@index([schoolName], map: "school_name")
+}
+
+model Province {
+  countryCode           String       @db.Char(2) @map("country_code")
+  code                  String       @db.Char(3)
+  name                  String       @db.VarChar(50)
+  frenchName            String?      @db.VarChar(50) @map("fr_name")
+  regionCode            String       @db.VarChar(3) @map("region_code")
+  alternateAbbreviation String?      @db.Char(3) @map("alternate_abbreviation")
+  type                  String?      @db.VarChar(60)
+  order                 Int?
+  display               Boolean      @default(true)
+  countries             Country      @relation(fields: [countryCode], references: [code], map: "provinces_ibfk_1")
+  regions               Region       @relation(fields: [countryCode, regionCode], references: [countryCode, code], map: "provinces_ibfk_2")
+  leads                 Lead[]
+
+  @@map("provinces")
+  @@schema("general")
+  @@id([countryCode, regionCode, code])
+  @@index([countryCode], map: "country_code")
+  @@unique([countryCode, code], map: "country_province")
+  @@index([countryCode, regionCode], map: "region_code")
+}
+
+model Region {
+  countryCode String     @default("") @db.Char(2) @map("country_code")
+  code        String     @default("") @db.VarChar(3)
+  name        String?    @db.VarChar(50)
+  frenchName  String?    @db.VarChar(50) @map("fr_name")
+  type        String?    @db.VarChar(60)
+  order       Int?
+  provinces   Province[]
+  countries   Country    @relation(fields: [countryCode], references: [code], map: "regions_ibfk_1")
+
+  @@map("regions")
+  @@schema("general")
+  @@id([countryCode, code])
+  @@index([countryCode], map: "country_code")
+}
+
+model School {
+  name        String       @id @db.VarChar(50)
+  order       Int          @default(0)
+  makeupOrder Int          @default(0) @map("makeup_order")
+  eventOrder  Int          @default(0) @map("event_order")
+  styleOrder  Int          @default(0) @map("style_order")
+  travelOrder Int          @map("travel_order")
+  courses     Course[]
+  leads       Lead[]
+
+  @@map("schools")
+  @@schema("general")
+  @@index([eventOrder], map: "event_order")
+  @@index([makeupOrder], map: "makeup_order")
+  @@index([styleOrder], map: "style_order")
+}
+
+
+model Lead {
+  leadId                Bytes                  @id @db.Binary(16)
+  ipAddress             Bytes?                 @db.Binary(16)
+  schoolName            String                 @db.VarChar(50)
+  emailAddress          String                 @db.VarChar(255)
+  firstName             String?                @db.VarChar(255)
+  lastName              String?                @db.VarChar(255)
+  telephoneNumber       String?                @db.VarChar(255)
+  emailOptIn            Boolean                @default(false)
+  smsOptIn              Boolean                @default(false)
+  provinceCode          String?                @db.Char(3)
+  countryCode           String?                @db.Char(2)
+  testGroup             Int?                   @db.UnsignedTinyInt()
+  gclid                 String?                @db.VarChar(100)
+  msclkid               String?                @db.VarChar(1024)
+  esp                   Boolean                @default(false)
+  created               DateTime               @default(now()) @db.DateTime(6)
+  country               Country?               @relation(fields: [countryCode], references: [code], onDelete: Cascade, map: "FK_leads_general.countries")
+  province              Province?              @relation(fields: [countryCode, provinceCode], references: [countryCode, code], onDelete: Cascade, map: "FK_leads_general.provinces")
+  school                School                 @relation(fields: [schoolName], references: [name], onDelete: Cascade, map: "FK_leads_general.schools")
+  marketingParameterSet MarketingParameterSet?
+  courses               LeadsOnCourses[]
+
+  @@map("leads")
+  @@schema("leads")
+  @@index([schoolName])
+  @@index([countryCode, provinceCode], map: "countryCodeProvinceCode")
+}
+
+model LeadsOnCourses {
+  leadId     Bytes  @db.Binary(16)
+  courseCode String @db.Char(2)
+  lead       Lead   @relation(fields: [leadId], references: [leadId], onDelete: Cascade, map: "FK_leads_courses_leads")
+  course     Course @relation(fields: [courseCode], references: [code], map: "FK_leads_courses_general.courses")
+
+  @@map("leads_courses")
+  @@schema("leads")
+  @@id([leadId, courseCode])
+  @@index([courseCode], map: "courseCode")
+}
+
+model MarketingParameterSet {
+  leadId   Bytes   @id @db.Binary(16)
+  source   String? @db.VarChar(1024)
+  medium   String? @db.VarChar(1024)
+  campaign String? @db.VarChar(1024)
+  content  String? @db.VarChar(1024)
+  term     String? @db.VarChar(1024)
+  lead     Lead    @relation(fields: [leadId], references: [leadId], onDelete: Cascade, map: "FK_marketing_parameter_sets_leads")
+
+  @@map("marketing_parameter_sets")
+  @@schema("leads")
+}
+
