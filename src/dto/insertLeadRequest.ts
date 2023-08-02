@@ -1,5 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
-import yup from 'yup';
+import * as yup from 'yup';
 
 import { Result, ResultType } from '../result';
 import { SchoolName, schools } from '../school';
