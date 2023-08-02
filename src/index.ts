@@ -28,7 +28,7 @@ app.use(compression());
 
 app.use(ipAddressMiddleware);
 
-app.get('/', asyncWrapper(handleLeadPost));
+app.post('/', asyncWrapper(handleLeadPost));
 app.use(globalErrorHandler);
 
 app.listen(config.port, () => {
