@@ -114,7 +114,6 @@ model Lead {
   testGroup             Int?                   @db.UnsignedTinyInt()
   gclid                 String?                @db.VarChar(100)
   msclkid               String?                @db.VarChar(1024)
-  esp                   Boolean                @default(false)
   created               DateTime               @default(now()) @db.DateTime(6)
   country               Country?               @relation(fields: [countryCode], references: [code], onDelete: Cascade, map: "FK_leads_general.countries")
   province              Province?              @relation(fields: [countryCode, provinceCode], references: [countryCode, code], onDelete: Cascade, map: "FK_leads_general.provinces")
