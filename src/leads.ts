@@ -1,6 +1,6 @@
 import { fixPrismaWriteDate, getDate } from './date';
 import { parseIpAddress } from './ipAddress';
-import { logError } from './logger';
+import { logError, logWarning } from './logger';
 import { prisma } from './prisma';
 import { Result, ResultType } from './result';
 import { SchoolName } from './school';
@@ -37,6 +37,31 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
     const prismaNow = fixPrismaWriteDate(getDate());
     const leadId = uuidToBin(createUUID());
 
+    let countryCode = null;
+    let provinceCode = null;
+
+    // try to find the matching country and province
+    if (request.provinceCode && request.countryCode) {
+      // eslint-disable-next-line camelcase
+      const provinceResult = await prisma.province.findUnique({ where: { countryCode_code: { countryCode: request.countryCode, code: request.provinceCode } } });
+      if (provinceResult) {
+        countryCode = provinceResult.countryCode;
+        provinceCode = provinceResult.code;
+      } else {
+        logWarning(`province not found: ${request.provinceCode}/${request.countryCode}`);
+      }
+    }
+
+    // we didn't find a province above so try to find just the country
+    if (provinceCode === null && request.countryCode) {
+      const countryResult = await prisma.country.findUnique({ where: { code: request.countryCode } });
+      if (countryResult) {
+        countryCode = countryResult.code;
+      } else {
+        logWarning(`country not found: ${request.countryCode}`);
+      }
+    }
+
     await prisma.lead.create({
       data: {
         leadId,
@@ -48,8 +73,8 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
         telephoneNumber: request.telephoneNumber,
         emailOptIn: request.emailOptIn ?? false,
         smsOptIn: request.smsOptIn ?? false,
-        countryCode: request.countryCode,
-        provinceCode: request.provinceCode,
+        countryCode,
+        provinceCode,
         testGroup: request.testGroup,
         gclid: request.gclid,
         msclkid: request.msclkid,
