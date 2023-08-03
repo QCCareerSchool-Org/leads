@@ -18,7 +18,7 @@ export const handleLeadPost = async (req: Request, res: Response): Promise<void>
   });
 
   if (response.success) {
-    res.end();
+    res.send(response.value);
   } else {
     switch (response.error.constructor) {
       default:
