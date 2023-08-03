@@ -1,7 +1,11 @@
 import ipaddr from 'ipaddr.js';
 
-export const parseIpAddress = (ip: string): Buffer => {
-  return Buffer.from(ipaddr.parse(ip).toByteArray());
+export const parseIpAddress = (ip: string): Buffer | null => {
+  try {
+    return Buffer.from(ipaddr.parse(ip).toByteArray());
+  } catch (err) {
+    return null;
+  }
 };
 
 export const stringifyBuffer = (buf: Buffer): string => {
