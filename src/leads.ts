@@ -7,9 +7,6 @@ import { SchoolName } from './school';
 import { createUUID, uuidToBin } from './uuid';
 
 export abstract class InsertLeadError extends Error { }
-export class InsertLeadUnknownESP extends InsertLeadError { }
-export class InsertLeadESPNotImplmented extends InsertLeadError { }
-export class InsertLeadPardotError extends InsertLeadError { }
 
 type InsertLeadRequest = {
   ipAddress: string | null;
@@ -58,9 +55,7 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
         msclkid: request.msclkid,
         created: prismaNow,
         courses: {
-          createMany: {
-            data: request.courses?.map(c => ({ leadId, courseCode: c })) ?? [],
-          },
+          create: request.courses?.map(c => ({ courseCode: c.toUpperCase() })) ?? [],
         },
         marketingParameterSet: typeof request.marketing === 'undefined' ? undefined : {
           create: {
