@@ -25,5 +25,4 @@ export const handleLeadPost = async (req: Request, res: Response): Promise<void>
         res.status(500).send(response.error.message);
     }
   }
-
 };
