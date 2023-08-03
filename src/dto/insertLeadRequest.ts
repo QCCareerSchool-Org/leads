@@ -46,7 +46,7 @@ const insertLeadRequestSchema: yup.ISchema<InsertLeadRequestDTO> = yup.object({
     campaign: yup.string().nullable().defined(),
     content: yup.string().nullable().defined(),
     term: yup.string().nullable().defined(),
-  }),
+  }).default(undefined),
   courses: yup.array().of(yup.string().defined()),
 });
 
