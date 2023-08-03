@@ -5,7 +5,7 @@ dotenv.config();
 
 export const ipAddressMiddleware: RequestHandler = (req, res, next) => {
   let ipAddress: string | null = null;
-  if (process.env.MODE !== 'production') {
+  if (process.env.NODE_ENV !== 'production') {
     ipAddress = '135.23.119.183';
   } else {
     const forwardedFor = req.headers['x-forwarded-for'];
