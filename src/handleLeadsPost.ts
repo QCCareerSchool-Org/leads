@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { validateInsertLeadRequest } from './dto/insertLeadRequest';
 import { insertLead } from './leads';
 
-export const handleLeadPost = async (req: Request, res: Response): Promise<void> => {
+export const handleLeadsPost = async (req: Request, res: Response): Promise<void> => {
   const validated = await validateInsertLeadRequest(req.body);
 
   if (!validated.success) {

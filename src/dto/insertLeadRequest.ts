@@ -12,8 +12,8 @@ export type InsertLeadRequestDTO = {
   telephoneNumber: string | null;
   emailOptIn: boolean | null;
   smsOptIn: boolean | null;
-  countryCode: string | null;
   provinceCode: string | null;
+  countryCode: string | null;
   testGroup: number | null;
   gclid: string | null;
   msclkid: string | null;

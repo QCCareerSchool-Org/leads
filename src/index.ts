@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import { asyncWrapper } from './asyncWrapper';
 import config from './config';
 import { globalErrorHandler } from './globalErrorHandler';
-import { handleLeadPost } from './handlers';
+import { handleLeadsPost } from './handleLeadsPost';
 import { logInfo } from './logger';
 import { browserDetectMiddleware } from './middleware/browserDetect';
 import { geoLocationMiddleware } from './middleware/geoLocation';
@@ -36,7 +36,7 @@ app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
 
-app.post('/', asyncWrapper(handleLeadPost));
+app.post('/', asyncWrapper(handleLeadsPost));
 app.use(globalErrorHandler);
 
 app.listen(config.port, () => {
