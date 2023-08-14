@@ -14,6 +14,11 @@ export const handleLeadPost = async (req: Request, res: Response): Promise<void>
   const request = validated.value;
   const response = await insertLead({
     ipAddress: res.locals.ipAddress ?? null,
+    city: res.locals.geoLocation?.city?.names.en ?? null,
+    browserName: res.locals.browser?.name ?? null,
+    browserVersion: res.locals.browser?.version ?? null,
+    os: res.locals.browser?.os ?? null,
+    mobile: res.locals.browser?.mobile ?? null,
     ...request,
   });
 

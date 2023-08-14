@@ -8,6 +8,8 @@ import config from './config';
 import { globalErrorHandler } from './globalErrorHandler';
 import { handleLeadPost } from './handlers';
 import { logInfo } from './logger';
+import { browserDetectMiddleware } from './middleware/browserDetect';
+import { geoLocationMiddleware } from './middleware/geoLocation';
 import { ipAddressMiddleware } from './middleware/ipAddress';
 
 const corsOptions: CorsOptions = {
@@ -31,6 +33,8 @@ app.use(compression());
 app.use(express.json());
 
 app.use(ipAddressMiddleware);
+app.use(geoLocationMiddleware);
+app.use(browserDetectMiddleware);
 
 app.post('/', asyncWrapper(handleLeadPost));
 app.use(globalErrorHandler);

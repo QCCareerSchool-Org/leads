@@ -109,8 +109,13 @@ model Lead {
   telephoneNumber       String?                @db.VarChar(255)
   emailOptIn            Boolean                @default(false)
   smsOptIn              Boolean                @default(false)
+  city                  String?                @db.VarChar(191)
   provinceCode          String?                @db.Char(3)
   countryCode           String?                @db.Char(2)
+  browserName           String?                @db.VarChar(191)
+  browserVersion        String?                @db.VarChar(191)
+  os                    String?                @db.VarChar(191)
+  mobile                Boolean? 
   testGroup             Int?                   @db.UnsignedTinyInt()
   gclid                 String?                @db.VarChar(100)
   msclkid               String?                @db.VarChar(1024)

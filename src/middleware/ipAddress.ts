@@ -3,6 +3,15 @@ import type { RequestHandler } from 'express';
 
 dotenv.config();
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Locals {
+      ipAddress?: string | null;
+    }
+  }
+}
+
 export const ipAddressMiddleware: RequestHandler = (req, res, next) => {
   let ipAddress: string | null = null;
   if (process.env.NODE_ENV !== 'production') {

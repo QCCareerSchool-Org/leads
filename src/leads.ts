@@ -30,6 +30,11 @@ type InsertLeadRequest = {
     term: string | null;
   };
   courses?: string[];
+  city: string | null;
+  browserName: string | null;
+  browserVersion: string | null;
+  os: string | null;
+  mobile: boolean | null;
 };
 
 export const insertLead = async (request: InsertLeadRequest): Promise<ResultType<void>> => {
@@ -73,8 +78,13 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
         telephoneNumber: request.telephoneNumber,
         emailOptIn: request.emailOptIn ?? false,
         smsOptIn: request.smsOptIn ?? false,
-        countryCode,
+        city: request.city,
         provinceCode,
+        countryCode,
+        browserName: request.browserName,
+        browserVersion: request.browserVersion,
+        os: request.os,
+        mobile: request.mobile,
         testGroup: request.testGroup,
         gclid: request.gclid,
         msclkid: request.msclkid,
