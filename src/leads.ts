@@ -4,7 +4,7 @@ import { logError, logWarning } from './logger';
 import { prisma } from './prisma';
 import { Result, ResultType } from './result';
 import { SchoolName } from './school';
-import { createUUID, uuidToBin } from './uuid';
+import { binToUUID, createUUID, uuidToBin } from './uuid';
 
 export abstract class InsertLeadError extends Error { }
 
@@ -37,7 +37,11 @@ type InsertLeadRequest = {
   mobile: boolean | null;
 };
 
-export const insertLead = async (request: InsertLeadRequest): Promise<ResultType<void>> => {
+type InsertLeadResponse = {
+  leadId: string;
+};
+
+export const insertLead = async (request: InsertLeadRequest): Promise<ResultType<InsertLeadResponse>> => {
   try {
     const prismaNow = fixPrismaWriteDate(getDate());
     const leadId = uuidToBin(createUUID());
@@ -67,7 +71,7 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
       }
     }
 
-    await prisma.lead.create({
+    const lead = await prisma.lead.create({
       data: {
         leadId,
         schoolName: request.school,
@@ -104,7 +108,9 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
       },
     });
 
-    return Result.success(undefined);
+    return Result.success({
+      leadId: binToUUID(lead.leadId),
+    });
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
     return Result.fail(err instanceof Error ? err : Error('unknown error'));
