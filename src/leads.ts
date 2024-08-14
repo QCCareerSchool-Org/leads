@@ -6,9 +6,7 @@ import { Result, ResultType } from './result';
 import { SchoolName } from './school';
 import { binToUUID, createUUID, uuidToBin } from './uuid';
 
-export abstract class InsertLeadError extends Error { }
-
-type InsertLeadRequest = {
+type LeadPayload = {
   ipAddress: string | null;
   school: SchoolName;
   emailAddress: string;
@@ -19,7 +17,7 @@ type InsertLeadRequest = {
   smsOptIn: boolean | null;
   countryCode: string | null;
   provinceCode: string | null;
-  testGroup: number | null;
+  city: string | null;
   gclid: string | null;
   msclkid: string | null;
   marketing?: {
@@ -30,18 +28,17 @@ type InsertLeadRequest = {
     term: string | null;
   };
   courses?: string[];
-  city: string | null;
   browserName: string | null;
   browserVersion: string | null;
   os: string | null;
   mobile: boolean | null;
 };
 
-type InsertLeadResponse = {
+type StoreLeadResponse = {
   leadId: string;
 };
 
-export const insertLead = async (request: InsertLeadRequest): Promise<ResultType<InsertLeadResponse>> => {
+export const storeLead = async (request: LeadPayload): Promise<ResultType<StoreLeadResponse>> => {
   try {
     const prismaNow = fixPrismaWriteDate(getDate());
     const leadId = uuidToBin(createUUID());
@@ -89,7 +86,6 @@ export const insertLead = async (request: InsertLeadRequest): Promise<ResultType
         browserVersion: request.browserVersion,
         os: request.os,
         mobile: request.mobile,
-        testGroup: request.testGroup,
         gclid: request.gclid,
         msclkid: request.msclkid,
         created: prismaNow,

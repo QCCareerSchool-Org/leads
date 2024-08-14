@@ -19,7 +19,7 @@ const logger = winston.createLogger({
       },
       from: config.logEmail.from,
       to: config.logEmail.to,
-      tags: [ 'proof' ],
+      tags: [ 'leads' ],
       level: 'error',
     }),
   ],

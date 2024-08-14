@@ -10,7 +10,13 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Locals {
-      geoLocation?: CityResponse | null;
+      geoLocation?: {
+        countryCode?: string;
+        provinceCode?: string | null;
+        city?: string;
+        latitude?: number;
+        longitude?: number;
+      };
     }
   }
 }
@@ -22,17 +28,30 @@ if (typeof process.env.MMDB_LOCATION === 'undefined') {
 const cityReaderPromise = maxmind.open<CityResponse>(process.env.MMDB_LOCATION);
 
 export const geoLocationMiddleware: RequestHandler = (req, res, next) => {
-  if (!res.locals.ipAddress) {
-    next();
-    return;
+  const ipAddress = res.locals.ipAddress;
+
+  if (!ipAddress) {
+    return next();
   }
+
   cityReaderPromise.then(reader => {
-    if (!res.locals.ipAddress) {
-      throw Error('ip address is missing');
+    const cityResponse = reader.get(ipAddress);
+    if (cityResponse) {
+      const countryCode = cityResponse.country?.iso_code;
+      res.locals.geoLocation = {
+        countryCode: countryCode,
+        provinceCode: needsProvinceCode(countryCode) ? cityResponse.subdivisions?.[0].iso_code : null,
+        city: cityResponse.city?.names.en,
+        latitude: cityResponse.location?.latitude,
+        longitude: cityResponse.location?.latitude,
+      };
     }
-    res.locals.geoLocation = reader.get(res.locals.ipAddress);
     next();
   }).catch(err => {
     logError('Error determining geo location', err);
   });
+};
+
+const needsProvinceCode = (countryCode?: string): boolean => {
+  return countryCode === 'CA' || countryCode === 'US' || countryCode === 'AU';
 };

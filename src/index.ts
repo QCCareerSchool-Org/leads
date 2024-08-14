@@ -31,6 +31,7 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
