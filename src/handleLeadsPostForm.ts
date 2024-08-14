@@ -87,6 +87,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     if (request.lastName) {
       successUrl.searchParams.set('lastName', request.lastName);
     }
+    successUrl.searchParams.set('leadId', storeLeadResponse.value.leadId);
     res.redirect(303, successUrl.href);
   } else {
     logError('Unable to store lead', storeLeadResponse.error.message);
