@@ -16,7 +16,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   if (!validated.success) {
     res.status(400).send(validated.error.message);
-    logError('Validation error', validated.error.message);
+    logError('Validation error', { error: validated.error.message, referrer: req.headers.referer });
     return;
   }
 
@@ -26,7 +26,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   try {
     successUrl = new URL(request.successLocation);
   } catch (err) {
-    logError('Invalid URL', err);
+    logError('Invalid URL', { error: err, referrer: req.headers.referer });
     res.status(400).send(err);
     return;
   }
@@ -38,12 +38,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const attributes = getAttributes(request.school);
 
   if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined)) {
-    logError('Could not create Brevo contact');
+    logError('Could not create Brevo contact', { referrer: req.headers.referer });
   }
 
   if (request.emailTemplateId) {
     if (!await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName)) {
-      logError('Could not send Brevo email');
+      logError('Could not send Brevo email', { referrer: req.headers.referer });
     }
   }
 
@@ -90,7 +90,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     successUrl.searchParams.set('leadId', storeLeadResponse.value.leadId);
     res.redirect(303, successUrl.href);
   } else {
-    logError('Unable to store lead', storeLeadResponse.error.message);
+    logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
     switch (storeLeadResponse.error.constructor) {
       default:
         res.status(500).send(storeLeadResponse.error.message);

@@ -15,7 +15,7 @@ export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<
 
   if (!validated.success) {
     res.status(400).send({ message: validated.error.message });
-    logError('ValidationError', validated.error.message);
+    logError('Validation error', { error: validated.error.message, referrer: req.headers.referer });
     return;
   }
 
@@ -27,12 +27,12 @@ export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<
 
   if (request.brevo) {
     if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, request.brevo.attributes, request.emailOptIn ? request.brevo.listIds : undefined)) {
-      logError('Could not create Brevo contact');
+      logError('Could not create Brevo contact', { referrer: req.headers.referer });
     }
 
     if (request.brevo.emailTemplateId) {
       if (!await sendBrevoEmail(request.brevo.emailTemplateId, request.emailAddress, request.firstName)) {
-        logError('Could not send Brevo email');
+        logError('Could not send Brevo email', { referrer: req.headers.referer });
       }
     }
   }
@@ -62,7 +62,7 @@ export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<
   if (storeLeadResponse.success) {
     res.send(storeLeadResponse.value);
   } else {
-    logError('Unable to store lead', storeLeadResponse.error.message);
+    logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
     switch (storeLeadResponse.error.constructor) {
       default:
         res.status(500).send(storeLeadResponse.error.message);
