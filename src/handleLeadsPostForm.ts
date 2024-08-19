@@ -61,13 +61,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     gclid: request.gclid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     msclkid: request.msclkid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    marketing: {
-      source: request.utmSource ?? null,
-      medium: request.utmMedium ?? null,
-      campaign: request.utmCampaign ?? null,
-      content: request.utmContent ?? null,
-      term: request.utmTerm ?? null,
-    },
+    marketing: request.utmSource || request.utmMedium || request.utmCampaign || request.utmContent || request.utmTerm ? {
+      source: request.utmSource || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+      medium: request.utmMedium || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+      campaign: request.utmCampaign || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+      content: request.utmContent || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+      term: request.utmTerm || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    } : undefined,
     courses: request.courseCodes,
     browserName: res.locals.browser?.name || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
