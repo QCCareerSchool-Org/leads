@@ -16,7 +16,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   if (!validated.success) {
     res.status(400).send(validated.error.message);
-    logError('Validation error', { error: validated.error.message, referrer: req.headers.referer });
+    logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
     return;
   }
 
