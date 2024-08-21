@@ -12,6 +12,11 @@ import type { SchoolName } from './school';
 import { schools } from './school';
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
+  if (typeof req.body.emailAddress === 'undefined') {
+    res.status(200).end();
+    return;
+  }
+
   const validated = await validatePostLeadRequest(req.body);
 
   if (!validated.success) {
@@ -38,12 +43,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const attributes = getAttributes(request.school);
 
   if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined)) {
-    logError('Could not create Brevo contact', { referrer: req.headers.referer });
+    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer });
   }
 
   if (request.emailTemplateId) {
     if (!await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName)) {
-      logError('Could not send Brevo email', { referrer: req.headers.referer });
+      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer });
     }
   }
 
