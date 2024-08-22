@@ -4,8 +4,9 @@ import { zfd } from 'zod-form-data';
 
 import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
+import { fbPostLead } from './facebook';
 import { storeLead } from './leads';
-import { logError } from './logger';
+import { logError, logWarning } from './logger';
 import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
@@ -85,6 +86,24 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   });
 
   if (storeLeadResponse.success) {
+    try {
+      await fbPostLead(
+        storeLeadResponse.value.leadId,
+        new Date(),
+        request.emailAddress,
+        request.firstName,
+        request.lastName,
+        countryCode,
+        req.headers.referer,
+        res.locals.ipAddress ?? undefined,
+        req.headers['user-agent'],
+        req.cookies._fbc,
+        req.cookies._fbp
+      );
+    } catch (err) {
+      logWarning('Error posting Facebook lead', err);
+    }
+
     successUrl.searchParams.set('emailAddress', request.emailAddress);
     successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
     if (request.firstName) {
