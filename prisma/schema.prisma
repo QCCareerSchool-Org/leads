@@ -116,7 +116,6 @@ model Lead {
   browserVersion        String?                @db.VarChar(191)
   os                    String?                @db.VarChar(191)
   mobile                Boolean? 
-  testGroup             Int?                   @db.UnsignedTinyInt()
   gclid                 String?                @db.VarChar(100)
   msclkid               String?                @db.VarChar(1024)
   created               DateTime               @default(now()) @db.DateTime(6)
