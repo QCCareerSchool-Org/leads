@@ -1,10 +1,11 @@
 import { createHash } from 'crypto';
+import { SchoolName } from './school';
 
 const apiVersion = 'v20.0';
-const datasetId = '520626392908502';
 const accessToken = 'EAAMUT7XQ1g0BO5wBaKj6vPYKLZBz0GZBsyGoFaGe6DMK9noiEvjUWfxNy0PKwloAqn7Lpuvi2ZCPwZAENgb2Ie5bwW7Y9ctPhP0MyY7S6ZBlvSuJ6bWHor6DPG7gbZB0FHPeWE7uHLu3WgxYPATgv9aT2H54sPmYMISUyynQxhxRBWvAHmekQyy7tVvOb7QPhvrwZDZD';
 
 export const fbPostLead = async (
+  school: SchoolName,
   eventId: string,
   eventTime: Date,
   emailAddress: string,
@@ -17,6 +18,11 @@ export const fbPostLead = async (
   fbc?: string,
   fbp?: string
 ): Promise<unknown> => {
+  const datasetId = getDatasetID(school);
+  if (datasetId === null) {
+    return;
+  }
+
   const url = `https://graph.facebook.com/${apiVersion}/${datasetId}/events?access_token=${accessToken}`;
 
   const body: { data: LeadConversion[] } = {
@@ -130,4 +136,15 @@ type LeadConversion = {
   user_data: UserData;
   event_source_url?: string;
   event_id: string;
+};
+
+const getDatasetID = (school: SchoolName): string | null => {
+  switch (school) {
+    case 'QC Design School':
+      return '5372705592757225';
+    case 'QC Event School':
+      return '520626392908502';
+    default:
+      return null;
+  }
 };

@@ -88,6 +88,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (storeLeadResponse.success) {
     try {
       await fbPostLead(
+        request.school,
         storeLeadResponse.value.leadId,
         new Date(),
         request.emailAddress,
