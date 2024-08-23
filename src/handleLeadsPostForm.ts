@@ -43,13 +43,15 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const attributes = getAttributes(request.school);
 
-  if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined)) {
-    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer });
+  const createContactResult = await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
+  if (!createContactResult.success) {
+    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
   }
 
   if (request.emailTemplateId) {
-    if (!await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName)) {
-      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer });
+    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName);
+    if (!sendEmailResult.success) {
+      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
     }
   }
 

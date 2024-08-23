@@ -1,4 +1,5 @@
 import * as brevo from '@getbrevo/brevo';
+import { Result, ResultType } from './result';
 
 const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 
@@ -17,7 +18,15 @@ export type BrevoAttributes = {
   STATUS_WRITING_STUDENT?: true;
 };
 
-export const createBrevoContact = async (emailAddress: string, firstName?: string, lastName?: string, countryCode?: string, provinceCode?: string | null, attributes?: BrevoAttributes, listIds?: number[]): Promise<boolean> => {
+export const createBrevoContact = async (
+  emailAddress: string,
+  firstName?: string,
+  lastName?: string,
+  countryCode?: string,
+  provinceCode?: string | null,
+  attributes?: BrevoAttributes,
+  listIds?: number[]
+): Promise<ResultType<void>> => {
   try {
     const contactsApi = new brevo.ContactsApi();
     contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, brevoApiKey);
@@ -46,13 +55,20 @@ export const createBrevoContact = async (emailAddress: string, firstName?: strin
 
     const result = await contactsApi.createContact(body);
 
-    return result.response.complete;
-  } catch {
-    return false;
+    if (result.response.complete) {
+      return Result.success(undefined);
+    }
+
+    return Result.fail(Error(result.response.statusMessage));
+  } catch (err) {
+    if (err instanceof Error) {
+      return Result.fail(err);
+    }
+    return Result.fail(Error('Unknown error'));
   }
 };
 
-export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<boolean> => {
+export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<ResultType<void>> => {
   try {
     const transactionalEmailsApi = new brevo.TransactionalEmailsApi();
     transactionalEmailsApi.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
@@ -66,8 +82,15 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
       // },
     });
 
-    return result.response.complete;
-  } catch {
-    return false;
+    if (result.response.complete) {
+      return Result.success(undefined);
+    }
+
+    return Result.fail(Error(result.response.statusMessage));
+  } catch (err) {
+    if (err instanceof Error) {
+      return Result.fail(err);
+    }
+    return Result.fail(Error('Unknown error'));
   }
 };
