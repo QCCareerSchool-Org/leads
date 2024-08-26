@@ -24,7 +24,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     try {
       const errors = JSON.parse(validated.error.message) as Array<{ validation: string } >;
       if (errors.some(e => e.validation === 'email')) {
-        res.status(400).send('<h1>Invalid Data</h1><p>There appears to be an issue with your email address. Please <a href="javascript:history.back()">go back to the form</p> and verify your email address.</p>');
+        res.status(400).send('<h1>Invalid Data</h1><p>There appears to be an issue with your email address. Please go back to the previous page and verify your email address.</p>');
         return;
       }
     } catch (err) { /* empty */ }
