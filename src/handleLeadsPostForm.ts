@@ -6,7 +6,7 @@ import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
 import { fbPostLead } from './facebook';
 import { storeLead } from './leads';
-import { logError, logWarning } from './logger';
+import { logError } from './logger';
 import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
@@ -104,7 +104,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
         req.cookies._fbp
       );
     } catch (err) {
-      logWarning('Error posting Facebook lead', err);
+      logError('Error posting Facebook lead', err);
     }
 
     successUrl.searchParams.set('emailAddress', request.emailAddress);

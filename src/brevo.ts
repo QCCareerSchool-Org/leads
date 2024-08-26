@@ -76,7 +76,7 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
     const result = await transactionalEmailsApi.sendTransacEmail({
       to: name ? [ { email: emailAddress, name } ] : [ { email: emailAddress } ],
       templateId,
-      params: { name },
+      // params: { name },
       // headers: {
       //   'X-Mailin-custom': 'custom_header_1:custom_value_1|custom_header_2:custom_value_2',
       // },
