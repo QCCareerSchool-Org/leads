@@ -107,6 +107,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       logError('Error posting Facebook lead', err);
     }
 
+    successUrl.searchParams.set('leadId', storeLeadResponse.value.leadId);
     successUrl.searchParams.set('emailAddress', request.emailAddress);
     successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
     if (request.firstName) {
@@ -118,7 +119,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     if (request.lastName) {
       successUrl.searchParams.set('lastName', request.lastName);
     }
-    successUrl.searchParams.set('leadId', storeLeadResponse.value.leadId);
+    if (countryCode) {
+      successUrl.searchParams.set('countryCode', countryCode);
+    }
+    if (provinceCode) {
+      successUrl.searchParams.set('provinceCode', provinceCode);
+    }
     res.redirect(303, successUrl.href);
   } else {
     logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
