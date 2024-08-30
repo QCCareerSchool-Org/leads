@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
@@ -24,7 +25,14 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     try {
       const errors = JSON.parse(validated.error.message) as Array<{ validation: string } >;
       if (errors.some(e => e.validation === 'email')) {
-        res.status(400).send('<h1>Invalid Data</h1><p>There appears to be an issue with your email address. Please go back to the previous page and verify your email address.</p>');
+        let message = '<h1>Invalid Data</h1>';
+        message += '<p>There appears to be an issue with your email address. We received "' + escapeHtml(req.body.emailAddress) + '".';
+        if (typeof req.body.emailAddress === 'string' && !req.body.emailAddress.includes('.')) {
+          message += ' Are you missing a TLD like ".com"?';
+        }
+        message += '</p>';
+        message += '<p>Please go back to the previous page and verify that you entered the correct address.</p>';
+        res.status(400).send(message);
         return;
       }
     } catch (err) { /* empty */ }
