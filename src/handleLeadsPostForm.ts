@@ -26,7 +26,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       const errors = JSON.parse(validated.error.message) as Array<{ validation: string } >;
       if (errors.some(e => e.validation === 'email')) {
         let message = '<h1>Invalid Data</h1>';
-        message += '<p>There appears to be an issue with your email address. We received "' + escapeHtml(req.body.emailAddress) + '".';
+        message += '<p>There appears to be an issue with your email address. We received <strong>"' + escapeHtml(req.body.emailAddress) + '"</strong>.';
         if (typeof req.body.emailAddress === 'string' && !req.body.emailAddress.includes('.')) {
           message += ' Are you missing a TLD like ".com"?';
         }
