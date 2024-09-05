@@ -43,16 +43,16 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const request = validated.value;
 
-  // const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
-  // if (captchaResult.success) {
-  //   if (!captchaResult.value) {
-  //     logError('Captcha check failed');
-  //     res.status(400).send('captcha check failed');
-  //     return;
-  //   }
-  // } else {
-  //   logError(captchaResult.error.message);
-  // }
+  const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
+  if (captchaResult.success) {
+    if (!captchaResult.value) {
+      logError('Captcha check failed');
+      res.status(400).send('captcha check failed');
+      return;
+    }
+  } else {
+    logError(captchaResult.error.message);
+  }
 
   let successUrl: URL;
   try {

@@ -57,6 +57,7 @@ export const validateCaptcha = async (token: string, remoteIp?: string | null): 
       console.log(validationResult);
       return Result.fail(Error('Invalid reCaptcha response body'));
     }
+    console.log(validationResult);
     return Result.success(validationResult.success);
   } catch (err) {
     return Result.fail(Error('Unknown reCaptcha error'));
