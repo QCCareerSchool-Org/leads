@@ -4,4 +4,4 @@ const log: Prisma.LogLevel[] = process.env.NODE_ENV !== 'production'
   ? [ 'query', 'info', 'warn', 'error' ]
   : [];
 
-export const prisma = new PrismaClient({ log });
+export const prisma = new PrismaClient();

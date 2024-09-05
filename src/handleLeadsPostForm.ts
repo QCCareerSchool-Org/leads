@@ -7,6 +7,7 @@ import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError } from './logger';
+import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
@@ -41,6 +42,17 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   const request = validated.value;
+
+  const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
+  if (captchaResult.success) {
+    if (!captchaResult.value) {
+      logError('Captcha check failed');
+      res.status(400).send('captcha check failed');
+      return;
+    }
+  } else {
+    logError(captchaResult.error.message);
+  }
 
   let successUrl: URL;
   try {
@@ -162,28 +174,30 @@ type PostLeadRequest = {
   emailTemplateId?: number;
   listId?: number;
   nonce?: string;
+  'g-recaptcha-response': string;
 };
 
 const schema = zfd.formData({
-  school: zfd.text(z.enum(schools)),
-  successLocation: zfd.text(z.string().regex(/^http(s?):\/\//ui)),
-  emailAddress: zfd.text(z.string().email()),
-  firstName: zfd.text(z.string().max(191).optional()),
-  lastName: zfd.text(z.string().max(191).optional()),
-  telephoneNumber: zfd.text(z.string().optional()),
-  emailOptIn: zfd.checkbox(),
-  smsOptIn: zfd.checkbox(),
-  gclid: zfd.text(z.string().optional()),
-  msclkid: zfd.text(z.string().optional()),
-  utmSource: zfd.text(z.string().optional()),
-  utmMedium: zfd.text(z.string().optional()),
-  utmCampaign: zfd.text(z.string().optional()),
-  utmContent: zfd.text(z.string().optional()),
-  utmTerm: zfd.text(z.string().optional()),
-  courseCodes: zfd.repeatableOfType(z.string()).optional(),
-  emailTemplateId: zfd.numeric(z.number().optional()),
-  listId: zfd.numeric(z.number().multipleOf(1).optional()),
-  nonce: zfd.text(z.string().uuid().optional()),
+  'school': zfd.text(z.enum(schools)),
+  'successLocation': zfd.text(z.string().regex(/^http(s?):\/\//ui)),
+  'emailAddress': zfd.text(z.string().email()),
+  'firstName': zfd.text(z.string().max(191).optional()),
+  'lastName': zfd.text(z.string().max(191).optional()),
+  'telephoneNumber': zfd.text(z.string().optional()),
+  'emailOptIn': zfd.checkbox(),
+  'smsOptIn': zfd.checkbox(),
+  'gclid': zfd.text(z.string().optional()),
+  'msclkid': zfd.text(z.string().optional()),
+  'utmSource': zfd.text(z.string().optional()),
+  'utmMedium': zfd.text(z.string().optional()),
+  'utmCampaign': zfd.text(z.string().optional()),
+  'utmContent': zfd.text(z.string().optional()),
+  'utmTerm': zfd.text(z.string().optional()),
+  'courseCodes': zfd.repeatableOfType(z.string()).optional(),
+  'emailTemplateId': zfd.numeric(z.number().optional()),
+  'listId': zfd.numeric(z.number().multipleOf(1).optional()),
+  'nonce': zfd.text(z.string().uuid().optional()),
+  'g-recaptcha-response': zfd.text(),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<ResultType<PostLeadRequest>> => {

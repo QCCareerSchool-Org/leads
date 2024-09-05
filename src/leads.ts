@@ -42,9 +42,7 @@ export type StoredLead = {
 export const getLeadByNonce = async (nonce: string): Promise<ResultType<StoredLead | false>> => {
   try {
     const nonceBin = uuidToBin(nonce);
-    console.log(nonce);
     const lead = await prisma.lead.findFirst({ where: { nonce: nonceBin } });
-    console.log(lead);
     if (lead) {
       return Result.success({
         leadId: binToUUID(lead.leadId),
