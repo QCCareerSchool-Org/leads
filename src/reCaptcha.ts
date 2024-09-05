@@ -50,7 +50,7 @@ export const validateCaptcha = async (token: string, remoteIp?: string | null): 
       body: new URLSearchParams(body),
     });
     if (!response.ok) {
-      return Result.fail(Error('reCaptcha request error'));
+      return Result.fail(Error('reCaptcha http request error'));
     }
     const validationResult = await response.json();
     if (!isReCaptchaResponse(validationResult)) {

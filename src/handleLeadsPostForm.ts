@@ -43,17 +43,15 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const request = validated.value;
 
-  if (request.emailAddress.endsWith('@qccareerschool.com')) {
-    const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
-    if (captchaResult.success) {
-      if (!captchaResult.value.success) {
-        logError('Captcha check failed', captchaResult.value);
-        res.status(400).send('captcha check failed');
-        return;
-      }
-    } else {
-      logError(captchaResult.error.message);
+  const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
+  if (captchaResult.success) {
+    if (!captchaResult.value.success) {
+      logError('Captcha validation failed', captchaResult.value);
+      res.status(400).send('captcha validation failed');
+      return;
     }
+  } else {
+    logError(captchaResult.error.message);
   }
 
   let successUrl: URL;
