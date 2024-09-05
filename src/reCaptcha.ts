@@ -35,7 +35,7 @@ const isReCaptchaResponse = (obj: unknown): obj is ReCaptchaResponse => {
     (!('hostname' in obj) || ('hostname' in obj && typeof obj.hostname === 'string'));
 };
 
-export const validateCaptcha = async (token: string, remoteIp?: string | null): Promise<ResultType<boolean>> => {
+export const validateCaptcha = async (token: string, remoteIp?: string | null): Promise<ResultType<ReCaptchaResponse>> => {
   try {
     const body: ReCaptchaRequest = {
       secret: secretKey,
@@ -54,11 +54,9 @@ export const validateCaptcha = async (token: string, remoteIp?: string | null): 
     }
     const validationResult = await response.json();
     if (!isReCaptchaResponse(validationResult)) {
-      console.log(validationResult);
       return Result.fail(Error('Invalid reCaptcha response body'));
     }
-    console.log(validationResult);
-    return Result.success(validationResult.success);
+    return Result.success(validationResult);
   } catch (err) {
     return Result.fail(Error('Unknown reCaptcha error'));
   }
