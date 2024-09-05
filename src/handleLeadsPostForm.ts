@@ -46,7 +46,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
   if (captchaResult.success) {
     if (!captchaResult.value.success) {
-      logError('Captcha validation failed', { body: req.body, referrer: req.headers.referer, captchaResponse: captchaResult.value });
+      logError('Captcha validation failed', { body: req.body, referrer: req.headers.referer, captchaResponse: captchaResult.value, captchaErrorCodes: captchaResult.value['error-codes'] });
       res.status(400).send('captcha validation failed');
       return;
     }
