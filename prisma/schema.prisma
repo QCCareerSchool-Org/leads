@@ -119,6 +119,7 @@ model Lead {
   gclid                 String?                @db.VarChar(100)
   msclkid               String?                @db.VarChar(1024)
   created               DateTime               @default(now()) @db.DateTime(6)
+  nonce                 Bytes?                 @db.Binary(16)
   country               Country?               @relation(fields: [countryCode], references: [code], onDelete: Cascade, map: "FK_leads_general.countries")
   province              Province?              @relation(fields: [countryCode, provinceCode], references: [countryCode, code], onDelete: Cascade, map: "FK_leads_general.provinces")
   school                School                 @relation(fields: [schoolName], references: [name], onDelete: Cascade, map: "FK_leads_general.schools")
@@ -128,6 +129,7 @@ model Lead {
   @@map("leads")
   @@schema("leads")
   @@index([schoolName])
+  @@index([nonce])
   @@index([countryCode, provinceCode], map: "countryCodeProvinceCode")
 }
 

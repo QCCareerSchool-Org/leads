@@ -32,13 +32,30 @@ type LeadPayload = {
   browserVersion: string | null;
   os: string | null;
   mobile: boolean | null;
+  nonce?: string;
 };
 
-type StoreLeadResponse = {
+export type StoredLead = {
   leadId: string;
 };
 
-export const storeLead = async (request: LeadPayload): Promise<ResultType<StoreLeadResponse>> => {
+export const getLeadByNonce = async (nonce: string): Promise<ResultType<StoredLead | false>> => {
+  try {
+    const nonceBin = uuidToBin(nonce);
+    const lead = await prisma.lead.findFirst({ where: { nonce: nonceBin } });
+    if (lead) {
+      return Result.success({
+        leadId: binToUUID(lead.leadId),
+      });
+    }
+    return Result.success(false);
+  } catch (err) {
+    logError('error checking nonce', err instanceof Error ? err.message : err);
+    return Result.fail(err instanceof Error ? err : Error('unknown error'));
+  }
+};
+
+export const storeLead = async (request: LeadPayload): Promise<ResultType<StoredLead>> => {
   try {
     const prismaNow = fixPrismaWriteDate(getDate());
     const leadId = uuidToBin(createUUID());
@@ -101,6 +118,7 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<StoreL
             term: request.marketing.term,
           },
         },
+        nonce: typeof request.nonce === 'undefined' ? null : uuidToBin(request.nonce),
       },
     });
 

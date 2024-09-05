@@ -5,7 +5,7 @@ import { zfd } from 'zod-form-data';
 
 import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
-import { storeLead } from './leads';
+import { getLeadByNonce, storeLead } from './leads';
 import { logError } from './logger';
 import type { ResultType } from './result';
 import { Result } from './result';
@@ -23,7 +23,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (!validated.success) {
     logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
     try {
-      const errors = JSON.parse(validated.error.message) as Array<{ validation: string } >;
+      const errors = JSON.parse(validated.error.message) as Array<{ validation: string }>;
       if (errors.some(e => e.validation === 'email')) {
         let message = '<h1>Invalid Data</h1>';
         message += '<p>There appears to be an issue with your email address. We received <strong>"' + escapeHtml(req.body.emailAddress) + '"</strong>.';
@@ -55,6 +55,34 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const provinceCode = res.locals.geoLocation?.provinceCode;
   const city = res.locals.geoLocation?.city;
 
+  successUrl.searchParams.set('emailAddress', request.emailAddress);
+  successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
+  if (request.firstName) {
+    successUrl.searchParams.set('firstName', request.firstName);
+  }
+  if (request.lastName) {
+    successUrl.searchParams.set('lastName', request.lastName);
+  }
+  if (request.lastName) {
+    successUrl.searchParams.set('lastName', request.lastName);
+  }
+  if (countryCode) {
+    successUrl.searchParams.set('countryCode', countryCode);
+  }
+  if (provinceCode) {
+    successUrl.searchParams.set('provinceCode', provinceCode);
+  }
+
+  // don't do any processing if we've already recorded a lead with this nonce
+  if (request.nonce) {
+    const leadResult = await getLeadByNonce(request.nonce);
+    if (leadResult.success && leadResult.value !== false) {
+      successUrl.searchParams.set('leadId', leadResult.value.leadId);
+      res.redirect(303, successUrl.href);
+      return;
+    }
+  }
+
   const attributes = getAttributes(request.school);
 
   const createContactResult = await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
@@ -79,7 +107,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     : undefined;
 
-  const storeLeadResponse = await storeLead({
+  const newLeadResult = await storeLead({
     ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     school: request.school,
     emailAddress: request.emailAddress,
@@ -99,33 +127,17 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     mobile: res.locals.browser?.mobile ?? null,
+    nonce: request.nonce,
   });
 
-  if (storeLeadResponse.success) {
-    successUrl.searchParams.set('leadId', storeLeadResponse.value.leadId);
-    successUrl.searchParams.set('emailAddress', request.emailAddress);
-    successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
-    if (request.firstName) {
-      successUrl.searchParams.set('firstName', request.firstName);
-    }
-    if (request.lastName) {
-      successUrl.searchParams.set('lastName', request.lastName);
-    }
-    if (request.lastName) {
-      successUrl.searchParams.set('lastName', request.lastName);
-    }
-    if (countryCode) {
-      successUrl.searchParams.set('countryCode', countryCode);
-    }
-    if (provinceCode) {
-      successUrl.searchParams.set('provinceCode', provinceCode);
-    }
+  if (newLeadResult.success) {
+    successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
     res.redirect(303, successUrl.href);
   } else {
-    logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
-    switch (storeLeadResponse.error.constructor) {
+    logError('Unable to store lead', { error: newLeadResult.error.message, referrer: req.headers.referer });
+    switch (newLeadResult.error.constructor) {
       default:
-        res.status(500).send(storeLeadResponse.error.message);
+        res.status(500).send(newLeadResult.error.message);
     }
   }
 };
@@ -149,6 +161,7 @@ type PostLeadRequest = {
   courseCodes?: string[];
   emailTemplateId?: number;
   listId?: number;
+  nonce?: string;
 };
 
 const schema = zfd.formData({
@@ -170,6 +183,7 @@ const schema = zfd.formData({
   courseCodes: zfd.repeatableOfType(z.string()).optional(),
   emailTemplateId: zfd.numeric(z.number().optional()),
   listId: zfd.numeric(z.number().multipleOf(1).optional()),
+  nonce: zfd.text(z.string().uuid().optional()),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<ResultType<PostLeadRequest>> => {
