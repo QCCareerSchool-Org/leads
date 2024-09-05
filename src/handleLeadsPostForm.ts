@@ -83,20 +83,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
   }
 
-  const attributes = getAttributes(request.school);
-
-  const createContactResult = await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
-  if (!createContactResult.success) {
-    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
-  }
-
-  if (request.emailTemplateId) {
-    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName);
-    if (!sendEmailResult.success) {
-      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
-    }
-  }
-
   const marketing = request.utmSource || request.utmMedium || request.utmCampaign || request.utmContent || request.utmTerm
     ? {
       source: request.utmSource || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
@@ -129,6 +115,20 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     mobile: res.locals.browser?.mobile ?? null,
     nonce: request.nonce,
   });
+
+  const attributes = getAttributes(request.school);
+
+  const createContactResult = await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
+  if (!createContactResult.success) {
+    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
+  }
+
+  if (request.emailTemplateId) {
+    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName);
+    if (!sendEmailResult.success) {
+      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
+    }
+  }
 
   if (newLeadResult.success) {
     successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
