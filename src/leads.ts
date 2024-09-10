@@ -100,6 +100,7 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
         city: request.city,
         provinceCode,
         countryCode,
+        referrer: request.referrer,
         browserName: request.browserName,
         browserVersion: request.browserVersion,
         os: request.os,
