@@ -11,6 +11,8 @@ import type { SchoolName } from './school';
 import { schools } from './school';
 
 export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<void> => {
+  logError('JSON Endpoint Still Being Used', req.body, req.headers.referer);
+
   if (typeof req.body.emailAddress === 'undefined') {
     res.status(200).end();
     return;
@@ -54,6 +56,7 @@ export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<
     countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     provinceCode: provinceCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    referrer: null,
     gclid: request.gclid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     msclkid: request.msclkid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     marketing: request.marketing,

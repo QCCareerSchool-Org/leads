@@ -18,6 +18,7 @@ type LeadPayload = {
   countryCode: string | null;
   provinceCode: string | null;
   city: string | null;
+  referrer: string | null;
   gclid: string | null;
   msclkid: string | null;
   marketing?: {

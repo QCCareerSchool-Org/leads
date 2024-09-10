@@ -112,6 +112,7 @@ model Lead {
   city                  String?                @db.VarChar(191)
   provinceCode          String?                @db.Char(3)
   countryCode           String?                @db.Char(2)
+  referrer              String?                @db.Text
   browserName           String?                @db.VarChar(191)
   browserVersion        String?                @db.VarChar(191)
   os                    String?                @db.VarChar(191)

@@ -117,6 +117,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     provinceCode: provinceCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    referrer: request.referrer || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     gclid: request.gclid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     msclkid: request.msclkid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     marketing,
@@ -175,6 +176,7 @@ type PostLeadRequest = {
   listId?: number;
   nonce?: string;
   'g-recaptcha-response': string;
+  referrer?: string;
 };
 
 const schema = zfd.formData({
@@ -198,6 +200,7 @@ const schema = zfd.formData({
   'listId': zfd.numeric(z.number().multipleOf(1).optional()),
   'nonce': zfd.text(z.string().uuid().optional()),
   'g-recaptcha-response': zfd.text(),
+  'referrer': zfd.text(z.string().optional()),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<ResultType<PostLeadRequest>> => {
