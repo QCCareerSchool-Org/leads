@@ -17,6 +17,7 @@ import type { SchoolName } from './school';
 import { schools } from './school';
 
 const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
+const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
   if (typeof req.body.emailAddress === 'undefined') {
@@ -31,14 +32,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     try {
       const errors = JSON.parse(validated.error.message) as Array<{ validation: string }>;
       if (errors.some(e => e.validation === 'email')) {
-        let message = '<h1>Invalid Data</h1>';
-        message += '<p>There appears to be an issue with your email address. We received <strong>"' + escapeHtml(req.body.emailAddress) + '"</strong>.';
-        if (typeof req.body.emailAddress === 'string' && !req.body.emailAddress.includes('.')) {
-          message += ' Are you missing a TLD like ".com"?';
-        }
-        message += '</p>';
-        message += '<p>Please go back to the previous page and verify that you entered the correct address.</p>';
-        res.status(400).send(message);
+        res.status(400).send(invalidEmailAddressHtml.replace(/\$\{emailAddress\}/gu, escapeHtml(req.body.emailAddress)));
         return;
       }
     } catch (err) { /* empty */ }

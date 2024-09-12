@@ -1,0 +1,49 @@
+<html>
+
+<head>
+  <title>Captcha Validation Failed</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin: 0 0 1rem;
+    }
+
+    .alert {
+      max-width: 32rem;
+      background-color: #f6dade;
+      color: #421218;
+      padding: 1rem 1rem 0 1rem;
+      border-radius: 0.25rem;
+    }
+
+    a {
+      color: inherit;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="alert">
+    <p><strong>
+        <svg style="position: relative; top: 1.5px;" height="18" fill="#d5343c" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24,4.8C13.397,4.8,4.8,13.397,4.8,24c0,10.604,8.597,19.2,19.2,19.2c10.604,0,19.2-8.597,19.2-19.2
+          C43.2,13.397,34.604,4.8,24,4.8z M0,24C0,10.745,10.745,0,24,0s24,10.745,24,24S37.255,48,24,48S0,37.255,0,24z" />
+          <path d="M24,28.8c-1.325,0-2.399-1.074-2.399-2.399V12c0-1.325,1.074-2.4,2.399-2.4s2.4,1.075,2.4,2.4v14.4
+          C26.4,27.726,25.325,28.8,24,28.8z M20.4,34.8c0-1.986,1.611-3.6,3.6-3.6c1.987,0,3.601,1.613,3.601,3.6
+          c0,1.988-1.613,3.601-3.601,3.601C22.012,38.4,20.4,36.788,20.4,34.8z" />
+        </svg>
+        Invalid email address detected.</strong></p>
+    <p>There appears to be an issue with your email address. We received <strong>${emailAddress}</strong>.
+    <p>To continue, please go back to the previous page and verify that you entered the correct address, including the TLD such as ".com" or ".org".</p>
+  </div>
+</body>
+
+</html>
