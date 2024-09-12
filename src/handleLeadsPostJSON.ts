@@ -2,80 +2,80 @@ import type { Request, Response } from 'express';
 import * as yup from 'yup';
 
 import type { BrevoAttributes } from './brevo';
-import { createBrevoContact, sendBrevoEmail } from './brevo';
-import { storeLead } from './leads';
-import { logError } from './logger';
 import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
 import { schools } from './school';
 
 export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<void> => {
-  logError('JSON Endpoint Still Being Used', req.body, req.headers.referer);
+  await new Promise(resolve => setTimeout(resolve, 8_000));
+  res.status(400).end();
 
-  if (typeof req.body.emailAddress === 'undefined') {
-    res.status(200).end();
-    return;
-  }
+  // logError('JSON Endpoint Still Being Used', req.body, req.headers.referer);
 
-  const validated = await validatePostLeadRequest(req.body);
+  // if (typeof req.body.emailAddress === 'undefined') {
+  //   res.status(200).end();
+  //   return;
+  // }
 
-  if (!validated.success) {
-    res.status(400).send({ message: validated.error.message });
-    logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
-    return;
-  }
+  // const validated = await validatePostLeadRequest(req.body);
 
-  const request = validated.value;
+  // if (!validated.success) {
+  //   res.status(400).send({ message: validated.error.message });
+  //   logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
+  //   return;
+  // }
 
-  const countryCode = res.locals.geoLocation?.countryCode;
-  const provinceCode = res.locals.geoLocation?.provinceCode;
-  const city = res.locals.geoLocation?.city;
+  // const request = validated.value;
 
-  if (request.brevo) {
-    if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, request.brevo.attributes, request.emailOptIn ? request.brevo.listIds : undefined)) {
-      logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer });
-    }
+  // const countryCode = res.locals.geoLocation?.countryCode;
+  // const provinceCode = res.locals.geoLocation?.provinceCode;
+  // const city = res.locals.geoLocation?.city;
 
-    if (request.brevo.emailTemplateId) {
-      if (!await sendBrevoEmail(request.brevo.emailTemplateId, request.emailAddress, request.firstName)) {
-        logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer });
-      }
-    }
-  }
+  // if (request.brevo) {
+  //   if (!await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, request.brevo.attributes, request.emailOptIn ? request.brevo.listIds : undefined)) {
+  //     logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer });
+  //   }
 
-  const storeLeadResponse = await storeLead({
-    ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    school: request.school,
-    emailAddress: request.emailAddress,
-    firstName: request.firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    lastName: request.lastName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    telephoneNumber: request.telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    emailOptIn: request.emailOptIn ?? null,
-    smsOptIn: request.smsOptIn ?? null,
-    countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    provinceCode: provinceCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    referrer: null,
-    gclid: request.gclid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    msclkid: request.msclkid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    marketing: request.marketing,
-    courses: request.courses,
-    browserName: res.locals.browser?.name || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    mobile: res.locals.browser?.mobile ?? null,
-  });
+  //   if (request.brevo.emailTemplateId) {
+  //     if (!await sendBrevoEmail(request.brevo.emailTemplateId, request.emailAddress, request.firstName)) {
+  //       logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer });
+  //     }
+  //   }
+  // }
 
-  if (storeLeadResponse.success) {
-    res.send(storeLeadResponse.value);
-  } else {
-    logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
-    switch (storeLeadResponse.error.constructor) {
-      default:
-        res.status(500).send(storeLeadResponse.error.message);
-    }
-  }
+  // const storeLeadResponse = await storeLead({
+  //   ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   school: request.school,
+  //   emailAddress: request.emailAddress,
+  //   firstName: request.firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   lastName: request.lastName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   telephoneNumber: request.telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   emailOptIn: request.emailOptIn ?? null,
+  //   smsOptIn: request.smsOptIn ?? null,
+  //   countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   provinceCode: provinceCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   referrer: null,
+  //   gclid: request.gclid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   msclkid: request.msclkid || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   marketing: request.marketing,
+  //   courses: request.courses,
+  //   browserName: res.locals.browser?.name || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+  //   mobile: res.locals.browser?.mobile ?? null,
+  // });
+
+  // if (storeLeadResponse.success) {
+  //   res.send(storeLeadResponse.value);
+  // } else {
+  //   logError('Unable to store lead', { error: storeLeadResponse.error.message, referrer: req.headers.referer });
+  //   switch (storeLeadResponse.error.constructor) {
+  //     default:
+  //       res.status(500).send(storeLeadResponse.error.message);
+  //   }
+  // }
 };
 
 type PostLeadRequest = {
