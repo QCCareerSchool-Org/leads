@@ -7,7 +7,8 @@ type ErrorCode =
   | 'missing-input-response' // The response parameter is missing.
   | 'invalid-input-response' // The response parameter is invalid or malformed.
   | 'bad-request' //  The request is invalid or malformed.
-  | 'timeout-or-duplicate'; // The response is no longer valid: either is too old or has been used previously.
+  | 'timeout-or-duplicate' // The response is no longer valid: either is too old or has been used previously.
+  | 'browser-error';
 
 type ReCaptchaResponse = {
   'success': boolean;

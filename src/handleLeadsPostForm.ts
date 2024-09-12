@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
@@ -5,6 +7,7 @@ import { zfd } from 'zod-form-data';
 
 import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
+import { getContactURL } from './contactUrl';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError } from './logger';
 import { validateCaptcha } from './reCaptcha';
@@ -12,6 +15,8 @@ import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
 import { schools } from './school';
+
+const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
   if (typeof req.body.emailAddress === 'undefined') {
@@ -47,6 +52,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (captchaResult.success) {
     if (!captchaResult.value.success) {
       logError('Captcha validation failed', { body: req.body, referrer: req.headers.referer, captchaResponse: captchaResult.value, captchaErrorCodes: captchaResult.value['error-codes'] });
+      if (captchaResult.value['error-codes']?.includes('browser-error')) {
+        res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(request.school)));
+        return;
+      }
       res.status(400).send('captcha validation failed');
       return;
     }
