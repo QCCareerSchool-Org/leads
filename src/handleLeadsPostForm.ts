@@ -14,7 +14,7 @@ import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
 import type { SchoolName } from './school';
-import { schools } from './school';
+import { isSchoolName, schools } from './school';
 
 const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
@@ -28,11 +28,16 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const validated = await validatePostLeadRequest(req.body);
 
   if (!validated.success) {
+    const school = isSchoolName(req.body.school) ? req.body.school : undefined;
     logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
     try {
-      const errors = JSON.parse(validated.error.message) as Array<{ validation: string }>;
-      if (errors.some(e => e.validation === 'email')) {
-        res.status(400).send(invalidEmailAddressHtml.replace(/\$\{emailAddress\}/gu, escapeHtml(req.body.emailAddress)));
+      const errors = JSON.parse(validated.error.message) as Array<{ path: string[] }>;
+      if (errors.some(e => e.path.includes('emailAddress'))) {
+        res.status(400).send(invalidEmailAddressHtml.replace(/\$\{contactUrl\}/gu, getContactURL(school)).replace(/\$\{emailAddress\}/gu, escapeHtml(req.body.emailAddress)));
+        return;
+      }
+      if (errors.some(e => e.path.includes('g-recaptcha-response'))) {
+        res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(school)));
         return;
       }
     } catch (err) { /* empty */ }
