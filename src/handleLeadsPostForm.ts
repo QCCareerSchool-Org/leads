@@ -20,8 +20,9 @@ const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserEr
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
-  if (typeof req.body.emailAddress === 'undefined') {
-    res.status(200).end();
+  if (isBot(req.body)) {
+    await delay(8000);
+    res.status(400).end();
     return;
   }
 
@@ -161,6 +162,23 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
         res.status(500).send(newLeadResult.error.message);
     }
   }
+};
+
+const delay = async (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const isBot = (body: Record<string, string>): boolean => {
+  if (typeof body.emailAddress === 'undefined') {
+    return true;
+  }
+  if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
+    return true;
+  }
+  if (body.lastName.startsWith(body.firstName.substring(0, 9))) {
+    return true;
+  }
+  return false;
 };
 
 type PostLeadRequest = {
