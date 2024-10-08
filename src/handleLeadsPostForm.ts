@@ -168,17 +168,17 @@ const delay = async (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const isBot = (body: Record<string, string>): boolean => {
+const isBot = (body: Record<string, string | undefined>): boolean => {
   if (typeof body.emailAddress === 'undefined') {
     return true;
   }
   if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
     return true;
   }
-  if (body.lastName.startsWith(body.firstName.substring(0, 9))) {
+  if (typeof body.firstName !== 'undefined' && typeof body.lastName !== 'undefined' && body.firstName.length >= 8 && body.lastName.startsWith(body.firstName.substring(0, 9))) {
     return true;
   }
-  if (typeof body.emailOptIn === 'string' && body.emailOptIn !== 'on') {
+  if (typeof body.emailOptIn !== 'undefined' && body.emailOptIn !== 'on') {
     return true;
   }
   return false;
