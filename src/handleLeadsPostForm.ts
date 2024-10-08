@@ -178,6 +178,9 @@ const isBot = (body: Record<string, string>): boolean => {
   if (body.lastName.startsWith(body.firstName.substring(0, 9))) {
     return true;
   }
+  if (typeof body.emailOptIn === 'string' && body.emailOptIn !== 'on') {
+    return true;
+  }
   return false;
 };
 
