@@ -48,6 +48,6 @@ const sendZap = async (payload: Payload, url: string): Promise<void> => {
 
     await response.json();
   } catch (err) {
-    logError('Unable to send zap', err);
+    logError('Unable to send zap', err instanceof Error ? err.message : err);
   }
 };
