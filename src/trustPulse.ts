@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 import { SchoolName } from './domain/school';
 import { logError } from './logger';
 
@@ -39,7 +41,6 @@ const sendZap = async (payload: Payload, url: string): Promise<void> => {
     const response = await fetch(url, {
       method: 'post',
       body: JSON.stringify(payload),
-      cache: 'no-cache',
     });
 
     if (!response.ok) {
