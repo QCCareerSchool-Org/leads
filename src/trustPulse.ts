@@ -37,7 +37,6 @@ type Payload = {
 
 const sendZap = async (payload: Payload, url: string): Promise<void> => {
   try {
-    console.log(`sending to ${url}`, payload);
     const response = await fetch(url, {
       method: 'post',
       body: JSON.stringify(payload),
