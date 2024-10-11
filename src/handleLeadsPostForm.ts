@@ -17,6 +17,7 @@ import { logError } from './logger';
 import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
+import { addTrustPulseLead } from './trustPulse';
 
 const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
@@ -52,6 +53,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const [ firstName, lastName ] = getName(request.firstName, request.lastName);
 
+  // captcha check
   const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
   if (captchaResult.success) {
     if (!captchaResult.value.success) {
@@ -152,6 +154,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
     }
   }
+
+  await addTrustPulseLead(request.school, request.emailAddress, firstName, res.locals.ipAddress);
 
   if (newLeadResult.success) {
     successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
