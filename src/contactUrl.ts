@@ -1,4 +1,4 @@
-import { SchoolName } from './school';
+import { SchoolName } from './domain/school';
 
 export const getContactURL = (school?: SchoolName): string => {
   switch (school) {

@@ -3,7 +3,7 @@ import { parseIpAddress } from './ipAddress';
 import { logError, logWarning } from './logger';
 import { prisma } from './prisma';
 import { Result, ResultType } from './result';
-import { SchoolName } from './school';
+import { SchoolName } from './domain/school';
 import { binToUUID, createUUID, uuidToBin } from './uuid';
 
 type LeadPayload = {

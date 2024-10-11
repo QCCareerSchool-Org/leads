@@ -8,13 +8,15 @@ import { zfd } from 'zod-form-data';
 import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
 import { getContactURL } from './contactUrl';
+import { PostLeadRequest } from './domain/postLeadRequest';
+import type { SchoolName } from './domain/school';
+import { isSchoolName, schools } from './domain/school';
+import { getName } from './getName';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError } from './logger';
 import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
-import type { SchoolName } from './school';
-import { isSchoolName, schools } from './school';
 
 const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
@@ -48,6 +50,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const request = validated.value;
 
+  const [ firstName, lastName ] = getName(request.firstName, request.lastName);
+
   const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
   if (captchaResult.success) {
     if (!captchaResult.value.success) {
@@ -78,14 +82,11 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   successUrl.searchParams.set('emailAddress', request.emailAddress);
   successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
-  if (request.firstName) {
-    successUrl.searchParams.set('firstName', request.firstName);
+  if (firstName) {
+    successUrl.searchParams.set('firstName', firstName);
   }
-  if (request.lastName) {
-    successUrl.searchParams.set('lastName', request.lastName);
-  }
-  if (request.lastName) {
-    successUrl.searchParams.set('lastName', request.lastName);
+  if (lastName) {
+    successUrl.searchParams.set('lastName', lastName);
   }
   if (countryCode) {
     successUrl.searchParams.set('countryCode', countryCode);
@@ -118,8 +119,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     school: request.school,
     emailAddress: request.emailAddress,
-    firstName: request.firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    lastName: request.lastName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    firstName: firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    lastName: lastName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     telephoneNumber: request.telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     emailOptIn: request.emailOptIn ?? null,
     smsOptIn: request.smsOptIn ?? null,
@@ -140,13 +141,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const attributes = getAttributes(request.school);
 
-  const createContactResult = await createBrevoContact(request.emailAddress, request.firstName, request.lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
+  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
   if (!createContactResult.success) {
     logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
   }
 
   if (request.emailTemplateId) {
-    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, request.firstName);
+    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
     if (!sendEmailResult.success) {
       logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
     }
@@ -182,30 +183,6 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
     return true;
   }
   return false;
-};
-
-type PostLeadRequest = {
-  school: SchoolName;
-  successLocation: string;
-  emailAddress: string;
-  firstName?: string;
-  lastName?: string;
-  telephoneNumber?: string;
-  emailOptIn?: boolean;
-  smsOptIn?: boolean;
-  gclid?: string;
-  msclkid?: string;
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  utmContent?: string;
-  utmTerm?: string;
-  courseCodes?: string[];
-  emailTemplateId?: number;
-  listId?: number;
-  nonce?: string;
-  'g-recaptcha-response': string;
-  referrer?: string;
 };
 
 const schema = zfd.formData({
