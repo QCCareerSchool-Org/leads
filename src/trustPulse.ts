@@ -5,7 +5,7 @@ const zapierEndpoints: Record<SchoolName, string | undefined> = {
   'QC Design School': 'https://hooks.zapier.com/hooks/catch/1909320/35z5cnc',
   'QC Event School': 'https://hooks.zapier.com/hooks/catch/1909320/35clg2t',
   'QC Makeup Academy': 'https://hooks.zapier.com/hooks/catch/1909320/358extf',
-  'QC Pet Studies': 'https://hooks.zapier.com/hooks/catch/1909320/213k723/',
+  'QC Pet Studies': 'https://hooks.zapier.com/hooks/catch/1909320/213k723',
   'QC Wellness Studies': undefined,
   'Winghill Writing School': undefined,
 };
@@ -35,6 +35,7 @@ type Payload = {
 
 const sendZap = async (payload: Payload, url: string): Promise<void> => {
   try {
+    console.log(`sending to ${url}`, payload);
     const response = await fetch(url, {
       method: 'post',
       body: JSON.stringify(payload),
