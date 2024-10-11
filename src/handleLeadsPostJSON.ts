@@ -2,10 +2,10 @@ import type { Request, Response } from 'express';
 import * as yup from 'yup';
 
 import type { BrevoAttributes } from './brevo';
-import type { ResultType } from './result';
-import { Result } from './result';
 import type { SchoolName } from './domain/school';
 import { schools } from './domain/school';
+import type { ResultType } from './result';
+import { Result } from './result';
 
 export const handleLeadsPostJSON = async (req: Request, res: Response): Promise<void> => {
   await new Promise(resolve => setTimeout(resolve, 8_000));
