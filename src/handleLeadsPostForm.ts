@@ -14,10 +14,10 @@ import { isSchoolName, schools } from './domain/school';
 import { getName } from './getName';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError } from './logger';
+import { addProvesrcLead } from './provesrc';
 import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
-import { addTrustPulseLead } from './trustPulse';
 
 const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
@@ -155,7 +155,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
   }
 
-  await addTrustPulseLead(request.school, request.emailAddress, firstName, res.locals.ipAddress);
+  await addProvesrcLead(request.school, request.emailAddress, firstName, res.locals.ipAddress);
 
   if (newLeadResult.success) {
     successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
