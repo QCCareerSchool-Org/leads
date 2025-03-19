@@ -7,6 +7,7 @@ import { asyncWrapper } from './asyncWrapper';
 import config from './config';
 import { globalErrorHandler } from './globalErrorHandler';
 import { handleLeadsPost } from './handleLeadsPost';
+import { handleTelephoneNumberPost } from './handleTelephoneNumberPost';
 import { logInfo } from './logger';
 import { browserDetectMiddleware } from './middleware/browserDetect';
 import { geoLocationMiddleware } from './middleware/geoLocation';
@@ -38,6 +39,7 @@ app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
 
 app.post('/', asyncWrapper(handleLeadsPost));
+app.post('/telephoneNumber', asyncWrapper(handleTelephoneNumberPost));
 app.use(globalErrorHandler);
 
 app.listen(config.port, () => {

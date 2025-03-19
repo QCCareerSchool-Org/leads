@@ -1,9 +1,9 @@
 import { fixPrismaWriteDate, getDate } from './date';
+import { SchoolName } from './domain/school';
 import { parseIpAddress } from './ipAddress';
 import { logError, logWarning } from './logger';
 import { prisma } from './prisma';
 import { Result, ResultType } from './result';
-import { SchoolName } from './domain/school';
 import { binToUUID, createUUID, uuidToBin } from './uuid';
 
 type LeadPayload = {
@@ -34,6 +34,12 @@ type LeadPayload = {
   os: string | null;
   mobile: boolean | null;
   nonce?: string;
+};
+
+type TelephoneNumberPayload = {
+  leadId: string;
+  telephoneCountryCode: number;
+  telephoneNumber: string;
 };
 
 export type StoredLead = {
@@ -127,6 +133,27 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
     return Result.success({
       leadId: binToUUID(lead.leadId),
     });
+  } catch (err) {
+    logError('error inserting lead', err instanceof Error ? err.message : err);
+    return Result.fail(err instanceof Error ? err : Error('unknown error'));
+  }
+};
+
+export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<ResultType<void>> => {
+  try {
+    const leadIdBin = uuidToBin(request.leadId);
+    const prismaNow = fixPrismaWriteDate(getDate());
+
+    await prisma.lead.update({
+      data: {
+        telephoneCountryCode: request.telephoneCountryCode,
+        telephoneNumber: request.telephoneNumber,
+        updated: prismaNow,
+      },
+      where: { leadId: leadIdBin },
+    });
+
+    return Result.success(undefined);
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
     return Result.fail(err instanceof Error ? err : Error('unknown error'));
