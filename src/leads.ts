@@ -38,7 +38,6 @@ type LeadPayload = {
 
 type TelephoneNumberPayload = {
   leadId: string;
-  telephoneCountryCode: number;
   telephoneNumber: string;
 };
 
@@ -139,21 +138,20 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
   }
 };
 
-export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<ResultType<void>> => {
+export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<ResultType<string>> => {
   try {
     const leadIdBin = uuidToBin(request.leadId);
     const prismaNow = fixPrismaWriteDate(getDate());
 
-    await prisma.lead.update({
+    const lead = await prisma.lead.update({
       data: {
-        telephoneCountryCode: request.telephoneCountryCode,
         telephoneNumber: request.telephoneNumber,
         updated: prismaNow,
       },
       where: { leadId: leadIdBin },
     });
 
-    return Result.success(undefined);
+    return Result.success(lead.emailAddress);
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
     return Result.fail(err instanceof Error ? err : Error('unknown error'));

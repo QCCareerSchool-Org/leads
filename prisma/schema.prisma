@@ -106,7 +106,6 @@ model Lead {
   emailAddress          String                 @db.VarChar(255)
   firstName             String?                @db.VarChar(255)
   lastName              String?                @db.VarChar(255)
-  telephoneCountryCode  Int?                   @db.SmallInt()
   telephoneNumber       String?                @db.VarChar(255)
   emailOptIn            Boolean                @default(false)
   smsOptIn              Boolean                @default(false)

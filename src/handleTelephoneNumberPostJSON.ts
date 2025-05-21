@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
+import { createBrevoContact } from './brevo';
 import { PostTelephoneNumberRequest } from './domain/postTelephoneNumberRequest';
 import { updateLeadTelephoneNumber } from './leads';
 import { logError } from './logger';
@@ -19,6 +20,13 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
   const updateResult = await updateLeadTelephoneNumber(request);
 
   if (updateResult.success) {
+    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, request.telephoneNumber);
+    if (!updateContactResult.success) {
+      logError('Could not update Brevo contact', { body: req.body, referrer: req.headers.referer, error: updateContactResult.error });
+    }
+  }
+
+  if (updateResult.success) {
     res.sendStatus(200);
   } else {
     logError('Unable to update lead', { error: updateResult.error.message });
@@ -31,7 +39,6 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
 
 const schema = z.object({
   leadId: z.string().uuid(),
-  telephoneCountryCode: z.number().int().positive(),
   telephoneNumber: z.string(),
 });
 

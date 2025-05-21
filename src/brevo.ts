@@ -25,7 +25,8 @@ export const createBrevoContact = async (
   countryCode?: string,
   provinceCode?: string | null,
   attributes?: BrevoAttributes,
-  listIds?: number[]
+  listIds?: number[],
+  telephoneNumber?: string,
 ): Promise<ResultType<void>> => {
   try {
     const contactsApi = new brevo.ContactsApi();
@@ -51,6 +52,9 @@ export const createBrevoContact = async (
     }
     if (typeof provinceCode !== 'undefined') {
       (body.attributes as Record<string, unknown>).PROVINCE_CODE = provinceCode === null ? '' : provinceCode.toLocaleUpperCase();
+    }
+    if (typeof telephoneNumber !== 'undefined') {
+      (body.attributes as Record<string, unknown>).SMS = telephoneNumber;
     }
 
     const result = await contactsApi.createContact(body);
