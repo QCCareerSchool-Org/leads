@@ -25,6 +25,7 @@ const corsOptions: CorsOptions = {
       /\.winghill\.com$/iu,
     ]
     : '*',
+  allowedHeaders: [ 'content-type' ],
 };
 
 const app = express();
