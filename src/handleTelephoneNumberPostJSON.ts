@@ -20,7 +20,7 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
   const updateResult = await updateLeadTelephoneNumber(request);
 
   if (updateResult.success) {
-    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, request.telephoneNumber);
+    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);
     if (!updateContactResult.success) {
       logError('Could not update Brevo contact', { body: req.body, referrer: req.headers.referer, error: updateContactResult.error });
     }
@@ -40,6 +40,7 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
 const schema = z.object({
   leadId: z.string().uuid(),
   telephoneNumber: z.string(),
+  listId: z.number().int().positive(),
 });
 
 const validateTelephoneNumberRequest = async (requestBody: Request['body']): Promise<ResultType<PostTelephoneNumberRequest>> => {
