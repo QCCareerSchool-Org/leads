@@ -117,8 +117,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     : undefined;
 
-  const telephoneNumber = request.telephoneNumber && /\d{10}/u.test(request.telephoneNumber)
-    ? '+1-' + request.telephoneNumber
+  const telephoneNumber = typeof request.telephoneNumber !== 'undefined' && /\d{10}/u.test(request.telephoneNumber)
+    ? '+1' + request.telephoneNumber
     : request.telephoneNumber;
 
   const newLeadResult = await storeLead({
@@ -147,6 +147,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const attributes = getAttributes(request.school);
 
+  // add "+1" to 10-digit phone numbers
   let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
   if (request.telephoneListId && telephoneNumber) {
     listIds = listIds ?? [];
