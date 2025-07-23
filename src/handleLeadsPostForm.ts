@@ -117,13 +117,17 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     : undefined;
 
+  const telephoneNumber = request.telephoneNumber && /\d{3}-\d{3}-\d{4}/u.test(request.telephoneNumber)
+    ? '+1-' + request.telephoneNumber
+    : request.telephoneNumber;
+
   const newLeadResult = await storeLead({
     ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     school: request.school,
     emailAddress: request.emailAddress,
     firstName: firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     lastName: lastName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
-    telephoneNumber: request.telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    telephoneNumber: telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     emailOptIn: request.emailOptIn ?? null,
     smsOptIn: request.smsOptIn ?? null,
     countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
@@ -143,7 +147,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const attributes = getAttributes(request.school);
 
-  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined);
+  let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
+  if (request.telephoneListId && telephoneNumber) {
+    listIds = listIds ?? [];
+    listIds.push(request.telephoneListId);
+  }
+
+  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
   if (!createContactResult.success) {
     logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
   }
@@ -208,6 +218,7 @@ const schema = zfd.formData({
   'courseCodes': zfd.repeatableOfType(z.string()).optional(),
   'emailTemplateId': zfd.numeric(z.number().optional()),
   'listId': zfd.numeric(z.number().multipleOf(1).optional()),
+  'telephoneListId': zfd.numeric(z.number().multipleOf(1).optional()),
   'nonce': zfd.text(z.string().uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),

@@ -17,7 +17,11 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
 
   const request = validated.value;
 
-  const updateResult = await updateLeadTelephoneNumber(request);
+  const telephoneNumber = /\d{3}-\d{3}-\d{4}/u.test(request.telephoneNumber)
+    ? '+1-' + request.telephoneNumber
+    : request.telephoneNumber;
+
+  const updateResult = await updateLeadTelephoneNumber({ leadId: request.leadId, telephoneNumber });
 
   if (updateResult.success) {
     const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);

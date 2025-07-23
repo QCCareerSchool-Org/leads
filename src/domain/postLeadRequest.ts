@@ -19,6 +19,7 @@ export type PostLeadRequest = {
   courseCodes?: string[];
   emailTemplateId?: number;
   listId?: number;
+  telephoneListId?: number;
   nonce?: string;
   'g-recaptcha-response': string;
   referrer?: string;
