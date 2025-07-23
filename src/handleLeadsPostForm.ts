@@ -117,7 +117,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     : undefined;
 
-  const telephoneNumber = request.telephoneNumber && /\d{3}-\d{3}-\d{4}/u.test(request.telephoneNumber)
+  const telephoneNumber = request.telephoneNumber && /\d{10}/u.test(request.telephoneNumber)
     ? '+1-' + request.telephoneNumber
     : request.telephoneNumber;
 
