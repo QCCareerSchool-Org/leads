@@ -153,7 +153,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     listIds.push(request.telephoneListId);
   }
 
-  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
+  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
   if (!createContactResult.success) {
     logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
   }
