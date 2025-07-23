@@ -17,7 +17,7 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
 
   const request = validated.value;
 
-  const telephoneNumber = /\d{10}/u.test(request.telephoneNumber)
+  const telephoneNumber = /^\d{10}$/u.test(request.telephoneNumber)
     ? '+1' + request.telephoneNumber
     : request.telephoneNumber;
 
