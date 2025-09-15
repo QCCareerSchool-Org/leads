@@ -3,6 +3,8 @@ import { Result, ResultType } from './result';
 
 const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 
+export type Source = 'Facebook';
+
 export type BrevoAttributes = {
   STATUS_DESIGN_LEAD?: true;
   STATUS_DESIGN_STUDENT?: true;
@@ -16,6 +18,7 @@ export type BrevoAttributes = {
   STATUS_WELLNESS_STUDENT?: true;
   STATUS_WRITING_LEAD?: true;
   STATUS_WRITING_STUDENT?: true;
+  SOURCE?: Source;
 };
 
 export const createBrevoContact = async (

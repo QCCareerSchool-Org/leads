@@ -147,6 +147,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const attributes = getAttributes(request.school);
 
+  if (request.referrer && /facebook/iu.test(request.referrer)) {
+    attributes.SOURCE = 'Facebook';
+  }
+
   // add "+1" to 10-digit phone numbers
   let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
   if (request.telephoneListId && telephoneNumber) {
