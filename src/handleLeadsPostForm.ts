@@ -161,6 +161,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
   if (!createContactResult.success) {
     logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
+    // make a second attempt without the telephone number
+    if (telephoneNumber) {
+      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
+      if (!createContactResult2.success) {
+        logError('Could not create Brevo contact without telephone number either', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
+      }
+    }
   }
 
   if (request.emailTemplateId) {
