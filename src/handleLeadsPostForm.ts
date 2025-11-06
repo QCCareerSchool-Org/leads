@@ -208,6 +208,9 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   if (typeof body.emailOptIn !== 'undefined' && body.emailOptIn !== 'on') {
     return true;
   }
+  if (body.countryCode === 'RU') {
+    return true;
+  }
   return false;
 };
 
