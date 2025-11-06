@@ -20,7 +20,7 @@ const logger = winston.createLogger({
       from: config.logEmail.from,
       to: config.logEmail.to,
       tags: [ 'leads' ],
-      level: 'error',
+      level: 'warning',
     }),
   ],
 });
