@@ -24,12 +24,6 @@ const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserEr
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
-  if (isBot(req.body)) {
-    await delay(8000);
-    res.status(400).end();
-    return;
-  }
-
   const validated = await validatePostLeadRequest(req.body);
 
   if (!validated.success) {
@@ -52,6 +46,21 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const request = validated.value;
 
+  let successUrl: URL;
+  try {
+    successUrl = new URL(request.successLocation);
+  } catch (err) {
+    logError('Invalid URL', { error: err, referrer: req.headers.referer });
+    res.status(400).send(err);
+    return;
+  }
+
+  if (isBot(req.body)) {
+    await delay(8000);
+    res.redirect(303, successUrl.href);
+    return;
+  }
+
   const [ firstName, lastName ] = getName(request.firstName, request.lastName);
 
   // captcha check
@@ -68,15 +77,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
   } else {
     logError(captchaResult.error.message);
-  }
-
-  let successUrl: URL;
-  try {
-    successUrl = new URL(request.successLocation);
-  } catch (err) {
-    logError('Invalid URL', { error: err, referrer: req.headers.referer });
-    res.status(400).send(err);
-    return;
   }
 
   const countryCode = res.locals.geoLocation?.countryCode;
