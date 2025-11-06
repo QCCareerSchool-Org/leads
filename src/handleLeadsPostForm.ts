@@ -12,8 +12,9 @@ import { PostLeadRequest } from './domain/postLeadRequest';
 import type { SchoolName } from './domain/school';
 import { isSchoolName, schools } from './domain/school';
 import { getName } from './getName';
+import { isGibberish } from './isGiberish';
 import { getLeadByNonce, storeLead } from './leads';
-import { logError } from './logger';
+import { logError, logWarning } from './logger';
 import { addProvesrcLead } from './provesrc';
 import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
@@ -211,8 +212,28 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   if (body.countryCode === 'RU') {
     return true;
   }
+  if (typeof body.firstName !== 'undefined') {
+    if (body.firstName.length <= 1) {
+      return true;
+    }
+    if (isGibberish(body.firstName)) {
+      logWarning('Gibberish detected', body);
+      return true;
+    }
+  }
+  if (typeof body.lastName !== 'undefined') {
+    if (body.lastName.length <= 1) {
+      return true;
+    }
+    if (isGibberish(body.lastName)) {
+      logWarning('Gibberish detected', body);
+      return true;
+    }
+  }
   return false;
 };
+
+const uppercaseCount = (str: string): number => (str.match(/[A-Z]/gu) ?? []).length;
 
 const schema = zfd.formData({
   'school': zfd.text(z.enum(schools)),
