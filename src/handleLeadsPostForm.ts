@@ -233,8 +233,6 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   return false;
 };
 
-const uppercaseCount = (str: string): number => (str.match(/[A-Z]/gu) ?? []).length;
-
 const schema = zfd.formData({
   'school': zfd.text(z.enum(schools)),
   'successLocation': zfd.text(z.string().regex(/^http(s?):\/\//ui)),
