@@ -212,7 +212,7 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   if (body.countryCode === 'RU') {
     return true;
   }
-  if (typeof body.firstName !== 'undefined') {
+  if (body.firstName) {
     if (body.firstName.length <= 1) {
       return true;
     }
@@ -221,7 +221,7 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
       return true;
     }
   }
-  if (typeof body.lastName !== 'undefined') {
+  if (body.lastName) {
     if (body.lastName.length <= 1) {
       return true;
     }
