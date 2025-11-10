@@ -200,6 +200,10 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   if (typeof body.emailAddress === 'undefined') {
     return true;
   }
+  if (typeof body.city !== undefined) {
+    logWarning('Hidden city field filled', body);
+    return true;
+  }
   if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
     return true;
   }
@@ -239,6 +243,7 @@ const schema = zfd.formData({
   'emailAddress': zfd.text(z.string().email()),
   'firstName': zfd.text(z.string().max(191).optional()),
   'lastName': zfd.text(z.string().max(191).optional()),
+  'city': zfd.text(z.string().max(64).optional()),
   'telephoneNumber': zfd.text(z.string().optional()),
   'emailOptIn': zfd.checkbox(),
   'smsOptIn': zfd.checkbox(),
