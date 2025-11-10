@@ -55,7 +55,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     return;
   }
 
-  if (isBot(req.body)) {
+  if (isBot(req.body, res.locals.ipAddress)) {
     await delay(8000);
     res.redirect(303, successUrl.href);
     return;
@@ -196,12 +196,12 @@ const delay = async (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-const isBot = (body: Record<string, string | undefined>): boolean => {
+const isBot = (body: Record<string, string | undefined>, ipAddress: string | null): boolean => {
   if (typeof body.emailAddress === 'undefined') {
     return true;
   }
   if (body.city) {
-    logWarning('Hidden city field filled', body);
+    logWarning('Hidden city field filled', body && { ipAddress });
     return true;
   }
   if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
@@ -221,7 +221,7 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
       return true;
     }
     if (isGibberish(body.firstName)) {
-      logWarning('Gibberish detected', body);
+      logWarning('Gibberish detected', body && { ipAddress });
       return true;
     }
   }
@@ -230,7 +230,7 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
       return true;
     }
     if (isGibberish(body.lastName)) {
-      logWarning('Gibberish detected', body);
+      logWarning('Gibberish detected', body && { ipAddress });
       return true;
     }
   }
