@@ -201,7 +201,7 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
     return true;
   }
   if (body.city) {
-    logWarning('Hidden city field filled', body && { ipAddress });
+    logWarning('Hidden city field filled', { ...body, ipAddress });
     return true;
   }
   if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
@@ -221,7 +221,7 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
       return true;
     }
     if (isGibberish(body.firstName)) {
-      logWarning('Gibberish detected', body && { ipAddress });
+      logWarning('Gibberish detected', { ...body, ipAddress });
       return true;
     }
   }
@@ -230,7 +230,7 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
       return true;
     }
     if (isGibberish(body.lastName)) {
-      logWarning('Gibberish detected', body && { ipAddress });
+      logWarning('Gibberish detected', { ...body, ipAddress });
       return true;
     }
   }
