@@ -200,7 +200,7 @@ const isBot = (body: Record<string, string | undefined>): boolean => {
   if (typeof body.emailAddress === 'undefined') {
     return true;
   }
-  if (typeof body.city !== undefined) {
+  if (body.city) {
     logWarning('Hidden city field filled', body);
     return true;
   }
