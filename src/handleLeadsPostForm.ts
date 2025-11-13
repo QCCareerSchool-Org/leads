@@ -12,7 +12,7 @@ import { PostLeadRequest } from './domain/postLeadRequest';
 import type { SchoolName } from './domain/school';
 import { isSchoolName, schools } from './domain/school';
 import { getName } from './getName';
-import { isGibberish } from './isGiberish';
+import { isGibberish } from './isGibberish';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError, logWarning } from './logger';
 import { addProvesrcLead } from './provesrc';

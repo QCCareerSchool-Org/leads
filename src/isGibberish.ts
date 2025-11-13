@@ -2,6 +2,7 @@ export const isGibberish = (input: string): boolean => {
   // Keep letters for analysis
   const letters = (input || '').replace(/[^A-Za-z]/gu, '');
   const n = letters.length;
+  const stripped = (input || '').replace(/[^A-Za-z ]/gu, '');
 
   // 1) Don’t judge short strings; and whitelist normal Title-Case names
   if (n < 8) {
@@ -32,8 +33,8 @@ export const isGibberish = (input: string): boolean => {
   // Longest consonant run
   let run = 0;
   let maxRun = 0;
-  for (const ch of letters) {
-    if (/[AEIOUaeiou]/u.test(ch)) {
+  for (const ch of stripped) {
+    if (/[AEIOUaeiou ]/u.test(ch)) {
       run = 0;
     } else {
       run++;
