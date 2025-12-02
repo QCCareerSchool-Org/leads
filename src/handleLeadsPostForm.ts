@@ -203,7 +203,8 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
     }
     if (key.startsWith('hp_')) {
       if (body[key]) {
-        logWarning('Honeypot field filled', { ...body, ipAddress });
+        const formUrl = getFormUrl(body);
+        logWarning('Honeypot field filled', { ...body, formUrl, ipAddress });
         return true;
       }
     }
@@ -229,7 +230,8 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
       return true;
     }
     if (isGibberish(body.firstName)) {
-      logWarning('Gibberish detected', { ...body, ipAddress });
+      const formUrl = getFormUrl(body);
+      logWarning('Gibberish detected', { ...body, formUrl, ipAddress });
       return true;
     }
   }
@@ -238,7 +240,8 @@ const isBot = (body: Record<string, string | undefined>, ipAddress: string | nul
       return true;
     }
     if (isGibberish(body.lastName)) {
-      logWarning('Gibberish detected', { ...body, ipAddress });
+      const formUrl = getFormUrl(body);
+      logWarning('Gibberish detected', { ...body, formUrl, ipAddress });
       return true;
     }
   }
@@ -297,4 +300,31 @@ const getAttributes = (schoolName: SchoolName): BrevoAttributes => {
     case 'Winghill Writing School':
       return { STATUS_WRITING_LEAD: true };
   }
+};
+
+const getFormUrl = (body: Record<string, string | undefined>): string | undefined => {
+  if (!body.currentPage) {
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (body.gclid) {
+    params.append('gclid', body.gclid);
+  }
+  if (body.msclkid) {
+    params.append('msclkid', body.msclkid);
+  }
+  if (body.utmSource) {
+    params.append('utm_source', body.utmSource);
+  }
+  if (body.utmMedium) {
+    params.append('utm_medium', body.utmMedium);
+  }
+  if (body.utmCampaign) {
+    params.append('utm_campaign', body.utmCampaign);
+  }
+  if (body.utmTerm) {
+    params.append('utm_term', body.utmTerm);
+  }
+  return `${body.currentPage}?${params.toString()}`;
 };
