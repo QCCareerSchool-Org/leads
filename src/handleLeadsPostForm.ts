@@ -61,8 +61,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     return;
   }
 
-  const [ firstName, lastName ] = getName(request.firstName, request.lastName);
-
   // captcha check
   const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
   if (captchaResult.success) {
@@ -82,6 +80,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const countryCode = res.locals.geoLocation?.countryCode;
   const provinceCode = res.locals.geoLocation?.provinceCode;
   const city = res.locals.geoLocation?.city;
+
+  const [ firstName, lastName ] = getName(request.firstName, request.lastName);
 
   successUrl.searchParams.set('emailAddress', request.emailAddress);
   successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
@@ -197,11 +197,17 @@ const delay = async (ms: number): Promise<void> => {
 };
 
 const isBot = (body: Record<string, string | undefined>, ipAddress: string | null): boolean => {
-  if (typeof body.emailAddress === 'undefined') {
-    return true;
+  for (const key in body) {
+    if (!Object.hasOwn(body, key)) {
+      continue;
+    }
+    if (key.startsWith('hp_')) {
+      logWarning('Honeypot field filled', { ...body, ipAddress });
+      return true;
+    }
   }
-  if (body.hp_city) {
-    logWarning('Hidden city field filled', { ...body, ipAddress });
+
+  if (typeof body.emailAddress === 'undefined') {
     return true;
   }
   if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
