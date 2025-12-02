@@ -197,15 +197,17 @@ const delay = async (ms: number): Promise<void> => {
 };
 
 const isBot = (body: Record<string, string | undefined>, ipAddress: string | null): boolean => {
-  // for (const key in body) {
-  //   if (!Object.hasOwn(body, key)) {
-  //     continue;
-  //   }
-  //   if (key.startsWith('hp_')) {
-  //     logWarning('Honeypot field filled', { ...body, ipAddress });
-  //     return true;
-  //   }
-  // }
+  for (const key in body) {
+    if (!Object.hasOwn(body, key)) {
+      continue;
+    }
+    if (key.startsWith('hp_')) {
+      if (body[key]) {
+        logWarning('Honeypot field filled', { ...body, ipAddress });
+        return true;
+      }
+    }
+  }
 
   if (typeof body.emailAddress === 'undefined') {
     return true;
