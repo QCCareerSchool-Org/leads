@@ -8,14 +8,15 @@ import { zfd } from 'zod-form-data';
 import type { BrevoAttributes } from './brevo';
 import { createBrevoContact, sendBrevoEmail } from './brevo';
 import { getContactURL } from './contactUrl';
+import { delay } from './delay';
 import { PostLeadRequest } from './domain/postLeadRequest';
 import type { SchoolName } from './domain/school';
 import { isSchoolName, schools } from './domain/school';
 import { getName } from './getName';
+import { invalidCountry } from './invalidCountry';
 import { isGibberish } from './isGibberish';
 import { getLeadByNonce, storeLead } from './leads';
 import { logError, logWarning } from './logger';
-import { addProvesrcLead } from './provesrc';
 import { validateCaptcha } from './reCaptcha';
 import type { ResultType } from './result';
 import { Result } from './result';
@@ -24,11 +25,21 @@ const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserEr
 const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
+  const countryCode = res.locals.geoLocation?.countryCode;
+  const provinceCode = res.locals.geoLocation?.provinceCode;
+  const city = res.locals.geoLocation?.city;
+
+  const formUrl = getFormUrl(req.body);
+  const requestBody = { ...req.body, referrer: req.headers.referer, formUrl, ipAddress: res.locals.ipAddress, detected: { countryCode, provinceCode, city } };
+
   const validated = await validatePostLeadRequest(req.body);
 
+  // not a valid request
   if (!validated.success) {
     const school = isSchoolName(req.body.school) ? req.body.school : undefined;
-    logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
+
+    logWarning('Validation error', validated.error, requestBody);
+
     try {
       const errors = JSON.parse(validated.error.message) as Array<{ path: string[] }>;
       if (errors.some(e => e.path.includes('emailAddress'))) {
@@ -40,6 +51,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
         return;
       }
     } catch (err) { /* empty */ }
+
     res.status(400).send(validated.error.message);
     return;
   }
@@ -50,12 +62,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   try {
     successUrl = new URL(request.successLocation);
   } catch (err) {
-    logError('Invalid URL', { error: err, referrer: req.headers.referer });
+    logWarning('Invalid URL', err, requestBody);
     res.status(400).send(err);
     return;
   }
 
-  if (isBot(req.body, res.locals.ipAddress)) {
+  if (isBot()) {
     await delay(8000);
     res.redirect(303, successUrl.href);
     return;
@@ -65,7 +77,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
   if (captchaResult.success) {
     if (!captchaResult.value.success) {
-      logError('Captcha validation failed', { body: req.body, referrer: req.headers.referer, captchaResponse: captchaResult.value, captchaErrorCodes: captchaResult.value['error-codes'] });
+      logWarning('Captcha validation failed', captchaResult.value, requestBody);
       if (captchaResult.value['error-codes']?.includes('browser-error')) {
         res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(request.school)));
         return;
@@ -74,12 +86,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       return;
     }
   } else {
-    logError(captchaResult.error.message);
+    logError('Unable to process captcha', captchaResult.error, requestBody);
   }
-
-  const countryCode = res.locals.geoLocation?.countryCode;
-  const provinceCode = res.locals.geoLocation?.provinceCode;
-  const city = res.locals.geoLocation?.city;
 
   const [ firstName, lastName ] = getName(request.firstName, request.lastName);
 
@@ -161,12 +169,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
   if (!createContactResult.success) {
-    logError('Could not create Brevo contact', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
+    logWarning('Could not create Brevo contact with telephone number', createContactResult.error, requestBody);
     // make a second attempt without the telephone number
     if (telephoneNumber) {
       const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
       if (!createContactResult2.success) {
-        logError('Could not create Brevo contact without telephone number either', { body: req.body, referrer: req.headers.referer, error: createContactResult.error });
+        logError('Could not create Brevo contact', createContactResult.error, requestBody);
       }
     }
   }
@@ -174,78 +182,67 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (request.emailTemplateId) {
     const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
     if (!sendEmailResult.success) {
-      logError('Could not send Brevo email', { body: req.body, referrer: req.headers.referer, error: sendEmailResult.error });
+      logError('Could not send Brevo email', sendEmailResult.error, requestBody);
     }
   }
-
-  await addProvesrcLead(request.school, request.emailAddress, firstName, res.locals.ipAddress);
 
   if (newLeadResult.success) {
     successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
     res.redirect(303, successUrl.href);
   } else {
-    logError('Unable to store lead', { error: newLeadResult.error.message, referrer: req.headers.referer });
+    logError('Unable to store lead', newLeadResult.error, requestBody);
     switch (newLeadResult.error.constructor) {
       default:
         res.status(500).send(newLeadResult.error.message);
     }
   }
-};
 
-const delay = async (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-const isBot = (body: Record<string, string | undefined>, ipAddress: string | null): boolean => {
-  for (const key in body) {
-    if (!Object.hasOwn(body, key)) {
-      continue;
+  function isBot(): boolean {
+    for (const key in req.body) {
+      if (!Object.hasOwn(req.body, key)) {
+        continue;
+      }
+      if (key.startsWith('hp_')) {
+        if (req.body[key]) {
+          logWarning('Honeypot field filled', requestBody);
+          return true;
+        }
+      }
     }
-    if (key.startsWith('hp_')) {
-      if (body[key]) {
-        const formUrl = getFormUrl(body);
-        logWarning('Honeypot field filled', { ...body, formUrl, ipAddress });
+
+    // email address same as first or last name
+    if (request.emailAddress === request.firstName || request.emailAddress === request.lastName) {
+      return true;
+    }
+    // first name and last name are similar
+    if (typeof request.firstName !== 'undefined' && typeof request.lastName !== 'undefined' && request.firstName.length >= 8 && request.lastName.startsWith(request.firstName.substring(0, 9))) {
+      return true;
+    }
+    if (invalidCountry(countryCode)) {
+      return true;
+    }
+    if (request.firstName) {
+      // too short
+      if (request.firstName.length <= 1) {
+        return true;
+      }
+      if (isGibberish(request.firstName)) {
+        logWarning('Gibberish detected', requestBody);
         return true;
       }
     }
-  }
-
-  if (typeof body.emailAddress === 'undefined') {
-    return true;
-  }
-  if (body.emailAddress === body.emailOptin || body.emailAddress === body.emailTemplateId || body.emailAddress === body.firstName) {
-    return true;
-  }
-  if (typeof body.firstName !== 'undefined' && typeof body.lastName !== 'undefined' && body.firstName.length >= 8 && body.lastName.startsWith(body.firstName.substring(0, 9))) {
-    return true;
-  }
-  if (typeof body.emailOptIn !== 'undefined' && body.emailOptIn !== 'on') {
-    return true;
-  }
-  if (body.countryCode === 'RU') {
-    return true;
-  }
-  if (body.firstName) {
-    if (body.firstName.length <= 1) {
-      return true;
+    if (request.lastName) {
+      // too short
+      if (request.lastName.length <= 1) {
+        return true;
+      }
+      if (isGibberish(request.lastName)) {
+        logWarning('Gibberish detected', requestBody);
+        return true;
+      }
     }
-    if (isGibberish(body.firstName)) {
-      const formUrl = getFormUrl(body);
-      logWarning('Gibberish detected', { ...body, formUrl, ipAddress });
-      return true;
-    }
+    return false;
   }
-  if (body.lastName) {
-    if (body.lastName.length <= 1) {
-      return true;
-    }
-    if (isGibberish(body.lastName)) {
-      const formUrl = getFormUrl(body);
-      logWarning('Gibberish detected', { ...body, formUrl, ipAddress });
-      return true;
-    }
-  }
-  return false;
 };
 
 const schema = zfd.formData({
