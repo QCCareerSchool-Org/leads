@@ -169,12 +169,12 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
   if (!createContactResult.success) {
-    logWarning('Could not create Brevo contact with telephone number', createContactResult.error, requestBody);
+    logWarning('Could not create contact with telephone number', createContactResult.error, requestBody);
     // make a second attempt without the telephone number
     if (telephoneNumber) {
       const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
       if (!createContactResult2.success) {
-        logError('Could not create Brevo contact', createContactResult.error, requestBody);
+        logError('Could not create contact', createContactResult.error, requestBody);
       }
     }
   }
@@ -182,7 +182,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (request.emailTemplateId) {
     const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
     if (!sendEmailResult.success) {
-      logError('Could not send Brevo email', sendEmailResult.error, requestBody);
+      logError('Could not send email', sendEmailResult.error, requestBody);
     }
   }
 
