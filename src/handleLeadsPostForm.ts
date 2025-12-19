@@ -19,7 +19,7 @@ import { getName } from './getName.js';
 import { invalidCountry } from './invalidCountry.js';
 import { isGibberish } from './isGibberish.js';
 import { getLeadByNonce, storeLead } from './leads.js';
-import { logError, logWarning } from './logger.js';
+import { logError, logInfo, logWarning } from './logger.js';
 import { validateCaptcha } from './reCaptcha.js';
 import type { ResultType } from './result.js';
 import { Result } from './result.js';
@@ -41,8 +41,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (!validated.success) {
     const isBody = (obj: unknown): obj is { school: string; emailAddress: string } => {
       return typeof obj === 'object' && obj !== null
-      && 'school' in obj && typeof obj.school === 'string'
-      && 'emailAddress' in obj && typeof obj.emailAddress === 'string';
+        && 'school' in obj && typeof obj.school === 'string'
+        && 'emailAddress' in obj && typeof obj.emailAddress === 'string';
     };
 
     const [ school, emailAddress ] = isBody(req.body) && isSchoolName(req.body.school)
@@ -179,20 +179,26 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
-  if (!createContactResult.success) {
+  if (createContactResult.success) {
+    logInfo('Created contact', createContactResult.value);
+  } else {
     logWarning('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
     // make a second attempt without the telephone number
     if (telephoneNumber) {
       const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
-      if (!createContactResult2.success) {
-        logError('Could not create contact', createContactResult.error, createPayload(req, res));
+      if (createContactResult2.success) {
+        logInfo('Created contact', createContactResult2.value);
+      } else {
+        logError('Could not create contact', createContactResult2.error, createPayload(req, res));
       }
     }
   }
 
   if (request.emailTemplateId) {
     const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
-    if (!sendEmailResult.success) {
+    if (sendEmailResult.success) {
+      logInfo('Email sent', sendEmailResult.value);
+    } else {
       logError('Could not send email', sendEmailResult.error, createPayload(req, res));
     }
   }

@@ -32,7 +32,7 @@ export const createBrevoContact = async (
   attributes?: BrevoAttributes,
   listIds?: number[],
   telephoneNumber?: string,
-): Promise<ResultType<void>> => {
+): Promise<ResultType<number>> => {
   try {
     const contactsApi = new brevo.ContactsApi();
     contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, brevoApiKey);
@@ -64,8 +64,8 @@ export const createBrevoContact = async (
 
     const result = await contactsApi.createContact(body);
 
-    if (result.response.complete) {
-      return Result.success(undefined);
+    if (result.body.id) {
+      return Result.success(result.body.id);
     }
 
     return Result.fail(Error(result.response.statusMessage));
@@ -77,7 +77,7 @@ export const createBrevoContact = async (
   }
 };
 
-export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<ResultType<void>> => {
+export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<ResultType<string>> => {
   try {
     const transactionalEmailsApi = new brevo.TransactionalEmailsApi();
     transactionalEmailsApi.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
@@ -91,8 +91,8 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
       // },
     });
 
-    if (result.response.complete) {
-      return Result.success(undefined);
+    if (result.body.messageId) {
+      return Result.success(result.body.messageId);
     }
 
     return Result.fail(Error(result.response.statusMessage));
