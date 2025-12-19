@@ -1,3 +1,4 @@
+import type { BrowserDetectResult } from 'browser-detect';
 import browser from 'browser-detect';
 import type { RequestHandler } from 'express';
 
@@ -5,7 +6,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Locals {
-      browser?: ReturnType<typeof browser>;
+      browser?: BrowserDetectResult;
     }
   }
 }

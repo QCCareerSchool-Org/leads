@@ -1,12 +1,14 @@
-import { fixPrismaWriteDate, getDate } from './date';
-import { SchoolName } from './domain/school';
-import { parseIpAddress } from './ipAddress';
-import { logError, logWarning } from './logger';
-import { prisma } from './prisma';
-import { Result, ResultType } from './result';
-import { binToUUID, createUUID, uuidToBin } from './uuid';
+import { fixPrismaWriteDate, getDate } from './date.js';
+import type { SchoolName } from './domain/school.js';
+import { parseIpAddress } from './ipAddress.js';
+import { logError, logWarning } from './logger.js';
+import { prismaGeneral } from './prismaGeneral.js';
+import { prismaLeads } from './prismaLeads.js';
+import type { ResultType } from './result.js';
+import { Result } from './result.js';
+import { binToUUID, createUUID, uuidToBin } from './uuid.js';
 
-type LeadPayload = {
+interface LeadPayload {
   ipAddress: string | null;
   school: SchoolName;
   emailAddress: string;
@@ -34,21 +36,21 @@ type LeadPayload = {
   os: string | null;
   mobile: boolean | null;
   nonce?: string;
-};
+}
 
-type TelephoneNumberPayload = {
+interface TelephoneNumberPayload {
   leadId: string;
   telephoneNumber: string;
-};
+}
 
-export type StoredLead = {
+export interface StoredLead {
   leadId: string;
-};
+}
 
 export const getLeadByNonce = async (nonce: string): Promise<ResultType<StoredLead | false>> => {
   try {
     const nonceBin = uuidToBin(nonce);
-    const lead = await prisma.lead.findFirst({ where: { nonce: nonceBin } });
+    const lead = await prismaLeads.lead.findFirst({ where: { nonce: nonceBin } });
     if (lead) {
       return Result.success({
         leadId: binToUUID(lead.leadId),
@@ -72,7 +74,7 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
     // try to find the matching country and province
     if (request.provinceCode && request.countryCode) {
       // eslint-disable-next-line camelcase
-      const provinceResult = await prisma.province.findUnique({ where: { countryCode_code: { countryCode: request.countryCode, code: request.provinceCode } } });
+      const provinceResult = await prismaGeneral.province.findUnique({ where: { countryCode_code: { countryCode: request.countryCode, code: request.provinceCode } } });
       if (provinceResult) {
         countryCode = provinceResult.countryCode;
         provinceCode = provinceResult.code;
@@ -83,7 +85,7 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
 
     // we didn't find a province above so try to find just the country
     if (provinceCode === null && request.countryCode) {
-      const countryResult = await prisma.country.findUnique({ where: { code: request.countryCode } });
+      const countryResult = await prismaGeneral.country.findUnique({ where: { code: request.countryCode } });
       if (countryResult) {
         countryCode = countryResult.code;
       } else {
@@ -91,7 +93,7 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
       }
     }
 
-    const lead = await prisma.lead.create({
+    const lead = await prismaLeads.lead.create({
       data: {
         leadId,
         schoolName: request.school,
@@ -143,7 +145,7 @@ export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload)
     const leadIdBin = uuidToBin(request.leadId);
     const prismaNow = fixPrismaWriteDate(getDate());
 
-    const lead = await prisma.lead.update({
+    const lead = await prismaLeads.lead.update({
       data: {
         telephoneNumber: request.telephoneNumber,
         updated: prismaNow,

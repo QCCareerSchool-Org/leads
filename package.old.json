@@ -1,0 +1,51 @@
+{
+  "name": "leads",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc",
+    "start": "node dist",
+    "generate": "npx prisma generate",
+    "lint": "eslint src/**/*"
+  },
+  "keywords": [],
+  "author": "QC Career School",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@getbrevo/brevo": "^2.5.0",
+    "@prisma/client": "^7.2.0",
+    "@qccareerschool/winston-nodemailer": "^4.0.6",
+    "browser-detect": "^0.2.28",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "escape-html": "^1.0.3",
+    "express": "^4.22.1",
+    "helmet": "^7.2.0",
+    "maxmind": "^4.3.29",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.19.0",
+    "yup": "^1.7.1",
+    "zod": "^3.25.76",
+    "zod-form-data": "^2.0.8"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/escape-html": "^1.0.4",
+    "@types/express": "^4.17.25",
+    "@types/node": "^20.19.27",
+    "@types/node-fetch": "^2.6.13",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "prisma": "^7.2.0",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

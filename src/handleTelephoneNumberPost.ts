@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { handleTelephoneNumberPostJSON } from './handleTelephoneNumberPostJSON';
+import { handleTelephoneNumberPostJSON } from './handleTelephoneNumberPostJSON.js';
 
 export const handleTelephoneNumberPost = async (req: Request, res: Response): Promise<void> => {
   if (req.headers['content-type']?.toLowerCase().startsWith('application/json')) {

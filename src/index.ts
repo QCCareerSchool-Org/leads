@@ -1,17 +1,18 @@
 import compression from 'compression';
-import cors, { CorsOptions } from 'cors';
+import type { CorsOptions } from 'cors';
+import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 
-import { asyncWrapper } from './asyncWrapper';
-import config from './config';
-import { globalErrorHandler } from './globalErrorHandler';
-import { handleLeadsPost } from './handleLeadsPost';
-import { handleTelephoneNumberPost } from './handleTelephoneNumberPost';
-import { logInfo } from './logger';
-import { browserDetectMiddleware } from './middleware/browserDetect';
-import { geoLocationMiddleware } from './middleware/geoLocation';
-import { ipAddressMiddleware } from './middleware/ipAddress';
+import { asyncWrapper } from './asyncWrapper.js';
+import config from './config.js';
+import { globalErrorHandler } from './globalErrorHandler.js';
+import { handleLeadsPost } from './handleLeadsPost.js';
+import { handleTelephoneNumberPost } from './handleTelephoneNumberPost.js';
+import { logInfo } from './logger.js';
+import { browserDetectMiddleware } from './middleware/browserDetect.js';
+import { geoLocationMiddleware } from './middleware/geoLocation.js';
+import { ipAddressMiddleware } from './middleware/ipAddress.js';
 
 const corsOptions: CorsOptions = {
   origin: process.env.NODE_ENV === 'production'

@@ -1,11 +1,13 @@
 import * as brevo from '@getbrevo/brevo';
-import { Result, ResultType } from './result';
+
+import type { ResultType } from './result.js';
+import { Result } from './result.js';
 
 const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 
 export type Source = 'Facebook';
 
-export type BrevoAttributes = {
+export interface BrevoAttributes {
   STATUS_DESIGN_LEAD?: true;
   STATUS_DESIGN_STUDENT?: true;
   STATUS_EVENT_LEAD?: true;
@@ -19,7 +21,7 @@ export type BrevoAttributes = {
   STATUS_WRITING_LEAD?: true;
   STATUS_WRITING_STUDENT?: true;
   SOURCE?: Source;
-};
+}
 
 export const createBrevoContact = async (
   emailAddress: string,

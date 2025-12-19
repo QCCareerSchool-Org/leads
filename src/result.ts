@@ -10,6 +10,7 @@ export interface IErrorResult {
 
 export type ResultType<T> = ISuccessResult<T> | IErrorResult;
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export abstract class Result {
 
   public static success<T>(value: T): ISuccessResult<T> {
@@ -22,7 +23,7 @@ export abstract class Result {
 
   public static combine<T>(results: ResultType<T>[]): ResultType<T | undefined> {
     for (const result of results) {
-      if (result.success === false) {
+      if (!result.success) {
         return result;
       }
     }
@@ -43,9 +44,9 @@ class ErrorResult implements IErrorResult {
 }
 
 export const isSuccessResult = <T>(result: ResultType<T>): result is ISuccessResult<T> => {
-  return result.success === true;
+  return result.success;
 };
 
 export const isErrorResult = <T>(result: ResultType<T>): result is IErrorResult => {
-  return result.success === false;
+  return !result.success;
 };

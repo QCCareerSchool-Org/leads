@@ -1,7 +1,7 @@
 import { NodemailerTransport } from '@qccareerschool/winston-nodemailer';
 import winston from 'winston';
 
-import config from './config';
+import config from './config.js';
 
 const logger = winston.createLogger({
   level: 'info',

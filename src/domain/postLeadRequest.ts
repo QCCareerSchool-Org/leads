@@ -1,6 +1,6 @@
-import { SchoolName } from './school';
+import type { SchoolName } from './school.js';
 
-export type PostLeadRequest = {
+export interface PostLeadRequest {
   school: SchoolName;
   successLocation: string;
   emailAddress: string;
@@ -23,4 +23,4 @@ export type PostLeadRequest = {
   nonce?: string;
   'g-recaptcha-response': string;
   referrer?: string;
-};
+}

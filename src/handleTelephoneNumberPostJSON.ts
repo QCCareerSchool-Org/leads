@@ -1,16 +1,19 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import { createBrevoContact } from './brevo';
-import { PostTelephoneNumberRequest } from './domain/postTelephoneNumberRequest';
-import { updateLeadTelephoneNumber } from './leads';
-import { logError } from './logger';
-import { Result, ResultType } from './result';
+
+import { createBrevoContact } from './brevo.js';
+import { createPayload } from './createPayload.js';
+import type { PostTelephoneNumberRequest } from './domain/postTelephoneNumberRequest.js';
+import { updateLeadTelephoneNumber } from './leads.js';
+import { logError } from './logger.js';
+import type { ResultType } from './result.js';
+import { Result } from './result.js';
 
 export const handleTelephoneNumberPostJSON = async (req: Request, res: Response): Promise<void> => {
   const validated = await validateTelephoneNumberRequest(req.body);
 
   if (!validated.success) {
-    logError('Validation error', { error: validated.error.message, body: req.body, referrer: req.headers.referer });
+    logError('Validation error', validated.error, createPayload(req, res));
     res.status(400).send(validated.error.message);
     return;
   }
@@ -26,14 +29,14 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
   if (updateResult.success) {
     const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);
     if (!updateContactResult.success) {
-      logError('Could not update Brevo contact', { body: req.body, referrer: req.headers.referer, error: updateContactResult.error });
+      logError('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
     }
   }
 
   if (updateResult.success) {
     res.sendStatus(200);
   } else {
-    logError('Unable to update lead', { error: updateResult.error.message });
+    logError('Unable to update lead', updateResult.error.message, createPayload(req, res));
     switch (updateResult.error.constructor) {
       default:
         res.status(500).send(updateResult.error.message);
@@ -42,7 +45,7 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
 };
 
 const schema = z.object({
-  leadId: z.string().uuid(),
+  leadId: z.uuid(),
   telephoneNumber: z.string(),
   listId: z.number().int().positive(),
 });

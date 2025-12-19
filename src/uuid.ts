@@ -4,7 +4,7 @@ export const createUUID = (): string => {
   return v1();
 };
 
-export const uuidToBin = (uuid: string): Buffer => {
+export const uuidToBin = (uuid: string): Uint8Array<ArrayBuffer> => {
   if (uuid.length !== 36) {
     throw Error('Invalid uuid length');
   }
@@ -17,17 +17,17 @@ export const uuidToBin = (uuid: string): Buffer => {
   return swap(buffer);
 };
 
-export const binToUUID = (buffer: Buffer): string => {
+export const binToUUID = (buffer: Uint8Array): string => {
   if (buffer.length !== 16) {
     throw Error('Invalid buffer length');
   }
   const unswappedBuffer = unswap(buffer);
-  const hex = unswappedBuffer.toString('hex');
+  const hex = Buffer.from(unswappedBuffer).toString('hex');
   // re-add hyphens
   return `${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20, 32)}`;
 };
 
-const swap = (buffer: Buffer): Buffer => {
+const swap = (buffer: Uint8Array): Uint8Array<ArrayBuffer> => {
   if (buffer.length !== 16) {
     throw Error('Invalid buffer length');
   }
@@ -46,7 +46,7 @@ const swap = (buffer: Buffer): Buffer => {
   return swappedBuffer;
 };
 
-const unswap = (buffer: Buffer): Buffer => {
+const unswap = (buffer: Uint8Array): Uint8Array<ArrayBuffer> => {
   if (buffer.length !== 16) {
     throw Error('Invalid buffer length');
   }

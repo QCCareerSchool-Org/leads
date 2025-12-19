@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
-import { Result, ResultType } from './result';
+import type { ResultType } from './result.js';
+import { Result } from './result.js';
 
 type ErrorCode =
   | 'missing-input-secret' // The secret parameter is missing.
@@ -10,20 +10,14 @@ type ErrorCode =
   | 'timeout-or-duplicate' // The response is no longer valid: either is too old or has been used previously.
   | 'browser-error';
 
-type ReCaptchaResponse = {
+interface ReCaptchaResponse {
   'success': boolean;
   /** string date */
   'challenge_ts': string;
   /** the hostname of the site where the reCAPTCHA was solved */
   'hostname': string;
   'error-codes'?: ErrorCode[];
-};
-
-type ReCaptchaRequest = {
-  secret: string;
-  response: string;
-  remoteIp?: string;
-};
+}
 
 const url = 'https://www.google.com/recaptcha/api/siteverify';
 
@@ -38,27 +32,29 @@ const isReCaptchaResponse = (obj: unknown): obj is ReCaptchaResponse => {
 
 export const validateCaptcha = async (token: string, remoteIp?: string | null): Promise<ResultType<ReCaptchaResponse>> => {
   try {
-    const body: ReCaptchaRequest = {
+    const urlSearchParams = new URLSearchParams({
       secret: secretKey,
       response: token,
-    };
+    });
     if (remoteIp) {
-      body.remoteIp = remoteIp;
+      urlSearchParams.append('remoteIp', remoteIp);
     }
     const response = await fetch(url, {
       method: 'post',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(body),
+      body: urlSearchParams,
     });
     if (!response.ok) {
       return Result.fail(Error('reCaptcha http request error'));
     }
-    const validationResult = await response.json();
+    const validationResult: unknown = await response.json();
     if (!isReCaptchaResponse(validationResult)) {
       return Result.fail(Error('Invalid reCaptcha response body'));
     }
     return Result.success(validationResult);
-  } catch (err) {
-    return Result.fail(Error('Unknown reCaptcha error'));
+  } catch (cause: unknown) {
+    const err = Error('Unknown reCaptcha error');
+    err.cause = cause;
+    return Result.fail(err);
   }
 };

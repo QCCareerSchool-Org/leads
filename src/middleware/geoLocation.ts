@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 import type { RequestHandler } from 'express';
-import maxmind, { CityResponse } from 'maxmind';
+import type { CityResponse } from 'maxmind';
+import maxmind from 'maxmind';
 
-import { logError } from '../logger';
+import { logError } from '../logger.js';
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ export const geoLocationMiddleware: RequestHandler = (req, res, next) => {
   const ipAddress = res.locals.ipAddress;
 
   if (!ipAddress) {
-    return next();
+    next(); return;
   }
 
   cityReaderPromise.then(reader => {
@@ -39,7 +40,7 @@ export const geoLocationMiddleware: RequestHandler = (req, res, next) => {
     if (cityResponse) {
       const countryCode = cityResponse.country?.iso_code;
       res.locals.geoLocation = {
-        countryCode: countryCode,
+        countryCode,
         provinceCode: needsProvinceCode(countryCode) ? cityResponse.subdivisions?.[0].iso_code : null,
         city: cityResponse.city?.names.en,
         latitude: cityResponse.location?.latitude,
@@ -47,7 +48,7 @@ export const geoLocationMiddleware: RequestHandler = (req, res, next) => {
       };
     }
     next();
-  }).catch(err => {
+  }).catch((err: unknown) => {
     logError('Error determining geo location', err);
   });
 };

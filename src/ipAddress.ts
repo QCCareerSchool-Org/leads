@@ -1,9 +1,9 @@
 import ipaddr from 'ipaddr.js';
 
-export const parseIpAddress = (ip: string): Buffer | null => {
+export const parseIpAddress = (ip: string): Uint8Array<ArrayBuffer> | null => {
   try {
     return Buffer.from(ipaddr.parse(ip).toByteArray());
-  } catch (err) {
+  } catch {
     return null;
   }
 };
