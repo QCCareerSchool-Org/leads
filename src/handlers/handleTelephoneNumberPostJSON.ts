@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { createBrevoContact } from './brevo.js';
-import { createPayload } from './createPayload.js';
-import type { PostTelephoneNumberRequest } from './domain/postTelephoneNumberRequest.js';
-import { updateLeadTelephoneNumber } from './leads.js';
-import { logError } from './logger.js';
-import type { ResultType } from './result.js';
-import { Result } from './result.js';
+import { createBrevoContact } from '../lib/brevo.js';
+import { createPayload } from '../lib/createPayload.js';
+import type { PostTelephoneNumberRequest } from '../domain/postTelephoneNumberRequest.js';
+import { updateLeadTelephoneNumber } from '../interactors/leads.js';
+import { logError } from '../logger.js';
+import type { ResultType } from '../lib/result.js';
+import { Result } from '../lib/result.js';
 
 export const handleTelephoneNumberPostJSON = async (req: Request, res: Response): Promise<void> => {
   const validated = await validateTelephoneNumberRequest(req.body);

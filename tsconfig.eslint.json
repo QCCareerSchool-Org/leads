@@ -6,6 +6,8 @@
   },
   "include": [
     "src",
+    "__test__",
+    "jest.config.ts",
     "eslint.config.ts",
     "browser-detect.d.ts",
   ]

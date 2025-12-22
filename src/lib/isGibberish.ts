@@ -58,31 +58,58 @@ export const isGibberish = (input: string): boolean => {
   if (maxRun >= 5) { signals++; } // long consonant streak
   signals += lenPen;
 
+  console.log('signals', signals);
   return signals >= 3;
 };
 
-const lengthPenalty = (name: string): number => {
-  // Count letters only (Unicode-aware)
-  const lettersOnly = [ ...name.normalize('NFC') ].filter(ch => /\p{L}/u.test(ch));
-  const total = lettersOnly.length;
+const letterRe = /\p{L}/u;
 
-  const parts = name.split(/[ '\u2019-]+/u).filter(Boolean); // spaces, hyphens, apostrophes
+const countLetters = (s: string): number => {
+  let n = 0;
+  for (const ch of Array.from(s.normalize('NFC'))) {
+    if (letterRe.test(ch)) { n += 1; }
+  }
+  return n;
+};
+
+const lengthPenalty = (name: string): number => {
+  const normalized = name.normalize('NFC');
+  console.log(normalized);
+
+  const total = countLetters(normalized);
+  console.log(total);
+  const parts = normalized.split(/[ '\u2019-]+/u).filter(Boolean);
+  console.log(parts);
 
   let penalty = 0;
 
   // Whole-name thresholds
-  if (total > 60) { return 999; } // effectively "reject"
-  if (total > 40) { penalty += 2; } else if (total > 30) { penalty += 1; }
+  if (total > 60) {
+    return 999; // effectively "reject"
+  }
+  if (total > 40) {
+    penalty += 2;
+  } else if (total > 30) {
+    penalty += 1;
+  }
 
   // Per-part thresholds
   for (const p of parts) {
-    const len = [ ...p ].filter(ch => /\p{L}/u.test(ch)).length;
-    if (len > 30) { return 999; } // reject a single extreme token
-    if (len > 25) { penalty += 2; } else if (len > 20) { penalty += 1; }
+    const len = countLetters(p);
+    if (len > 30) {
+      return 999; // reject a single extreme token
+    }
+    if (len > 25) {
+      penalty += 2;
+    } else if (len > 20) {
+      penalty += 1;
+    }
   }
 
   // Many-name parts is unusual
-  if (parts.length > 4) { penalty += 1; }
+  if (parts.length > 4) {
+    penalty += 1;
+  }
 
   return penalty; // 0 = fine, higher = more suspicious
 };

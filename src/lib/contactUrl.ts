@@ -1,4 +1,4 @@
-import type { SchoolName } from './domain/school.js';
+import type { SchoolName } from '../domain/school.js';
 
 export const getContactURL = (school?: SchoolName): string => {
   switch (school) {

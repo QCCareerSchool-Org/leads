@@ -1,4 +1,4 @@
-import { getName } from './getName.js';
+import { getName } from '../../../src/lib/getName.ts';
 
 describe('getName', () => {
 

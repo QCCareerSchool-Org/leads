@@ -6,32 +6,31 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import type { BrevoAttributes } from './brevo.js';
-import { createBrevoContact, sendBrevoEmail } from './brevo.js';
-import { getContactURL } from './contactUrl.js';
-import { createPayload } from './createPayload.js';
-import { delay } from './delay.js';
-import type { PostLeadRequest } from './domain/postLeadRequest.js';
-import type { SchoolName } from './domain/school.js';
-import { isSchoolName } from './domain/school.js';
-import { schools } from './domain/school.js';
-import { getName } from './getName.js';
-import { invalidCountry } from './invalidCountry.js';
-import { isGibberish } from './isGibberish.js';
-import { getLeadByNonce, storeLead } from './leads.js';
-import { logError, logInfo, logWarning } from './logger.js';
-import { validateCaptcha } from './reCaptcha.js';
-import type { ResultType } from './result.js';
-import { Result } from './result.js';
+import type { PostLeadRequest } from '../domain/postLeadRequest.js';
+import type { SchoolName } from '../domain/school.js';
+import { isSchoolName } from '../domain/school.js';
+import { schools } from '../domain/school.js';
+import { getLeadByNonce, storeLead } from '../interactors/leads.js';
+import type { BrevoAttributes } from '../lib/brevo.js';
+import { createBrevoContact, sendBrevoEmail } from '../lib/brevo.js';
+import { getContactURL } from '../lib/contactUrl.js';
+import { createPayload } from '../lib/createPayload.js';
+import { delay } from '../lib/delay.js';
+import { getName } from '../lib/getName.js';
+import { isBot } from '../lib/isBot.js';
+import { validateCaptcha } from '../lib/reCaptcha.js';
+import type { ResultType } from '../lib/result.js';
+import { Result } from '../lib/result.js';
+import { logError, logInfo, logWarning } from '../logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../html/browserError.html'), 'utf-8');
-const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../html/invalidEmailAddress.html'), 'utf-8');
+const browserErrorHtml = fs.readFileSync(path.join(__dirname, '../../html/browserError.html'), 'utf-8');
+const invalidEmailAddressHtml = fs.readFileSync(path.join(__dirname, '../../html/invalidEmailAddress.html'), 'utf-8');
 
 export const handleLeadsPostForm = async (req: Request, res: Response): Promise<void> => {
-  const countryCode = res.locals.geoLocation?.countryCode;
+  const countryCode = res.locals.geoLocation?.countryCode ?? 'US';
   const provinceCode = res.locals.geoLocation?.provinceCode;
   const city = res.locals.geoLocation?.city;
 
@@ -78,8 +77,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     return;
   }
 
-  if (isBot()) {
+  const botStatus = isBot(req.body as Record<string, string | undefined>, countryCode);
+  if (botStatus.result) {
     await delay(8000);
+    logWarning(botStatus.message, createPayload(req, res));
     res.redirect(303, successUrl.href);
     return;
   }
@@ -150,7 +151,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     telephoneNumber: telephoneNumber || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     emailOptIn: request.emailOptIn ?? null,
     smsOptIn: request.smsOptIn ?? null,
-    countryCode: countryCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    countryCode: countryCode || null,
     provinceCode: provinceCode || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     city: city || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     referrer: request.referrer || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
@@ -212,54 +213,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       default:
         res.status(500).send(newLeadResult.error.message);
     }
-  }
-
-  function isBot(): boolean {
-    const body = req.body as Record<string, string | undefined>;
-    for (const key in body) {
-      if (!Object.hasOwn(body, key)) {
-        continue;
-      }
-      if (key.startsWith('hp_')) {
-        if (body[key]) {
-          logWarning('Honeypot field filled', createPayload(req, res));
-          return true;
-        }
-      }
-    }
-
-    // email address same as first or last name
-    if (request.emailAddress === request.firstName || request.emailAddress === request.lastName) {
-      return true;
-    }
-    // first name and last name are similar
-    if (typeof request.firstName !== 'undefined' && typeof request.lastName !== 'undefined' && request.firstName.length >= 8 && request.lastName.startsWith(request.firstName.substring(0, 9))) {
-      return true;
-    }
-    if (invalidCountry(countryCode)) {
-      return true;
-    }
-    if (request.firstName) {
-      // too short
-      if (request.firstName.length <= 1) {
-        return true;
-      }
-      if (isGibberish(request.firstName)) {
-        logWarning('Gibberish detected', createPayload(req, res));
-        return true;
-      }
-    }
-    if (request.lastName) {
-      // too short
-      if (request.lastName.length <= 1) {
-        return true;
-      }
-      if (isGibberish(request.lastName)) {
-        logWarning('Gibberish detected', createPayload(req, res));
-        return true;
-      }
-    }
-    return false;
   }
 };
 

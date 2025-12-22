@@ -4,11 +4,12 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 
-import { asyncWrapper } from './asyncWrapper.js';
 import config from './config.js';
-import { globalErrorHandler } from './globalErrorHandler.js';
-import { handleLeadsPost } from './handleLeadsPost.js';
-import { handleTelephoneNumberPost } from './handleTelephoneNumberPost.js';
+import { globalErrorHandler } from './handlers/globalErrorHandler.js';
+import { handleFacebookPush } from './handlers/handleFacebookPush.js';
+import { handleLeadsPost } from './handlers/handleLeadsPost.js';
+import { handleTelephoneNumberPost } from './handlers/handleTelephoneNumberPost.js';
+import { asyncWrapper } from './lib/asyncWrapper.js';
 import { logInfo } from './logger.js';
 import { browserDetectMiddleware } from './middleware/browserDetect.js';
 import { geoLocationMiddleware } from './middleware/geoLocation.js';
@@ -42,6 +43,7 @@ app.use(browserDetectMiddleware);
 
 app.post('/', asyncWrapper(handleLeadsPost));
 app.post('/telephoneNumber', asyncWrapper(handleTelephoneNumberPost));
+app.post('/fb/:school', asyncWrapper(handleFacebookPush));
 app.use(globalErrorHandler);
 
 app.listen(config.port, () => {

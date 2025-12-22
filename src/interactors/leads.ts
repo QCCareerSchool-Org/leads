@@ -1,12 +1,12 @@
-import { fixPrismaWriteDate, getDate } from './date.js';
-import type { SchoolName } from './domain/school.js';
-import { parseIpAddress } from './ipAddress.js';
-import { logError, logWarning } from './logger.js';
-import { prismaGeneral } from './prismaGeneral.js';
-import { prismaLeads } from './prismaLeads.js';
-import type { ResultType } from './result.js';
-import { Result } from './result.js';
-import { binToUUID, createUUID, uuidToBin } from './uuid.js';
+import type { SchoolName } from '../domain/school.js';
+import { parseIpAddress } from '../ipAddress.js';
+import { fixPrismaWriteDate, getDate } from '../lib/date.js';
+import type { ResultType } from '../lib/result.js';
+import { Result } from '../lib/result.js';
+import { binToUUID, createUUID, uuidToBin } from '../lib/uuid.js';
+import { logError, logWarning } from '../logger.js';
+import { prismaGeneral } from '../prismaGeneral.js';
+import { prismaLeads } from '../prismaLeads.js';
 
 interface LeadPayload {
   ipAddress: string | null;
