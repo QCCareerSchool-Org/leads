@@ -8,5 +8,5 @@ import { verifyFBSignature } from './middleware/verifyFBSignature.mjs';
 export const fbRouter = Router();
 
 fbRouter.use(verifyFBSignature);
-fbRouter.get('/verify', handleFacebookVerification);
+fbRouter.get('/forms/:schoolSlug', handleFacebookVerification);
 fbRouter.post('/forms/:schoolSlug', asyncWrapper(handleFacebookEvent));
