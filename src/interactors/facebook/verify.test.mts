@@ -1,5 +1,5 @@
-import type { FBVerification } from '../domain/facebook.mjs';
-import { verify } from '../interactors/facebook.mjs';
+import type { FBVerification } from '#src/domain/facebook/verification.mjs';
+import { fbVerify } from './verify.mjs';
 
 describe('facebook interactor', () => {
   describe('verify', () => {
@@ -9,7 +9,7 @@ describe('facebook interactor', () => {
         'hub.challenge': 94850349,
         'hub.verify_token': 'Something that is definitely not our token',
       };
-      const result = verify(payload);
+      const result = fbVerify(payload);
       expect(result.success).toBe(false);
     });
   });

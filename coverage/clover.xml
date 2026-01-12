@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1768239124975" clover="3.2.0">
-  <project timestamp="1768239124975" name="All files">
-    <metrics statements="296" coveredstatements="181" conditionals="217" coveredconditionals="80" methods="34" coveredmethods="15" elements="547" coveredelements="276" complexity="0" loc="296" ncloc="296" packages="7" files="15" classes="15"/>
+<coverage generated="1768250134424" clover="3.2.0">
+  <project timestamp="1768250134425" name="All files">
+    <metrics statements="181" coveredstatements="149" conditionals="117" coveredconditionals="73" methods="15" coveredmethods="14" elements="313" coveredelements="236" complexity="0" loc="181" ncloc="181" packages="5" files="11" classes="11"/>
     <package name="__test__">
       <metrics statements="9" coveredstatements="9" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
       <file name="express.mts" path="C:\Workspace\Node\leads\__test__\express.mts">
@@ -17,52 +17,9 @@
         <line num="27" count="9" type="stmt"/>
       </file>
     </package>
-    <package name="src">
-      <metrics statements="21" coveredstatements="18" conditionals="12" coveredconditionals="7" methods="4" coveredmethods="1"/>
-      <file name="config.mts" path="C:\Workspace\Node\leads\src\config.mts">
-        <metrics statements="9" coveredstatements="9" conditionals="10" coveredconditionals="6" methods="1" coveredmethods="1"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="8" count="2" type="stmt"/>
-        <line num="9" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="10" count="1" type="stmt"/>
-        <line num="11" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="12" count="1" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="18" count="7" type="stmt"/>
-      </file>
-      <file name="logger.mts" path="C:\Workspace\Node\leads\src\logger.mts">
-        <metrics statements="12" coveredstatements="9" conditionals="2" coveredconditionals="1" methods="3" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="28" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="34" count="1" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="38" count="1" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="42" count="1" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.domain">
-      <metrics statements="7" coveredstatements="3" conditionals="34" coveredconditionals="0" methods="4" coveredmethods="0"/>
-      <file name="facebook.mts" path="C:\Workspace\Node\leads\src\domain\facebook.mts">
-        <metrics statements="7" coveredstatements="3" conditionals="34" coveredconditionals="0" methods="4" coveredmethods="0"/>
-        <line num="37" count="1" type="stmt"/>
-        <line num="38" count="0" type="cond" truecount="0" falsecount="8"/>
-        <line num="43" count="1" type="stmt"/>
-        <line num="44" count="0" type="cond" truecount="0" falsecount="19"/>
-        <line num="55" count="1" type="stmt"/>
-        <line num="56" count="0" type="cond" truecount="0" falsecount="7"/>
-        <line num="58" count="0" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.handlers.handleFacebookVerification">
+    <package name="src.handlers.facebook.handleVerification">
       <metrics statements="21" coveredstatements="21" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2"/>
-      <file name="index.mts" path="C:\Workspace\Node\leads\src\handlers\handleFacebookVerification\index.mts">
+      <file name="index.mts" path="C:\Workspace\Node\leads\src\handlers\facebook\handleVerification\index.mts">
         <metrics statements="13" coveredstatements="13" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -78,7 +35,7 @@
         <line num="17" count="1" type="stmt"/>
         <line num="20" count="1" type="stmt"/>
       </file>
-      <file name="validateRequest.mts" path="C:\Workspace\Node\leads\src\handlers\handleFacebookVerification\validateRequest.mts">
+      <file name="validateRequest.mts" path="C:\Workspace\Node\leads\src\handlers\facebook\handleVerification\validateRequest.mts">
         <metrics statements="8" coveredstatements="8" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -90,115 +47,22 @@
         <line num="18" count="1" type="stmt"/>
       </file>
     </package>
-    <package name="src.interactors">
-      <metrics statements="62" coveredstatements="13" conditionals="36" coveredconditionals="2" methods="10" coveredmethods="1"/>
-      <file name="facebook.mts" path="C:\Workspace\Node\leads\src\interactors\facebook.mts">
-        <metrics statements="62" coveredstatements="13" conditionals="36" coveredconditionals="2" methods="10" coveredmethods="1"/>
+    <package name="src.interactors.facebook">
+      <metrics statements="8" coveredstatements="6" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="verify.mts" path="C:\Workspace\Node\leads\src\interactors\facebook\verify.mts">
+        <metrics statements="8" coveredstatements="6" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="2" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="7" count="1" type="stmt"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="10" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="15" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="16" count="1" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="21" count="1" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="37" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="44" count="1" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="56" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="57" count="0" type="stmt"/>
-        <line num="60" count="0" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="65" count="0" type="stmt"/>
-        <line num="66" count="0" type="stmt"/>
-        <line num="67" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="82" count="1" type="stmt"/>
-        <line num="89" count="1" type="stmt"/>
-        <line num="90" count="0" type="stmt"/>
-        <line num="91" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="92" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="93" count="0" type="stmt"/>
-        <line num="95" count="0" type="stmt"/>
-        <line num="96" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="97" count="0" type="stmt"/>
-        <line num="98" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="99" count="0" type="stmt"/>
-        <line num="104" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="105" count="0" type="stmt"/>
-        <line num="106" count="0" type="stmt"/>
-        <line num="107" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="108" count="0" type="stmt"/>
-        <line num="112" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="113" count="0" type="stmt"/>
-        <line num="116" count="0" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
       </file>
     </package>
     <package name="src.lib">
-      <metrics statements="151" coveredstatements="94" conditionals="113" coveredconditionals="50" methods="10" coveredmethods="7"/>
-      <file name="brevo.mts" path="C:\Workspace\Node\leads\src\lib\brevo.mts">
-        <metrics statements="36" coveredstatements="5" conditionals="24" coveredconditionals="1" methods="2" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="5" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="25" count="1" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="57" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="58" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="60" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="66" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="75" count="0" type="stmt"/>
-        <line num="79" count="1" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
-        <line num="84" count="0" type="stmt"/>
-        <line num="93" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="94" count="0" type="stmt"/>
-        <line num="97" count="0" type="stmt"/>
-        <line num="99" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="100" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-      </file>
+      <metrics statements="115" coveredstatements="89" conditionals="89" coveredconditionals="49" methods="8" coveredmethods="7"/>
       <file name="createSHA256Hash.mts" path="C:\Workspace\Node\leads\src\lib\createSHA256Hash.mts">
         <metrics statements="6" coveredstatements="5" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
         <line num="2" count="1" type="stmt"/>
@@ -334,34 +198,37 @@
       </file>
     </package>
     <package name="src.middleware">
-      <metrics statements="25" coveredstatements="23" conditionals="14" coveredconditionals="13" methods="1" coveredmethods="1"/>
+      <metrics statements="28" coveredstatements="24" conditionals="16" coveredconditionals="14" methods="1" coveredmethods="1"/>
       <file name="verifyFBSignature.mts" path="C:\Workspace\Node\leads\src\middleware\verifyFBSignature.mts">
-        <metrics statements="25" coveredstatements="23" conditionals="14" coveredconditionals="13" methods="1" coveredmethods="1"/>
+        <metrics statements="28" coveredstatements="24" conditionals="16" coveredconditionals="14" methods="1" coveredmethods="1"/>
         <line num="3" count="1" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
         <line num="6" count="6" type="cond" truecount="1" falsecount="1"/>
         <line num="7" count="0" type="stmt"/>
         <line num="8" count="0" type="stmt"/>
-        <line num="11" count="6" type="stmt"/>
-        <line num="13" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="18" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="11" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="16" count="6" type="stmt"/>
+        <line num="18" count="6" type="cond" truecount="2" falsecount="0"/>
         <line num="19" count="1" type="stmt"/>
         <line num="20" count="1" type="stmt"/>
-        <line num="23" count="4" type="stmt"/>
-        <line num="25" count="4" type="cond" truecount="4" falsecount="0"/>
-        <line num="26" count="1" type="stmt"/>
-        <line num="27" count="1" type="stmt"/>
-        <line num="30" count="3" type="stmt"/>
-        <line num="32" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="33" count="1" type="stmt"/>
-        <line num="34" count="1" type="stmt"/>
-        <line num="37" count="2" type="stmt"/>
-        <line num="39" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="40" count="1" type="stmt"/>
-        <line num="41" count="1" type="stmt"/>
-        <line num="44" count="1" type="stmt"/>
+        <line num="23" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="30" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="37" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="44" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
       </file>
     </package>
   </project>

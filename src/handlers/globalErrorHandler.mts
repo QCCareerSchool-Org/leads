@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
 
-import { logError } from '../logger.mjs';
+import { logError } from '#src/logger.mjs';
 
 const INTERNAL_SERVER_ERROR_CODE = 500;
 

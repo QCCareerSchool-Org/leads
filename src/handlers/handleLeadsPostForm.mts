@@ -1,8 +1,8 @@
 import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import fs from 'fs';
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
@@ -243,13 +243,13 @@ const schema = zfd.formData({
   'referrer': zfd.text(z.string().optional()),
 });
 
-const validatePostLeadRequest = async (requestBody: Request['body']): Promise<ResultType<PostLeadRequest>> => {
+const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
   try {
     const body = await schema.parseAsync(await requestBody);
-    return Result.success(body);
+    return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
-    return Result.fail(Error(message));
+    return fail(Error(message));
   }
 };
 

@@ -1,6 +1,6 @@
 import * as brevo from '@getbrevo/brevo';
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 
@@ -31,7 +31,7 @@ export const createBrevoContact = async (
   attributes?: BrevoAttributes,
   listIds?: number[],
   telephoneNumber?: string,
-): Promise<ResultType<number>> => {
+): Promise<Result<number>> => {
   try {
     const contactsApi = new brevo.ContactsApi();
     contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, brevoApiKey);
@@ -64,19 +64,19 @@ export const createBrevoContact = async (
     const result = await contactsApi.createContact(body);
 
     if (result.body.id) {
-      return Result.success(result.body.id);
+      return success(result.body.id);
     }
 
-    return Result.fail(Error(result.response.statusMessage));
+    return fail(Error(result.response.statusMessage));
   } catch (err) {
     if (err instanceof Error) {
-      return Result.fail(err);
+      return fail(err);
     }
-    return Result.fail(Error('Unknown error'));
+    return fail(Error('Unknown error'));
   }
 };
 
-export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<ResultType<string>> => {
+export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<Result<string>> => {
   try {
     const transactionalEmailsApi = new brevo.TransactionalEmailsApi();
     transactionalEmailsApi.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
@@ -91,14 +91,14 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
     });
 
     if (result.body.messageId) {
-      return Result.success(result.body.messageId);
+      return success(result.body.messageId);
     }
 
-    return Result.fail(Error(result.response.statusMessage));
+    return fail(Error(result.response.statusMessage));
   } catch (err) {
     if (err instanceof Error) {
-      return Result.fail(err);
+      return fail(err);
     }
-    return Result.fail(Error('Unknown error'));
+    return fail(Error('Unknown error'));
   }
 };

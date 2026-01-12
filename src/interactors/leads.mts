@@ -1,5 +1,5 @@
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 import type { SchoolName } from '../domain/school.mjs';
 import { parseIpAddress } from '../ipAddress.mjs';
@@ -48,23 +48,23 @@ export interface StoredLead {
   leadId: string;
 }
 
-export const getLeadByNonce = async (nonce: string): Promise<ResultType<StoredLead | false>> => {
+export const getLeadByNonce = async (nonce: string): Promise<Result<StoredLead | false>> => {
   try {
     const nonceBin = uuidToBin(nonce);
     const lead = await prismaLeads.lead.findFirst({ where: { nonce: nonceBin } });
     if (lead) {
-      return Result.success({
+      return success({
         leadId: binToUUID(lead.leadId),
       });
     }
-    return Result.success(false);
+    return success(false);
   } catch (err) {
     logError('error checking nonce', err instanceof Error ? err.message : err);
-    return Result.fail(err instanceof Error ? err : Error('unknown error'));
+    return fail(err instanceof Error ? err : Error('unknown error'));
   }
 };
 
-export const storeLead = async (request: LeadPayload): Promise<ResultType<StoredLead>> => {
+export const storeLead = async (request: LeadPayload): Promise<Result<StoredLead>> => {
   try {
     const prismaNow = fixPrismaWriteDate(getDate());
     const leadId = uuidToBin(createUUID());
@@ -132,16 +132,16 @@ export const storeLead = async (request: LeadPayload): Promise<ResultType<Stored
       },
     });
 
-    return Result.success({
+    return success({
       leadId: binToUUID(lead.leadId),
     });
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
-    return Result.fail(err instanceof Error ? err : Error('unknown error'));
+    return fail(err instanceof Error ? err : Error('unknown error'));
   }
 };
 
-export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<ResultType<string>> => {
+export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<Result<string>> => {
   try {
     const leadIdBin = uuidToBin(request.leadId);
     const prismaNow = fixPrismaWriteDate(getDate());
@@ -154,9 +154,9 @@ export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload)
       where: { leadId: leadIdBin },
     });
 
-    return Result.success(lead.emailAddress);
+    return success(lead.emailAddress);
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
-    return Result.fail(err instanceof Error ? err : Error('unknown error'));
+    return fail(err instanceof Error ? err : Error('unknown error'));
   }
 };

@@ -1,14 +1,14 @@
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 import { createSHA256Hash } from './createSHA256Hash.mjs';
 
-export const verifySignature = (payload: Buffer, signature: string): ResultType<void> => {
+export const verifySignature = (payload: Buffer, signature: string): Result => {
   const hash = createSHA256Hash(payload);
 
   if (hash !== signature) {
-    return Result.fail(Error('Signature mismatch'));
+    return fail(Error('Signature mismatch'));
   }
 
-  return Result.success(undefined);
+  return success(undefined);
 };

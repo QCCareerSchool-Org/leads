@@ -1,9 +1,9 @@
 import type { RequestHandler } from 'express';
 
+import { fbVerify } from '#src/interactors/facebook/verify.mjs';
 import { validateRequest } from './validateRequest.mjs';
-import { verify } from '../../interactors/facebook.mjs';
 
-export const handleFacebookVerification: RequestHandler = async (req, res) => {
+export const handleVerification: RequestHandler = async (req, res) => {
   const validateResult = await validateRequest(req.query);
   if (!validateResult.success) {
     res.status(400).send(validateResult.error.message);
@@ -11,7 +11,7 @@ export const handleFacebookVerification: RequestHandler = async (req, res) => {
   }
   const payload = validateResult.value;
 
-  const result = verify(payload);
+  const result = fbVerify(payload);
   if (!result.success) {
     res.status(403).send(result.error.message);
     return;

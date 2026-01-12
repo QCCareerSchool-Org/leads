@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 import { z } from 'zod';
 
 import type { PostTelephoneNumberRequest } from '../domain/postTelephoneNumberRequest.mjs';
@@ -50,12 +50,12 @@ const schema = z.object({
   listId: z.number().int().positive(),
 });
 
-const validateTelephoneNumberRequest = async (requestBody: Request['body']): Promise<ResultType<PostTelephoneNumberRequest>> => {
+const validateTelephoneNumberRequest = async (requestBody: Request['body']): Promise<Result<PostTelephoneNumberRequest>> => {
   try {
     const body = await schema.parseAsync(await requestBody);
-    return Result.success(body);
+    return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
-    return Result.fail(Error(message));
+    return fail(Error(message));
   }
 };

@@ -1,4 +1,4 @@
-import { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 import { createNext, createReq, createRes } from '#test/express.mjs';
 import { verifyFBSignature } from './verifyFBSignature.mjs';
@@ -63,7 +63,7 @@ describe('verifySignature middleware', () => {
 
   it('should call res.status(403) if the rawBody\'s hash doesn\'t matches the signature', () => {
     const errorMessage = 'hgksdfjhglsdfkjgh';
-    verifySignatureMock.mockReturnValue(Result.fail(Error(errorMessage)));
+    verifySignatureMock.mockReturnValue(fail(Error(errorMessage)));
     const rawBody = Buffer.from('3f8a9c1d72e4b5a0c6d1f92b8e47a3c59d0e4a7b1c6f82d5e93a04b7c1f6d8a2e5b9c0471a6d3f82c9e0b5a7d14f6c93', 'hex');
     const signature = 'c8cb72bc8cb3241efa33824fbe0a3c1498206db9d0f88b6ca90d3fc7707791cf';
     const req = createReq({ rawBody, headers: { 'x-hub-signature-256': `sha256=${signature}` } });
@@ -77,7 +77,7 @@ describe('verifySignature middleware', () => {
   });
 
   it('should call next if the rawBody\'s hash matches the signature', () => {
-    verifySignatureMock.mockReturnValue(Result.success(undefined));
+    verifySignatureMock.mockReturnValue(success(undefined));
     const rawBody = Buffer.from('3f8a9c1d72e4b5a0c6d1f92b8e47a3c59d0e4a7b1c6f82d5e93a04b7c1f6d8a2e5b9c0471a6d3f82c9e0b5a7d14f6c93', 'hex');
     const signature = 'c8cb72bc8cb3241efa33824fbe0a3c1498206db9d0f88b6ca90d3fc7707791cf';
     const req = createReq({ rawBody, headers: { 'x-hub-signature-256': `sha256=${signature}` } });

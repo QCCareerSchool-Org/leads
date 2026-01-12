@@ -1,5 +1,5 @@
-import type { ResultType } from 'generic-result-type';
-import { Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 type ErrorCode =
   | 'missing-input-secret' // The secret parameter is missing.
@@ -30,7 +30,7 @@ const isReCaptchaResponse = (obj: unknown): obj is ReCaptchaResponse => {
     (!('hostname' in obj) || ('hostname' in obj && typeof obj.hostname === 'string'));
 };
 
-export const validateCaptcha = async (token: string, remoteIp?: string | null): Promise<ResultType<ReCaptchaResponse>> => {
+export const validateCaptcha = async (token: string, remoteIp?: string | null): Promise<Result<ReCaptchaResponse>> => {
   try {
     const urlSearchParams = new URLSearchParams({
       secret: secretKey,
@@ -45,16 +45,16 @@ export const validateCaptcha = async (token: string, remoteIp?: string | null): 
       body: urlSearchParams,
     });
     if (!response.ok) {
-      return Result.fail(Error('reCaptcha http request error'));
+      return fail(Error('reCaptcha http request error'));
     }
     const validationResult: unknown = await response.json();
     if (!isReCaptchaResponse(validationResult)) {
-      return Result.fail(Error('Invalid reCaptcha response body'));
+      return fail(Error('Invalid reCaptcha response body'));
     }
-    return Result.success(validationResult);
+    return success(validationResult);
   } catch (cause: unknown) {
     const err = Error('Unknown reCaptcha error');
     err.cause = cause;
-    return Result.fail(err);
+    return fail(err);
   }
 };
