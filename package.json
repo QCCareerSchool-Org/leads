@@ -13,13 +13,16 @@
   "license": "UNLICENSED",
   "author": "QC Career School",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "imports": {
+    "#src/*": "./dist/*"
+  },
   "scripts": {
-    "start": "node dist",
-    "build": "tsc",
-    "lint": "eslint src",
-    "lint:fix": "eslint --fix src",
+    "start": "node dist/index.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "jest --verbose",
     "test:watch": "jest --verbose --watch",
     "generate": "prisma generate --schema ./prisma/schema.general.prisma && prisma generate --schema ./prisma/schema.leads.prisma"
@@ -35,6 +38,7 @@
     "dotenv": "^17.2.3",
     "escape-html": "^1.0.3",
     "express": "^5.2.1",
+    "generic-result-type": "^1.0.0",
     "helmet": "^8.1.0",
     "maxmind": "^5.0.3",
     "uuid": "^13.0.0",
@@ -57,6 +61,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.4",
     "@types/node-fetch": "^2.6.13",
+    "eslint": "^9.39.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest": "^29.12.1",
