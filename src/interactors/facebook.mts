@@ -12,6 +12,8 @@ if (!verifyToken) {
 }
 
 export const verify = (payload: FBVerification): ResultType<number> => {
+  console.log('expecter', verifyToken);
+  console.log('received', payload['hub.verify_token']);
   if (payload['hub.verify_token'] !== verifyToken) {
     return Result.fail(Error('hub.verify_token mismatch'));
   }

@@ -4,7 +4,7 @@ import { validateRequest } from './validateRequest.mjs';
 import { verify } from '../../interactors/facebook.mjs';
 
 export const handleFacebookVerification: RequestHandler = async (req, res) => {
-  const validateResult = await validateRequest(req.body);
+  const validateResult = await validateRequest(req.query);
   if (!validateResult.success) {
     res.status(400).send(validateResult.error.message);
     return;
