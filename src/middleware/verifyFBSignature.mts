@@ -8,6 +8,11 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
     return;
   }
 
+  if (req.method === 'GET') {
+    next();
+    return;
+  }
+
   const header = req.headers['x-hub-signature-256'];
 
   if (!header) {
