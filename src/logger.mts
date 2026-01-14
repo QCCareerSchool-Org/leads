@@ -47,3 +47,7 @@ export const logWarning = (message: string, ...meta: unknown[]): void => {
 export const logInfo = (message: string, ...meta: unknown[]): void => {
   logger.info(message, meta);
 };
+
+export const logDebug = (message: string, ...meta: unknown[]): void => {
+  logger.debug(message, meta);
+};

@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-import { logWarning } from '#src/logger.mjs';
+import { logDebug, logWarning } from '#src/logger.mjs';
 import { logError } from '#src/logger.mjs';
 import { verifySignature } from '../lib/verifySignature.mjs';
 
@@ -16,6 +16,7 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
   }
 
   const header = req.headers['x-hub-signature-256'];
+  logDebug('X-Hub-Signature-256', header);
 
   if (!header) {
     logWarning('X-Hub-Signature-256 header not found');
