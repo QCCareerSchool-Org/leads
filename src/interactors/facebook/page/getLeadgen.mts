@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { success } from 'generic-result-type';
+import { fail, success } from 'generic-result-type';
 
 import type { Leadgen } from '#src/domain/facebook/leadgen.mjs';
 import { isLeadGen } from '#src/domain/facebook/leadgen.mjs';
