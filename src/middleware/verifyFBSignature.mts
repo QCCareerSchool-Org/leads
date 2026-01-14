@@ -55,5 +55,7 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
     return;
   }
 
+  logDebug('Signature matches');
+
   next();
 };
