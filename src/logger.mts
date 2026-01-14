@@ -1,14 +1,17 @@
 import { NodemailerTransport } from '@qccareerschool/winston-nodemailer';
-import winston from 'winston';
+import { createLogger, format, transports } from 'winston';
 
 import config from './config.mjs';
 
-const logger = winston.createLogger({
+const logger = createLogger({
   level: 'info',
-  format: winston.format.json(),
+  format: format.combine(
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.json(),
+  ),
   transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
+    new transports.File({ filename: 'error.log', level: 'error' }),
+    new transports.File({ filename: 'combined.log' }),
     new NodemailerTransport({
       host: config.logEmail.host,
       port: config.logEmail.port,
@@ -26,8 +29,8 @@ const logger = winston.createLogger({
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
+  logger.add(new transports.Console({
+    format: format.simple(),
   }));
 }
 
