@@ -7,6 +7,8 @@ const logger = createLogger({
   level: 'info',
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.splat(),
+    format.metadata({ fillExcept: [ 'level', 'message', 'timestamp' ] }),
     format.json(),
   ),
   transports: [
