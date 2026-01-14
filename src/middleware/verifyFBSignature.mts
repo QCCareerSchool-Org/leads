@@ -16,7 +16,7 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
   }
 
   const header = req.headers['x-hub-signature-256'];
-  logDebug('X-Hub-Signature-256', header);
+  logDebug('X-Hub-Signature-256 header', header);
 
   if (!header) {
     logWarning('X-Hub-Signature-256 header not found');
@@ -30,7 +30,7 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
     return;
   }
 
-  const matches = /^sha256=([0-9a-f])+$/u.exec(header);
+  const matches = /^sha256=([0-9a-f]{64})+$/u.exec(header);
 
   if (matches === null || matches.length === 0) {
     logWarning('X-Hub-Signature-256 header has an invalid format');
