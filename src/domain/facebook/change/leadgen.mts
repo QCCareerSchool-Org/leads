@@ -1,23 +1,17 @@
-export interface FBChange {
-  field: string;
-}
+import type { FBChange } from './index.mjs';
+import { isFBChange } from './index.mjs';
 
-const isFBChange = (obj: unknown): obj is FBChange => {
-  return obj !== null && typeof obj === 'object' &&
-    'field' in obj && typeof obj.field === 'string';
-};
-
-export interface FBLeadGenChange extends FBChange {
+export interface FBLeadgenChange extends FBChange {
   field: 'leadgen';
-  value: FBLeadGenChangeValue;
+  value: FBLeadgenChangeValue;
 }
 
-export const isFBLeadGenChange = (obj: unknown): obj is FBLeadGenChange => {
+export const isFBLeadgenChange = (obj: unknown): obj is FBLeadgenChange => {
   return isFBChange(obj) && obj.field === 'leadgen' &&
-  'value' in obj && Array.isArray(obj.value) && obj.value.every(isFBLeadGenChangeValue);
+  'value' in obj && Array.isArray(obj.value) && obj.value.every(isFBLeadgenChangeValue);
 };
 
-interface FBLeadGenChangeValue {
+interface FBLeadgenChangeValue {
   leadgen_id: string;
   page_id: string;
   form_id: string;
@@ -26,7 +20,7 @@ interface FBLeadGenChangeValue {
   created_time: number;
 }
 
-const isFBLeadGenChangeValue = (obj: unknown): obj is FBLeadGenChange => {
+const isFBLeadgenChangeValue = (obj: unknown): obj is FBLeadgenChange => {
   return obj !== null && typeof obj === 'object' &&
     'leadgen_id' in obj && typeof obj.leadgen_id === 'string' &&
     'page_id' in obj && typeof obj.page_id === 'string' &&

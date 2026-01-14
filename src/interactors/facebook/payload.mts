@@ -1,21 +1,28 @@
 import type { Result } from 'generic-result-type';
 import { fail, success } from 'generic-result-type';
 
-import type { FBLeadGenChange } from '#src/domain/facebook/change.mjs';
-import { isFBLeadGenChange } from '#src/domain/facebook/change.mjs';
+import type { FBLeadgenChange } from '#src/domain/facebook/change/leadgen.mjs';
+import { isFBLeadgenChange } from '#src/domain/facebook/change/leadgen.mjs';
 import type { FBPayload } from '#src/domain/facebook/payload.mjs';
 import type { SchoolSlug } from '#src/domain/school.mjs';
 import { createBrevoContact, sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { logWarning } from '#src/logger.mjs';
 
-export const fbPayload = async (payload: FBPayload, schoolSlug: SchoolSlug): Promise<Result<number>> => {
+/**
+ * Acts on a payload
+ * @param payload the payload
+ * @param schoolSlug get rid of this once the old endpoint is decommissioned
+ * @returns a Result type indicating the number of changes processed
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const fbPayload = async (payload: FBPayload, schoolSlug?: SchoolSlug): Promise<Result<number>> => {
   const errors: Error[] = [];
   let total = 0;
 
   for (const entry of payload.entry) {
     for (const change of entry.changes) {
-      if (isFBLeadGenChange(change)) {
-        const result = await fbLeadgen(change, schoolSlug);
+      if (isFBLeadgenChange(change)) {
+        const result = await fbLeadgenChange(change);
         if (!result.success) {
           errors.push(result.error);
         } else {
@@ -34,15 +41,15 @@ export const fbPayload = async (payload: FBPayload, schoolSlug: SchoolSlug): Pro
   return success(total);
 };
 
-const fbLeadgen = async (change: FBLeadGenChange, schoolSlug: SchoolSlug): Promise<Result> => {
-  const formMap = schoolMap[schoolSlug];
-  if (!formMap) {
-    return fail(Error(`form map for school ${schoolSlug} not found`));
-  }
-
+/**
+ * Acts on a change
+ * @param change the change
+ * @returns a Result type
+ */
+const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   const form = formMap[change.value.form_id];
   if (!form) {
-    return fail(Error(`form "${change.value.form_id}" not found in form map for ${schoolSlug}`));
+    return fail(Error(`form "${change.value.form_id}" not found in form map`));
   }
 
   const data = await getLeadGen(change.value.leadgen_id, 'ddddd');
@@ -75,13 +82,10 @@ const fbLeadgen = async (change: FBLeadGenChange, schoolSlug: SchoolSlug): Promi
 };
 
 type FormMap = Record<string, { listIds?: number[]; emailTemplateId?: number } | undefined>;
-type SchoolMap = Partial<Record<SchoolSlug, FormMap>>;
 
-const schoolMap: SchoolMap = {
-  makeup: {
-    1510363700231237: { listIds: [ 77 ], emailTemplateId: 32 },
-    1: { listIds: [], emailTemplateId: 54 },
-  },
+const formMap: FormMap = {
+  1510363700231237: { listIds: [ 77 ], emailTemplateId: 32 },
+  1: { listIds: [], emailTemplateId: 54 },
 };
 
 const addToBrevo = async (emailAddress: string, firstName?: string, phoneNumber?: string, listIds?: number[], emailTemplateId?: number): Promise<Result> => {

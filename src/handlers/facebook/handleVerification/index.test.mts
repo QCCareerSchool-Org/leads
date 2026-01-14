@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { fail, success } from 'generic-result-type';
 
 import type { FBVerification } from '#src/domain/facebook/verification.mjs';
-import { verify } from '#src/interactors/facebook/verify.mjs';
+import { fbVerify } from '#src/interactors/facebook/verify.mjs';
 import { createNext, createReq, createRes } from '#test/express.mjs';
 import { handleVerification } from './index.mjs';
 import { validateRequest } from './validateRequest.mjs';
@@ -16,7 +16,7 @@ jest.mock('#src/interactors/facebook/verify.mjs', () => ({
 }));
 
 const validateRequestMock = validateRequest as jest.MockedFunction<typeof validateRequest>;
-const verifyMock = verify as jest.MockedFunction<typeof verify>;
+const verifyMock = fbVerify as jest.MockedFunction<typeof fbVerify>;
 
 describe('handleFacebookVerification handler', () => {
   it('should call res.status(400) if the request is invalid', async () => {

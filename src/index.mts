@@ -11,7 +11,6 @@ import { fbRouter } from './fbRouter.mjs';
 import { globalErrorHandler } from './handlers/globalErrorHandler.mjs';
 import { handleLeadsPost } from './handlers/handleLeadsPost.mjs';
 import { handleTelephoneNumberPost } from './handlers/handleTelephoneNumberPost.mjs';
-import { asyncWrapper } from './lib/asyncWrapper.mjs';
 import { logInfo } from './logger.mjs';
 import { browserDetectMiddleware } from './middleware/browserDetect.mjs';
 import { geoLocationMiddleware } from './middleware/geoLocation.mjs';
@@ -52,8 +51,8 @@ app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
 
-app.post('/', asyncWrapper(handleLeadsPost));
-app.post('/telephoneNumber', asyncWrapper(handleTelephoneNumberPost));
+app.post('/', handleLeadsPost);
+app.post('/telephoneNumber', handleTelephoneNumberPost);
 app.use('/fb', fbRouter);
 
 app.use(globalErrorHandler);
