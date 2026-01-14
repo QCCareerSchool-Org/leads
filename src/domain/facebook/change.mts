@@ -1,15 +1,11 @@
-import type { FBChange } from './index.mjs';
-import { isFBChange } from './index.mjs';
+export interface FBChange {
+  field: string;
+}
 
 export interface FBLeadgenChange extends FBChange {
   field: 'leadgen';
   value: FBLeadgenChangeValue;
 }
-
-export const isFBLeadgenChange = (obj: unknown): obj is FBLeadgenChange => {
-  return isFBChange(obj) && obj.field === 'leadgen' &&
-  'value' in obj && Array.isArray(obj.value) && obj.value.every(isFBLeadgenChangeValue);
-};
 
 interface FBLeadgenChangeValue {
   leadgen_id: string;
@@ -19,6 +15,16 @@ interface FBLeadgenChangeValue {
   ad_id: string;
   created_time: number;
 }
+
+export const isFBChange = (obj: unknown): obj is FBChange => {
+  return obj !== null && typeof obj === 'object' &&
+    'field' in obj && typeof obj.field === 'string';
+};
+
+export const isFBLeadgenChange = (obj: unknown): obj is FBLeadgenChange => {
+  return isFBChange(obj) && obj.field === 'leadgen' &&
+  'value' in obj && Array.isArray(obj.value) && obj.value.every(isFBLeadgenChangeValue);
+};
 
 const isFBLeadgenChangeValue = (obj: unknown): obj is FBLeadgenChange => {
   return obj !== null && typeof obj === 'object' &&

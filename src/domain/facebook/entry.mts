@@ -1,5 +1,5 @@
-import type { FBChange } from './change/index.mjs';
-import { isFBChange } from './change/index.mjs';
+import type { FBChange } from './change.mjs';
+import { isFBChange } from './change.mjs';
 
 export interface FBEntry {
   id: string;
