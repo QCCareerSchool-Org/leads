@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
 
+import { isError } from '#src/lib/isError.mjs';
 import { logError } from '#src/logger.mjs';
 
 const INTERNAL_SERVER_ERROR_CODE = 500;
@@ -11,8 +12,4 @@ export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => 
   } else {
     next(err);
   }
-};
-
-const isError = (o: unknown): o is Error => {
-  return typeof o === 'object' && o !== null && 'message' in o && typeof o.message === 'string';
 };
