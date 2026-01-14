@@ -2,11 +2,13 @@ import type { RequestHandler } from 'express';
 
 import { fbPage } from '#src/interactors/facebook/page/index.mjs';
 import { logError } from '#src/logger.mjs';
+import { logWarning } from '#src/logger.mjs';
 import { validateRequest } from './validateRequest.mjs';
 
 export const handlePage: RequestHandler = async (req, res) => {
   const payload = await validateRequest(req.body);
   if (!payload.success) {
+    logWarning(payload.error.message);
     res.status(400).send(payload.error.message);
     return;
   }
