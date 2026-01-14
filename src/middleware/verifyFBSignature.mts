@@ -39,6 +39,7 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
   }
 
   const signature = matches[1];
+  logDebug('Signature', signature);
 
   if (!req.rawBody) {
     logError('Raw buffer not detected');
