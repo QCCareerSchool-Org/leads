@@ -1,9 +1,9 @@
 import { type Result, success } from 'generic-result-type';
 import z from 'zod';
 
-import type { FBPayload } from '#src/domain/facebook/payload.mjs';
+import type { FBObject } from '#src/domain/facebook/payload.mjs';
 
-export const validateRequest = async (requestBody: unknown): Promise<Result<FBPayload>> => {
+export const validateRequest = async (requestBody: unknown): Promise<Result<FBObject>> => {
   const result = await schema.safeParseAsync(await requestBody);
   if (result.error) {
     return fail(Error(result.error.message));

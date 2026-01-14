@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
-import { handlePayload } from './handlers/facebook/handlePayload/index.mjs';
-import { handlePayload as oldHandlePayload } from './handlers/facebook/handlePayload/index.old.mjs';
+import { handlePage } from './handlers/facebook/handlePage/index.mjs';
 import { handleVerification } from './handlers/facebook/handleVerification/index.mjs';
 import { logRequest } from './middleware/logRequest.mjs';
 import { verifyFBSignature } from './middleware/verifyFBSignature.mjs';
@@ -10,7 +9,5 @@ export const fbRouter = Router();
 
 fbRouter.use(logRequest);
 fbRouter.use(verifyFBSignature);
-fbRouter.get('/forms/:schoolSlug', handleVerification);
-fbRouter.post('/forms/:schoolSlug', oldHandlePayload);
-fbRouter.get('/forms', handleVerification);
-fbRouter.post('/forms', handlePayload);
+fbRouter.get('/pages', handleVerification);
+fbRouter.post('/pages', handlePage);
