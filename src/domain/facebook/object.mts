@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { logDebug } from '#src/logger.mjs';
 import type { FBEntry } from './entry.mjs';
 import { isFBEntry } from './entry.mjs';
@@ -29,28 +28,3 @@ export const isFBPage = (obj: unknown): obj is FBPage => {
   }
   return result;
 };
-
-const test = {
-  entry: [
-    {
-      changes: [
-        {
-          field: 'leadgen',
-          value: {
-            created_time: 1768430020,
-            form_id: '1510363700231237',
-            leadgen_id: '1570418743993590',
-            page_id: '313411673642',
-          },
-        },
-      ],
-      id: '313411673642',
-      time: 1768430023,
-    },
-  ],
-  object: 'page',
-};
-
-if (!isFBPage(test)) {
-  throw Error();
-}

@@ -8,9 +8,9 @@ import { addToBrevo } from './addToBrevo.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.mjs';
 
-export const fbChange = async (change: FBChange, pageId: string): Promise<Result> => {
+export const fbChange = async (change: FBChange): Promise<Result> => {
   if (isFBLeadgenChange(change)) {
-    return fbLeadgenChange(change, pageId);
+    return fbLeadgenChange(change);
   }
 
   return fail(Error('Unrecognized change'));
@@ -21,12 +21,12 @@ export const fbChange = async (change: FBChange, pageId: string): Promise<Result
  * @param change the change
  * @returns a Result type
  */
-const fbLeadgenChange = async (change: FBLeadgenChange, pageId: string): Promise<Result> => {
+const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   logDebug('Processing change');
 
-  const page = pageMap[pageId];
+  const page = pageMap[change.value.page_id];
   if (!page) {
-    return fail(Error(`page id ${pageId} not found`));
+    return fail(Error(`page id ${change.value.page_id} not found`));
   }
 
   const form = page.formMap[change.value.form_id];

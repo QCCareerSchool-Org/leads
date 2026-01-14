@@ -38,11 +38,10 @@ export const fbPage = async (page: FBObject): Promise<Result<number>> => {
 const fbEntry = async (entry: FBEntry): Promise<ISuccessResult<number>> => {
   logDebug('Processing entry');
 
-  const pageId = entry.id;
   let total = 0;
 
   for (const change of entry.changes) {
-    const result = await fbChange(change, pageId);
+    const result = await fbChange(change);
     if (result.success) {
       total++;
     } else {

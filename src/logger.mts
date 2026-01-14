@@ -14,19 +14,19 @@ const logger = createLogger({
   transports: [
     new transports.File({ filename: 'error.log', level: 'error' }),
     new transports.File({ filename: 'combined.log' }),
-    new NodemailerTransport({
-      host: config.logEmail.host,
-      port: config.logEmail.port,
-      secure: config.logEmail.mode === 'TLS',
-      auth: {
-        user: config.logEmail.username,
-        pass: config.logEmail.password,
-      },
-      from: config.logEmail.from,
-      to: config.logEmail.to,
-      tags: [ 'leads' ],
-      level: 'warn',
-    }),
+    // new NodemailerTransport({
+    //   host: config.logEmail.host,
+    //   port: config.logEmail.port,
+    //   secure: config.logEmail.mode === 'TLS',
+    //   auth: {
+    //     user: config.logEmail.username,
+    //     pass: config.logEmail.password,
+    //   },
+    //   from: config.logEmail.from,
+    //   to: config.logEmail.to,
+    //   tags: [ 'leads' ],
+    //   level: 'warn',
+    // }),
   ],
 });
 
