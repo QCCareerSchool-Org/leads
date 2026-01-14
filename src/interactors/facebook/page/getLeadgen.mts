@@ -3,7 +3,7 @@ import { success } from 'generic-result-type';
 
 import type { Leadgen } from '#src/domain/facebook/leadgen.mjs';
 import { isLeadGen } from '#src/domain/facebook/leadgen.mjs';
-import { errToResult } from '#src/lib/errToResult.mjs';
+import { coerceError } from '#src/lib/coerceError.mjs';
 
 export const getLeadgen = async (id: string, pageAccessToken: string): Promise<Result<Leadgen>> => {
   // eslint-disable-next-line camelcase
@@ -19,6 +19,6 @@ export const getLeadgen = async (id: string, pageAccessToken: string): Promise<R
     }
     return success(body);
   } catch (err: unknown) {
-    return errToResult(err, 'Unknown error fetching leadgen');
+    return fail(coerceError(err, 'Unknown error fetching leadgen'));
   }
 };
