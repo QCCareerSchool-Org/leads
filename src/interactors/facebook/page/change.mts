@@ -4,6 +4,7 @@ import { fail, success } from 'generic-result-type';
 import type { FBLeadgenChange } from '#src/domain/facebook/change/leadgen.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change/leadgen.mjs';
 import type { FBChange } from '#src/domain/facebook.mjs';
+import { logDebug } from '#src/logger.mjs';
 import { addToBrevo } from './addToBrevo.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.js';
@@ -22,6 +23,8 @@ export const fbChange = async (change: FBChange, pageId: string): Promise<Result
  * @returns a Result type
  */
 const fbLeadgenChange = async (change: FBLeadgenChange, pageId: string): Promise<Result> => {
+  logDebug('Processing change');
+
   const page = pageMap[pageId];
   if (!page) {
     return fail(Error(`page id ${pageId} not found`));

@@ -5,6 +5,7 @@ import type { FBObject } from '#src/domain/facebook/object.mjs';
 import { isFBPage } from '#src/domain/facebook/object.mjs';
 import type { FBEntry } from '#src/domain/facebook.mjs';
 import { logError } from '#src/logger.mjs';
+import { logDebug } from '#src/logger.mjs';
 import { fbChange } from './change.mjs';
 
 /**
@@ -13,6 +14,8 @@ import { fbChange } from './change.mjs';
  * @returns the number of changes acted on
  */
 export const fbPage = async (page: FBObject): Promise<Result<number>> => {
+  logDebug('Processing page');
+
   if (!isFBPage(page)) {
     return fail(Error('Not a page object'));
   }
@@ -33,6 +36,8 @@ export const fbPage = async (page: FBObject): Promise<Result<number>> => {
  * @returns the number of changes acted on
  */
 const fbEntry = async (entry: FBEntry): Promise<ISuccessResult<number>> => {
+  logDebug('Processing entry');
+
   const pageId = entry.id;
   let total = 0;
 

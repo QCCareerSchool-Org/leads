@@ -14,7 +14,7 @@ export const handlePage: RequestHandler = async (req, res) => {
     return;
   }
 
-  logDebug('Got object', payload);
+  logDebug('Got object', payload.value);
 
   const result = await fbPage(payload.value);
   if (!result.success) {
