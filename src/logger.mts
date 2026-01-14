@@ -9,7 +9,7 @@ const logger = createLogger({
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.splat(),
     format.metadata({ fillExcept: [ 'level', 'message', 'timestamp' ] }),
-    format.json(),
+    format.json({ space: 2 }),
   ),
   transports: [
     new transports.File({ filename: 'error.log', level: 'error' }),
