@@ -1,9 +1,9 @@
 import type { ISuccessResult, Result } from 'generic-result-type';
 import { fail, success } from 'generic-result-type';
 
+import type { FBEntry } from '#src/domain/facebook/entry.mjs';
 import type { FBObject } from '#src/domain/facebook/object.mjs';
 import { isFBPage } from '#src/domain/facebook/object.mjs';
-import type { FBEntry } from '#src/domain/facebook.mjs';
 import { logError } from '#src/logger.mjs';
 import { logDebug } from '#src/logger.mjs';
 import { fbChange } from './change.mjs';

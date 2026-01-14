@@ -3,7 +3,6 @@ import type { RequestHandler } from 'express';
 import { fbPage } from '#src/interactors/facebook/page/index.mjs';
 import { logError } from '#src/logger.mjs';
 import { logWarning } from '#src/logger.mjs';
-import { logDebug } from '#src/logger.mjs';
 import { validateRequest } from './validateRequest.mjs';
 
 export const handlePage: RequestHandler = async (req, res) => {
@@ -13,8 +12,6 @@ export const handlePage: RequestHandler = async (req, res) => {
     res.status(400).send(payload.error.message);
     return;
   }
-
-  logDebug('Got object', payload.value);
 
   const result = await fbPage(payload.value);
   if (!result.success) {
