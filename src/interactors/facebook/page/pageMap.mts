@@ -1,9 +1,12 @@
-interface Page {
+import type { SchoolName } from '#src/domain/school.mjs';
+
+export interface Page {
+  schoolName: SchoolName;
   accessToken: string;
   formMap: FormMap;
 }
 
-interface Form {
+export interface Form {
   listIds: number[];
   emailTemplateId?: number;
 }
@@ -20,6 +23,7 @@ const required = (name: string): string => {
 
 export const pageMap: PageMap = {
   313411673642: {
+    schoolName: 'QC Event School',
     accessToken: required('313411673642'),
     formMap: {
       1510363700231237: { listIds: [ 77 ], emailTemplateId: 32 },

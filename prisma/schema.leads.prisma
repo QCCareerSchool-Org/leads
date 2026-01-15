@@ -34,6 +34,7 @@ model Lead {
   // school                School                 @relation(fields: [schoolName], references: [name], onDelete: Cascade, map: "FK_leads_general.schools")
   marketingParameterSet MarketingParameterSet?
   courses               LeadsOnCourses[]
+  fbFields              Json?
 
   @@map("leads")
   @@index([schoolName])

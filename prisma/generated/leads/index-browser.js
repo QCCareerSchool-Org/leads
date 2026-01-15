@@ -142,7 +142,8 @@ exports.Prisma.LeadScalarFieldEnum = {
   msclkid: 'msclkid',
   created: 'created',
   updated: 'updated',
-  nonce: 'nonce'
+  nonce: 'nonce',
+  fbFields: 'fbFields'
 };
 
 exports.Prisma.LeadsOnCoursesScalarFieldEnum = {
@@ -162,6 +163,22 @@ exports.Prisma.MarketingParameterSetScalarFieldEnum = {
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {

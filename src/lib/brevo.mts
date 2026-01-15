@@ -90,6 +90,8 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
       // },
     });
 
+    console.log(result.body, result.response);
+
     if (result.body.messageId) {
       return success(result.body.messageId);
     }

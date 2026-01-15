@@ -8,11 +8,12 @@ import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
+import { storeLead } from '#src/lib/storeLead.mjs';
 import type { PostLeadRequest } from '../domain/postLeadRequest.mjs';
 import type { SchoolName } from '../domain/school.mjs';
 import { isSchoolName } from '../domain/school.mjs';
 import { schools } from '../domain/school.mjs';
-import { getLeadByNonce, storeLead } from '../interactors/leads.mjs';
+import { getLeadByNonce } from '../interactors/leads.mjs';
 import type { BrevoAttributes } from '../lib/brevo.mjs';
 import { createBrevoContact, sendBrevoEmail } from '../lib/brevo.mjs';
 import { getContactURL } from '../lib/contactUrl.mjs';
@@ -122,7 +123,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (request.nonce) {
     const leadResult = await getLeadByNonce(request.nonce);
     if (leadResult.success && leadResult.value !== false) {
-      successUrl.searchParams.set('leadId', leadResult.value.leadId);
+      successUrl.searchParams.set('leadId', leadResult.value);
       res.redirect(303, successUrl.href);
       return;
     }
@@ -164,6 +165,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     mobile: res.locals.browser?.mobile ?? null,
     nonce: request.nonce,
+    fbFields: null,
   });
 
   const attributes = getAttributes(request.school);
@@ -205,7 +207,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   if (newLeadResult.success) {
-    successUrl.searchParams.set('leadId', newLeadResult.value.leadId);
+    successUrl.searchParams.set('leadId', newLeadResult.value);
     res.redirect(303, successUrl.href);
   } else {
     logError('Unable to store lead', newLeadResult.error, createPayload(req, res));

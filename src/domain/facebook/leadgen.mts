@@ -1,3 +1,5 @@
+import type { JsonValue } from '../json.mjs';
+
 export interface Leadgen {
   /** string date */
   created_time: string;
@@ -6,6 +8,7 @@ export interface Leadgen {
 }
 
 interface LeadgenFieldData {
+  [k: string]: JsonValue;
   name: string;
   values: string[];
 }

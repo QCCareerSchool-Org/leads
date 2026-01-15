@@ -1133,6 +1133,7 @@ export namespace Prisma {
     created: number
     updated: number
     nonce: number
+    fbFields: number
     _all: number
   }
 
@@ -1210,6 +1211,7 @@ export namespace Prisma {
     created?: true
     updated?: true
     nonce?: true
+    fbFields?: true
     _all?: true
   }
 
@@ -1308,6 +1310,7 @@ export namespace Prisma {
     created: Date
     updated: Date
     nonce: Bytes | null
+    fbFields: JsonValue | null
     _count: LeadCountAggregateOutputType | null
     _min: LeadMinAggregateOutputType | null
     _max: LeadMaxAggregateOutputType | null
@@ -1350,6 +1353,7 @@ export namespace Prisma {
     created?: boolean
     updated?: boolean
     nonce?: boolean
+    fbFields?: boolean
     marketingParameterSet?: boolean | Lead$marketingParameterSetArgs<ExtArgs>
     courses?: boolean | Lead$coursesArgs<ExtArgs>
     _count?: boolean | LeadCountOutputTypeDefaultArgs<ExtArgs>
@@ -1380,9 +1384,10 @@ export namespace Prisma {
     created?: boolean
     updated?: boolean
     nonce?: boolean
+    fbFields?: boolean
   }
 
-  export type LeadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"leadId" | "ipAddress" | "schoolName" | "emailAddress" | "firstName" | "lastName" | "telephoneNumber" | "emailOptIn" | "smsOptIn" | "city" | "provinceCode" | "countryCode" | "referrer" | "browserName" | "browserVersion" | "os" | "mobile" | "gclid" | "msclkid" | "created" | "updated" | "nonce", ExtArgs["result"]["lead"]>
+  export type LeadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"leadId" | "ipAddress" | "schoolName" | "emailAddress" | "firstName" | "lastName" | "telephoneNumber" | "emailOptIn" | "smsOptIn" | "city" | "provinceCode" | "countryCode" | "referrer" | "browserName" | "browserVersion" | "os" | "mobile" | "gclid" | "msclkid" | "created" | "updated" | "nonce" | "fbFields", ExtArgs["result"]["lead"]>
   export type LeadInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     marketingParameterSet?: boolean | Lead$marketingParameterSetArgs<ExtArgs>
     courses?: boolean | Lead$coursesArgs<ExtArgs>
@@ -1418,6 +1423,7 @@ export namespace Prisma {
       created: Date
       updated: Date
       nonce: Prisma.Bytes | null
+      fbFields: Prisma.JsonValue | null
     }, ExtArgs["result"]["lead"]>
     composites: {}
   }
@@ -1811,6 +1817,7 @@ export namespace Prisma {
     readonly created: FieldRef<"Lead", 'DateTime'>
     readonly updated: FieldRef<"Lead", 'DateTime'>
     readonly nonce: FieldRef<"Lead", 'Bytes'>
+    readonly fbFields: FieldRef<"Lead", 'Json'>
   }
     
 
@@ -4087,7 +4094,8 @@ export namespace Prisma {
     msclkid: 'msclkid',
     created: 'created',
     updated: 'updated',
-    nonce: 'nonce'
+    nonce: 'nonce',
+    fbFields: 'fbFields'
   };
 
   export type LeadScalarFieldEnum = (typeof LeadScalarFieldEnum)[keyof typeof LeadScalarFieldEnum]
@@ -4119,6 +4127,31 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
   export const NullsOrder: {
@@ -4201,6 +4234,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -4236,6 +4283,7 @@ export namespace Prisma {
     created?: DateTimeFilter<"Lead"> | Date | string
     updated?: DateTimeFilter<"Lead"> | Date | string
     nonce?: BytesNullableFilter<"Lead"> | Bytes | null
+    fbFields?: JsonNullableFilter<"Lead">
     marketingParameterSet?: XOR<MarketingParameterSetNullableScalarRelationFilter, MarketingParameterSetWhereInput> | null
     courses?: LeadsOnCoursesListRelationFilter
   }
@@ -4263,6 +4311,7 @@ export namespace Prisma {
     created?: SortOrder
     updated?: SortOrder
     nonce?: SortOrderInput | SortOrder
+    fbFields?: SortOrderInput | SortOrder
     marketingParameterSet?: MarketingParameterSetOrderByWithRelationInput
     courses?: LeadsOnCoursesOrderByRelationAggregateInput
     _relevance?: LeadOrderByRelevanceInput
@@ -4294,6 +4343,7 @@ export namespace Prisma {
     created?: DateTimeFilter<"Lead"> | Date | string
     updated?: DateTimeFilter<"Lead"> | Date | string
     nonce?: BytesNullableFilter<"Lead"> | Bytes | null
+    fbFields?: JsonNullableFilter<"Lead">
     marketingParameterSet?: XOR<MarketingParameterSetNullableScalarRelationFilter, MarketingParameterSetWhereInput> | null
     courses?: LeadsOnCoursesListRelationFilter
   }, "leadId">
@@ -4321,6 +4371,7 @@ export namespace Prisma {
     created?: SortOrder
     updated?: SortOrder
     nonce?: SortOrderInput | SortOrder
+    fbFields?: SortOrderInput | SortOrder
     _count?: LeadCountOrderByAggregateInput
     _max?: LeadMaxOrderByAggregateInput
     _min?: LeadMinOrderByAggregateInput
@@ -4352,6 +4403,7 @@ export namespace Prisma {
     created?: DateTimeWithAggregatesFilter<"Lead"> | Date | string
     updated?: DateTimeWithAggregatesFilter<"Lead"> | Date | string
     nonce?: BytesNullableWithAggregatesFilter<"Lead"> | Bytes | null
+    fbFields?: JsonNullableWithAggregatesFilter<"Lead">
   }
 
   export type LeadsOnCoursesWhereInput = {
@@ -4480,6 +4532,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetCreateNestedOneWithoutLeadInput
     courses?: LeadsOnCoursesCreateNestedManyWithoutLeadInput
   }
@@ -4507,6 +4560,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUncheckedCreateNestedOneWithoutLeadInput
     courses?: LeadsOnCoursesUncheckedCreateNestedManyWithoutLeadInput
   }
@@ -4534,6 +4588,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUpdateOneWithoutLeadNestedInput
     courses?: LeadsOnCoursesUpdateManyWithoutLeadNestedInput
   }
@@ -4561,6 +4616,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUncheckedUpdateOneWithoutLeadNestedInput
     courses?: LeadsOnCoursesUncheckedUpdateManyWithoutLeadNestedInput
   }
@@ -4588,6 +4644,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type LeadUpdateManyMutationInput = {
@@ -4613,6 +4670,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type LeadUncheckedUpdateManyInput = {
@@ -4638,6 +4696,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type LeadsOnCoursesCreateInput = {
@@ -4800,6 +4859,29 @@ export namespace Prisma {
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type MarketingParameterSetNullableScalarRelationFilter = {
     is?: MarketingParameterSetWhereInput | null
@@ -4850,6 +4932,7 @@ export namespace Prisma {
     created?: SortOrder
     updated?: SortOrder
     nonce?: SortOrder
+    fbFields?: SortOrder
   }
 
   export type LeadMaxOrderByAggregateInput = {
@@ -4986,6 +5069,32 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type LeadScalarRelationFilter = {
@@ -5354,6 +5463,29 @@ export namespace Prisma {
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type MarketingParameterSetCreateWithoutLeadInput = {
     source?: string | null
@@ -5468,6 +5600,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetCreateNestedOneWithoutLeadInput
   }
 
@@ -5494,6 +5627,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUncheckedCreateNestedOneWithoutLeadInput
   }
 
@@ -5536,6 +5670,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUpdateOneWithoutLeadNestedInput
   }
 
@@ -5562,6 +5697,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     marketingParameterSet?: MarketingParameterSetUncheckedUpdateOneWithoutLeadNestedInput
   }
 
@@ -5588,6 +5724,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     courses?: LeadsOnCoursesCreateNestedManyWithoutLeadInput
   }
 
@@ -5614,6 +5751,7 @@ export namespace Prisma {
     created?: Date | string
     updated?: Date | string
     nonce?: Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     courses?: LeadsOnCoursesUncheckedCreateNestedManyWithoutLeadInput
   }
 
@@ -5656,6 +5794,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     courses?: LeadsOnCoursesUpdateManyWithoutLeadNestedInput
   }
 
@@ -5682,6 +5821,7 @@ export namespace Prisma {
     created?: DateTimeFieldUpdateOperationsInput | Date | string
     updated?: DateTimeFieldUpdateOperationsInput | Date | string
     nonce?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    fbFields?: NullableJsonNullValueInput | InputJsonValue
     courses?: LeadsOnCoursesUncheckedUpdateManyWithoutLeadNestedInput
   }
 
