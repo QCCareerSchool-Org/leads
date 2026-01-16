@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { JsonValue } from '#src/domain/json.mjs';
 import type { SchoolName } from '#src/domain/school.mjs';
@@ -113,6 +113,6 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
     return success(binToUUID(lead.leadId));
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
-    return fail(err instanceof Error ? err : Error('unknown error'));
+    return failure(err instanceof Error ? err : Error('unknown error'));
   }
 };
