@@ -8,6 +8,7 @@ export interface Page {
 
 export interface Form {
   listIds: number[];
+  smsListIds: number[];
   emailTemplateId?: number;
 }
 
@@ -31,7 +32,7 @@ export const pageMap: PageMap = {
     schoolName: 'QC Event School',
     accessToken: required('313411673642'),
     formMap: {
-      1764882231136307: { listIds: [ 77 ], emailTemplateId: 32 },
+      1764882231136307: { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
     },
   },
   165425206839810: {

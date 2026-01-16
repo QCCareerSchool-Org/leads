@@ -86,8 +86,16 @@ const store = async (page: Page, form: Form, emailAddresses: string[], fields: J
     errors.push(storeResult.error);
   }
 
+  const listIds: number[] = [];
+  if (emailOptIn) {
+    listIds.push(...form.listIds);
+  }
+  if (smsOptIn) {
+    listIds.push(...form.smsListIds);
+  }
+
   for (const emailAddress of emailAddresses) {
-    const brevoResult = await addToBrevo(emailAddress, firstName, telephoneNumber, form.listIds, form.emailTemplateId);
+    const brevoResult = await addToBrevo(emailAddress, firstName, telephoneNumber, listIds, form.emailTemplateId);
     if (!brevoResult.success) {
       errors.push(brevoResult.error);
     }
