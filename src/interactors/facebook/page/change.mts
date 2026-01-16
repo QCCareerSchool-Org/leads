@@ -51,10 +51,13 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const telephoneNumber = data.value.field_data.find(f => f.name === 'phone')?.values[0];
 
-  return store(page, form, emailAddresses, data.value.field_data, firstName, telephoneNumber);
+  const emailOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('additional_emails')) !== -1;
+  const smsOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('sms_offers')) !== -1;
+
+  return store(page, form, emailAddresses, data.value.field_data, emailOptIn, smsOptIn, firstName, telephoneNumber);
 };
 
-const store = async (page: Page, form: Form, emailAddresses: string[], fields: JsonValue, firstName?: string, telephoneNumber?: string): Promise<Result> => {
+const store = async (page: Page, form: Form, emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
   const errors: Error[] = [];
 
   const leadPayload: LeadPayload = {
@@ -64,8 +67,8 @@ const store = async (page: Page, form: Form, emailAddresses: string[], fields: J
     firstName: firstName ?? null,
     lastName: null,
     telephoneNumber: telephoneNumber ?? null,
-    emailOptIn: true,
-    smsOptIn: true,
+    emailOptIn,
+    smsOptIn,
     countryCode: null,
     provinceCode: null,
     city: null,

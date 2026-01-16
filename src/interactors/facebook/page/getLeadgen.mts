@@ -8,7 +8,7 @@ import { logDebug } from '#src/logger.mjs';
 
 export const getLeadgen = async (id: string, pageAccessToken: string): Promise<Result<Leadgen>> => {
   // eslint-disable-next-line camelcase
-  const params = new URLSearchParams({ access_token: pageAccessToken });
+  const params = new URLSearchParams({ fields: 'created_time,field_data,custom_disclaimer_responses', access_token: pageAccessToken });
   const url = `https://graph.facebook.com/v24.0/${id}?${params.toString()}`;
   logDebug('Fetching', url);
   try {
@@ -20,6 +20,7 @@ export const getLeadgen = async (id: string, pageAccessToken: string): Promise<R
     if (!isLeadGen(body)) {
       return failure(Error('Unexpected response'));
     }
+    logDebug('Leadgen', body);
     return success(body);
   } catch (err: unknown) {
     return failure(coerceError(err, 'Unknown error fetching leadgen'));
