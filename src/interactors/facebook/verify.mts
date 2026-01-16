@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { FBVerification } from '#src/domain/facebook/verification.mjs';
 
@@ -10,7 +10,7 @@ if (!verifyToken) {
 
 export const fbVerify = (payload: FBVerification): Result<number> => {
   if (payload['hub.verify_token'] !== verifyToken) {
-    return fail(Error('hub.verify_token mismatch'));
+    return failure(Error('hub.verify_token mismatch'));
   }
   return success(payload['hub.challenge']);
 };

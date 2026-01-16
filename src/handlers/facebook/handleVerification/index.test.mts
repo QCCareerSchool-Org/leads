@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { FBVerification } from '#src/domain/facebook/verification.mjs';
 import { fbVerify } from '#src/interactors/facebook/verify.mjs';
@@ -7,23 +7,23 @@ import { createNext, createReq, createRes } from '#test/express.mjs';
 import { handleVerification } from './index.mjs';
 import { validateRequest } from './validateRequest.mjs';
 
+jest.mock('#src/interactors/facebook/verify.mjs', () => ({
+  fbVerify: jest.fn(),
+}));
+
 jest.mock('./validateRequest.mjs', () => ({
   validateRequest: jest.fn(),
 }));
 
-jest.mock('#src/interactors/facebook/verify.mjs', () => ({
-  verify: jest.fn(),
-}));
-
 const validateRequestMock = validateRequest as jest.MockedFunction<typeof validateRequest>;
-const verifyMock = fbVerify as jest.MockedFunction<typeof fbVerify>;
+const fbVerifyMock = fbVerify as jest.MockedFunction<typeof fbVerify>;
 
 describe('handleFacebookVerification handler', () => {
   it('should call res.status(400) if the request is invalid', async () => {
     const errorMessage = faker.lorem.words();
     const challenge = faker.number.int(1000);
-    validateRequestMock.mockResolvedValue(fail(Error(errorMessage)));
-    verifyMock.mockReturnValue(success(challenge));
+    validateRequestMock.mockResolvedValue(failure(Error(errorMessage)));
+    fbVerifyMock.mockReturnValue(success(challenge));
     const req = createReq();
     const res = createRes();
     const next = createNext();
@@ -42,7 +42,7 @@ describe('handleFacebookVerification handler', () => {
       'hub.verify_token': faker.string.hexadecimal({ length: 16 }),
     };
     validateRequestMock.mockResolvedValue(success(body));
-    verifyMock.mockReturnValue(fail(Error(errorMessage)));
+    fbVerifyMock.mockReturnValue(failure(Error(errorMessage)));
     const req = createReq({ body });
     const res = createRes();
     const next = createNext();
@@ -60,7 +60,7 @@ describe('handleFacebookVerification handler', () => {
       'hub.verify_token': faker.string.hexadecimal({ length: 16 }),
     };
     validateRequestMock.mockResolvedValue(success(body));
-    verifyMock.mockReturnValue(success(challenge));
+    fbVerifyMock.mockReturnValue(success(challenge));
     const req = createReq({ body });
     const res = createRes();
     const next = createNext();

@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 
 interface MockResponse extends Response {
-  status: jest.Mock;
-  send: jest.Mock;
-  type: jest.Mock;
+  status: jest.MockedFunction<() => this>;
+  send: jest.MockedFunction<() => this>;
+  type: jest.MockedFunction<() => this>;
 }
 
 export const createReq = (overrides: Partial<Request> = {}): Request => ({
@@ -23,6 +23,4 @@ export const createRes = (overrides: Partial<MockResponse> = {}): MockResponse =
   } as MockResponse;
 };
 
-export const createNext = (): NextFunction => {
-  return jest.fn();
-};
+export const createNext = (): jest.MockedFunction<NextFunction> => jest.fn();

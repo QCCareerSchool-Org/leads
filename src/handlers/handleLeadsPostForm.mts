@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import type { Request, Response } from 'express';
 import fs from 'fs';
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
@@ -251,7 +251,7 @@ const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Re
     return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
-    return fail(Error(message));
+    return failure(Error(message));
   }
 };
 

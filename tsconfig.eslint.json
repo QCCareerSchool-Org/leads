@@ -4,12 +4,12 @@
     "rootDir": ".",
     "noEmit": true
   },
-  // "include": [
-  //   "src",
-  //   "__test__",
-  //   "jest.config.ts",
-  //   "jest.env.mts",
-  //   "eslint.config.mts",
-  //   "browser-detect.d.ts",
-  // ]
+  "include": [
+    "__test__",
+    "eslint.config.mts",
+    "jest.config.ts",
+    "jest.env.mts",
+    "browser-detect.d.ts",
+    "src",
+  ]
 }

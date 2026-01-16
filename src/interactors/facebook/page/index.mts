@@ -1,5 +1,5 @@
 import type { ISuccessResult, Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { FBEntry } from '#src/domain/facebook/entry.mjs';
 import type { FBObject } from '#src/domain/facebook/object.mjs';
@@ -17,7 +17,7 @@ export const fbPage = async (page: FBObject): Promise<Result<number>> => {
   logDebug('Processing page');
 
   if (!isFBPage(page)) {
-    return fail(Error('Not a page object'));
+    return failure(Error('Not a page object'));
   }
 
   let total = 0;

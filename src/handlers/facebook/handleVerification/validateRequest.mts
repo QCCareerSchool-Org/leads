@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 import z from 'zod';
 
 import type { FBVerification, FBVerifyMode } from '#src/domain/facebook/verification.mjs';
@@ -13,7 +13,7 @@ const schema = z.object({
 export const validateRequest = async (requestBody: unknown): Promise<Result<FBVerification>> => {
   const result = await schema.safeParseAsync(requestBody);
   if (result.error) {
-    return fail(Error(result.error.message));
+    return failure(Error(result.error.message));
   }
   return success(result.data);
 };

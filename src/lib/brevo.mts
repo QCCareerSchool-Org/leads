@@ -1,6 +1,6 @@
 import * as brevo from '@getbrevo/brevo';
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 
@@ -67,12 +67,12 @@ export const createBrevoContact = async (
       return success(result.body.id);
     }
 
-    return fail(Error(result.response.statusMessage));
+    return failure(Error(result.response.statusMessage));
   } catch (err) {
     if (err instanceof Error) {
-      return fail(err);
+      return failure(err);
     }
-    return fail(Error('Unknown error'));
+    return failure(Error('Unknown error'));
   }
 };
 
@@ -96,11 +96,11 @@ export const sendBrevoEmail = async (templateId: number, emailAddress: string, n
       return success(result.body.messageId);
     }
 
-    return fail(Error(result.response.statusMessage));
+    return failure(Error(result.response.statusMessage));
   } catch (err) {
     if (err instanceof Error) {
-      return fail(err);
+      return failure(err);
     }
-    return fail(Error('Unknown error'));
+    return failure(Error('Unknown error'));
   }
 };

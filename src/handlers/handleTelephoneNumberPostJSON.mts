@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 import { z } from 'zod';
 
 import type { PostTelephoneNumberRequest } from '../domain/postTelephoneNumberRequest.mjs';
@@ -56,6 +56,6 @@ const validateTelephoneNumberRequest = async (requestBody: Request['body']): Pro
     return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
-    return fail(Error(message));
+    return failure(Error(message));
   }
 };

@@ -1,7 +1,18 @@
 import { NodemailerTransport } from '@qccareerschool/winston-nodemailer';
+import nodemailer from 'nodemailer';
 import { createLogger, format, transports } from 'winston';
 
 import config from './config.mjs';
+
+const transporter = nodemailer.createTransport({
+  host: config.logEmail.host,
+  port: config.logEmail.port,
+  secure: config.logEmail.mode === 'TLS',
+  auth: {
+    user: config.logEmail.username,
+    pass: config.logEmail.password,
+  },
+});
 
 const logger = createLogger({
   level: process.env.LOG_LEVEL ?? 'info',
@@ -14,19 +25,13 @@ const logger = createLogger({
   transports: [
     new transports.File({ filename: 'error.log', level: 'error' }),
     new transports.File({ filename: 'combined.log' }),
-    // new NodemailerTransport({
-    //   host: config.logEmail.host,
-    //   port: config.logEmail.port,
-    //   secure: config.logEmail.mode === 'TLS',
-    //   auth: {
-    //     user: config.logEmail.username,
-    //     pass: config.logEmail.password,
-    //   },
-    //   from: config.logEmail.from,
-    //   to: config.logEmail.to,
-    //   tags: [ 'leads' ],
-    //   level: 'warn',
-    // }),
+    new NodemailerTransport({
+      transporter,
+      to: config.logEmail.to,
+      from: config.logEmail.from,
+      tags: [ 'leads' ],
+      level: 'warn',
+    }),
   ],
 });
 

@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import { fixPrismaWriteDate, getDate } from '../lib/date.mjs';
 import { binToUUID, uuidToBin } from '../lib/uuid.mjs';
@@ -21,7 +21,7 @@ export const getLeadByNonce = async (nonce: string): Promise<Result<string | fal
     return success(false);
   } catch (err) {
     logError('error checking nonce', err instanceof Error ? err.message : err);
-    return fail(err instanceof Error ? err : Error('unknown error'));
+    return failure(err instanceof Error ? err : Error('unknown error'));
   }
 };
 
@@ -41,6 +41,6 @@ export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload)
     return success(lead.emailAddress);
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
-    return fail(err instanceof Error ? err : Error('unknown error'));
+    return failure(err instanceof Error ? err : Error('unknown error'));
   }
 };

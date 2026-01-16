@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
@@ -31,7 +31,7 @@ export const addToBrevo = async (emailAddress: string, firstName?: string, phone
   }
 
   if (errors.length) {
-    return fail(Error(errors.map(e => e.message).join('\n')));
+    return failure(Error(errors.map(e => e.message).join('\n')));
   }
 
   return success();

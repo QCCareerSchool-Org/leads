@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 type ErrorCode =
   | 'missing-input-secret' // The secret parameter is missing.
@@ -45,16 +45,16 @@ export const validateCaptcha = async (token: string, remoteIp?: string | null): 
       body: urlSearchParams,
     });
     if (!response.ok) {
-      return fail(Error('reCaptcha http request error'));
+      return failure(Error('reCaptcha http request error'));
     }
     const validationResult: unknown = await response.json();
     if (!isReCaptchaResponse(validationResult)) {
-      return fail(Error('Invalid reCaptcha response body'));
+      return failure(Error('Invalid reCaptcha response body'));
     }
     return success(validationResult);
   } catch (cause: unknown) {
     const err = Error('Unknown reCaptcha error');
     err.cause = cause;
-    return fail(err);
+    return failure(err);
   }
 };

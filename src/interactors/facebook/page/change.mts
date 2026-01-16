@@ -1,5 +1,5 @@
 import type { Result } from 'generic-result-type';
-import { fail, success } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
@@ -16,7 +16,7 @@ export const fbChange = async (change: FBChange): Promise<Result> => {
     return fbLeadgenChange(change);
   }
 
-  return fail(Error('Unrecognized change'));
+  return failure(Error('Unrecognized change'));
 };
 
 /**
@@ -29,12 +29,12 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const page = pageMap[change.value.page_id];
   if (!page) {
-    return fail(Error(`page id ${change.value.page_id} not found`));
+    return failure(Error(`page id ${change.value.page_id} not found`));
   }
 
   const form = page.formMap[change.value.form_id];
   if (!form) {
-    return fail(Error(`form "${change.value.form_id}" not found in form map`));
+    return failure(Error(`form "${change.value.form_id}" not found in form map`));
   }
 
   const data = await getLeadgen(change.value.leadgen_id, page.accessToken);
@@ -44,7 +44,7 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const emailAddresses = data.value.field_data.find(f => f.name === 'email')?.values;
   if (!emailAddresses || emailAddresses.length === 0) {
-    return fail(Error(`No email addresses found in change ${change.value.leadgen_id}`));
+    return failure(Error(`No email addresses found in change ${change.value.leadgen_id}`));
   }
 
   const firstName = data.value.field_data.find(f => f.name === 'first name')?.values[0];
@@ -91,7 +91,7 @@ const store = async (page: Page, form: Form, emailAddresses: string[], fields: J
   }
 
   if (errors.length > 0) {
-    return fail(Error(errors.map(e => e.message).join('\n')));
+    return failure(Error(errors.map(e => e.message).join('\n')));
   }
 
   return success();

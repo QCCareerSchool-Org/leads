@@ -20,6 +20,7 @@ const eslintConfig = defineConfig([
   globalIgnores([
     'dist',
     'coverage',
+    'prisma',
   ]),
   {
     plugins: {
