@@ -223,7 +223,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       // add to querystring (remove once front ends changed)
       successUrl.searchParams.set(key, additionalParameters[key]);
       // add to cookies
-      res.cookie(key, additionalParameters[key], { domain, httpOnly: true, secure: true, sameSite: 'none' });
+      res.cookie(key, additionalParameters[key], { domain, httpOnly: true, secure: process.env.MODE !== 'development', sameSite: 'lax' });
     }
     res.redirect(303, successUrl.href);
   } else {
