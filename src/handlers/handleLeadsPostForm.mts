@@ -104,18 +104,28 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const [ firstName, lastName ] = getName(request.firstName, request.lastName);
 
+  const additionalParameters: Record<string, string> = {};
+
+  additionalParameters.emailAddress = request.emailAddress;
   successUrl.searchParams.set('emailAddress', request.emailAddress);
+
+  additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
   successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
+
   if (firstName) {
+    additionalParameters.firstName = firstName;
     successUrl.searchParams.set('firstName', firstName);
   }
   if (lastName) {
+    additionalParameters.lastName = lastName;
     successUrl.searchParams.set('lastName', lastName);
   }
   if (countryCode) {
+    additionalParameters.countryCode = countryCode;
     successUrl.searchParams.set('countryCode', countryCode);
   }
   if (provinceCode) {
+    additionalParameters.provinceCode = provinceCode;
     successUrl.searchParams.set('provinceCode', provinceCode);
   }
 
@@ -207,6 +217,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   if (newLeadResult.success) {
+    for (const key of Object.keys(additionalParameters)) {
+      successUrl.searchParams.set(key, additionalParameters[key]);
+      res.cookie(key, additionalParameters[key], { httpOnly: true, secure: true, sameSite: true });
+    }
     successUrl.searchParams.set('leadId', newLeadResult.value);
     res.redirect(303, successUrl.href);
   } else {
