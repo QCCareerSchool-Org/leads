@@ -219,7 +219,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (newLeadResult.success) {
     for (const key of Object.keys(additionalParameters)) {
       successUrl.searchParams.set(key, additionalParameters[key]);
-      res.cookie(key, additionalParameters[key], { httpOnly: true, secure: true, sameSite: true });
+      res.cookie(key, additionalParameters[key], { domain: successUrl.host, httpOnly: true, secure: true, sameSite: true });
     }
     successUrl.searchParams.set('leadId', newLeadResult.value);
     res.redirect(303, successUrl.href);
