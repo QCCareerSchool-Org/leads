@@ -51,8 +51,8 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const telephoneNumber = data.value.field_data.find(f => f.name === 'phone')?.values[0];
 
-  const emailOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('additional_emails')) !== -1;
-  const smsOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('sms_offers')) !== -1;
+  const emailOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('additional_emails') && r.is_checked === '1') !== -1;
+  const smsOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('sms_offers') && r.is_checked === '1') !== -1;
 
   return store(page, form, emailAddresses, data.value.field_data, emailOptIn, smsOptIn, firstName, telephoneNumber);
 };
