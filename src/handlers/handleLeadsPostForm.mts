@@ -217,11 +217,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   if (newLeadResult.success) {
+    additionalParameters.leadId = newLeadResult.value;
     for (const key of Object.keys(additionalParameters)) {
+      // add to querystring (remove once front ends changed)
       successUrl.searchParams.set(key, additionalParameters[key]);
-      res.cookie(key, additionalParameters[key], { domain: successUrl.host, httpOnly: true, secure: true, sameSite: true });
+      // add to cookies
+      res.cookie(key, additionalParameters[key], { domain: successUrl.host, httpOnly: true, secure: true, sameSite: 'none' });
     }
-    successUrl.searchParams.set('leadId', newLeadResult.value);
     res.redirect(303, successUrl.href);
   } else {
     logError('Unable to store lead', newLeadResult.error, createPayload(req, res));
