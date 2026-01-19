@@ -38,7 +38,9 @@ export const pageMap: PageMap = {
   165425206839810: {
     schoolName: 'QC Makeup Academy',
     accessToken: required('165425206839810'),
-    formMap: {},
+    formMap: {
+      2712154659184754: { listIds: [ 74 ], smsListIds: [ 81 ], emailTemplateId: 2648 },
+    },
   },
   344662312548309: {
     schoolName: 'QC Pet Studies',
