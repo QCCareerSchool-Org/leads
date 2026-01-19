@@ -5,7 +5,7 @@ export const createPayload = (req: Request, res: Response) => {
   return {
     body,
     locals: res.locals,
-    headers: req.headers,
+    // headers: req.headers,
     formUrl: getFormUrl(body),
   };
 };

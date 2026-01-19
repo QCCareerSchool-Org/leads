@@ -15,6 +15,7 @@ import { logInfo } from './logger.mjs';
 import { browserDetectMiddleware } from './middleware/browserDetect.mjs';
 import { geoLocationMiddleware } from './middleware/geoLocation.mjs';
 import { ipAddressMiddleware } from './middleware/ipAddress.mjs';
+import { logRequest } from './middleware/logRequest.mjs';
 
 const corsOptions: CorsOptions = {
   origin: process.env.NODE_ENV === 'production'
@@ -50,6 +51,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
+
+app.use(logRequest);
 
 app.post('/', handleLeadsPost);
 app.post('/telephoneNumber', handleTelephoneNumberPost);
