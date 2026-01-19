@@ -107,26 +107,23 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const additionalParameters: Record<string, string> = {};
 
   additionalParameters.emailAddress = request.emailAddress;
-  successUrl.searchParams.set('emailAddress', request.emailAddress);
 
   additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
-  successUrl.searchParams.set('emailOptIn', request.emailOptIn ? '1' : '0');
 
   if (firstName) {
     additionalParameters.firstName = firstName;
-    successUrl.searchParams.set('firstName', firstName);
   }
+
   if (lastName) {
     additionalParameters.lastName = lastName;
-    successUrl.searchParams.set('lastName', lastName);
   }
+
   if (countryCode) {
     additionalParameters.countryCode = countryCode;
-    successUrl.searchParams.set('countryCode', countryCode);
   }
+
   if (provinceCode) {
     additionalParameters.provinceCode = provinceCode;
-    successUrl.searchParams.set('provinceCode', provinceCode);
   }
 
   // don't do any processing if we've already recorded a lead with this nonce
@@ -219,10 +216,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (newLeadResult.success) {
     additionalParameters.leadId = newLeadResult.value;
     for (const key of Object.keys(additionalParameters)) {
-      // add to querystring (remove once front ends changed)
       successUrl.searchParams.set(key, additionalParameters[key]);
-      // add to cookies
-      res.cookie(key, additionalParameters[key], { httpOnly: true, secure: process.env.MODE !== 'development', sameSite: 'lax' });
     }
     res.redirect(303, successUrl.href);
   } else {
