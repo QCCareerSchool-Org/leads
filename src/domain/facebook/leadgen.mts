@@ -9,14 +9,14 @@ export interface Leadgen {
 }
 
 interface CustomDisclaimerResponse {
-  [k: string]: JsonValue;
+  [k: string]: JsonValue; // needed for typescript to consider this a JSON value
   checkbox_key: string;
-  /* numeric string */
+  /** numeric string */
   is_checked: string;
 }
 
 interface LeadgenFieldData {
-  [k: string]: JsonValue;
+  [k: string]: JsonValue; // needed for typescript to consider this a JSON value
   name: string;
   values: string[];
 }
