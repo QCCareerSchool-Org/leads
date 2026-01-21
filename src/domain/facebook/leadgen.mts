@@ -9,6 +9,7 @@ export interface Leadgen {
 }
 
 interface CustomDisclaimerResponse {
+  [k: string]: JsonValue;
   checkbox_key: string;
   /* numeric string */
   is_checked: string;
