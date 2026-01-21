@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/general"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Country {
+  code              String     @id @default("") @db.Char(2)
+  name              String     @default("") @db.VarChar(255)
+  longName          String     @map("long_name") @db.VarChar(255)
+  frenchName        String     @map("fr_name") @db.VarChar(255)
+  iso3166           Int?       @unique(map: "iso 3166-1") @map("iso 3166-1") @db.SmallInt
+  eu                Boolean    @default(false)
+  ofac              Boolean    @default(false)
+  priceDisplayOrder Int        @map("price_display_order") @db.SmallInt
+  lastUpdate        String?    @map("last_update") @db.VarChar(255)
+  noShipping        Boolean    @default(false) @map("no_shipping")
+  provinces         Province[]
+  regions           Region[]
+  // leads             Lead[]
+
+  @@map("countries")
+}
+
+model Course {
+  code        String  @id @db.Char(2)
+  name        String  @db.VarChar(255)
+  schoolName  String? @map("school_name") @db.VarChar(50)
+  order       Int     @default(99)
+  combination Boolean @default(false)
+  enabled     Boolean @default(true)
+  schools     School? @relation(fields: [schoolName], references: [name], onDelete: Restrict, map: "courses_ibfk_1")
+  // leads       LeadsOnCourses[]
+
+  @@index([schoolName], map: "school_name")
+  @@map("courses")
+}
+
+model Province {
+  countryCode           String  @map("country_code") @db.Char(2)
+  code                  String  @db.Char(3)
+  name                  String  @db.VarChar(50)
+  frenchName            String? @map("fr_name") @db.VarChar(50)
+  regionCode            String  @map("region_code") @db.VarChar(3)
+  alternateAbbreviation String? @map("alternate_abbreviation") @db.Char(3)
+  type                  String? @db.VarChar(60)
+  order                 Int?
+  display               Boolean @default(true)
+  countries             Country @relation(fields: [countryCode], references: [code], map: "provinces_ibfk_1")
+  regions               Region  @relation(fields: [countryCode, regionCode], references: [countryCode, code], map: "provinces_ibfk_2")
+  // leads                 Lead[]
+
+  @@id([countryCode, regionCode, code])
+  @@unique([countryCode, code], map: "country_province")
+  @@index([countryCode], map: "country_code")
+  @@index([countryCode, regionCode], map: "region_code")
+  @@map("provinces")
+}
+
+model Region {
+  countryCode String     @default("") @map("country_code") @db.Char(2)
+  code        String     @default("") @db.VarChar(3)
+  name        String?    @db.VarChar(50)
+  frenchName  String?    @map("fr_name") @db.VarChar(50)
+  type        String?    @db.VarChar(60)
+  order       Int?
+  provinces   Province[]
+  countries   Country    @relation(fields: [countryCode], references: [code], map: "regions_ibfk_1")
+
+  @@id([countryCode, code])
+  @@index([countryCode], map: "country_code")
+  @@map("regions")
+}
+
+model School {
+  name        String   @id @db.VarChar(50)
+  order       Int      @default(0)
+  makeupOrder Int      @default(0) @map("makeup_order")
+  eventOrder  Int      @default(0) @map("event_order")
+  styleOrder  Int      @default(0) @map("style_order")
+  travelOrder Int      @map("travel_order")
+  courses     Course[]
+  // leads       Lead[]
+
+  @@index([eventOrder], map: "event_order")
+  @@index([makeupOrder], map: "makeup_order")
+  @@index([styleOrder], map: "style_order")
+  @@map("schools")
+}
