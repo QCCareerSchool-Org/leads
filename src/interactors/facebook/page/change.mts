@@ -52,8 +52,12 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const telephoneNumber = getValues([ 'phone', 'phone number', 'phone_number', 'tel', 'telephone number', 'telephone_number' ])?.[0];
 
-  const emailOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('additional_emails') && r.is_checked === '1') !== -1;
-  const smsOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('sms_offers') && r.is_checked === '1') !== -1;
+  const disclaimerValue = (searchString: string): boolean => {
+    return data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes(searchString) && r.is_checked === '1') !== -1;
+  };
+
+  const emailOptIn = disclaimerValue('additional_emails');
+  const smsOptIn = disclaimerValue('sms_offers');
 
   return store(page, form, emailAddresses, data.value.field_data, emailOptIn, smsOptIn, firstName, telephoneNumber);
 };
