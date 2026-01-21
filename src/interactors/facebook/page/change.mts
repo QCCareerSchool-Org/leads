@@ -1,15 +1,12 @@
 import type { Result } from 'generic-result-type';
-import { failure, success } from 'generic-result-type';
+import { failure } from 'generic-result-type';
 
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
-import type { JsonValue } from '#src/domain/json.mjs';
-import { type LeadPayload, storeLead } from '#src/lib/storeLead.mjs';
 import { logDebug } from '#src/logger.mjs';
-import { addToBrevo } from './addToBrevo.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
-import type { Form, Page } from './pageMap.mjs';
 import { pageMap } from './pageMap.mjs';
+import { store } from './store.mjs';
 
 export const fbChange = async (change: FBChange): Promise<Result> => {
   if (isFBLeadgenChange(change)) {
@@ -42,68 +39,21 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
     return data;
   }
 
-  const emailAddresses = data.value.field_data.find(f => f.name === 'email')?.values;
+  const getValues = (fieldNames: string[]): string[] | undefined => {
+    return data.value.field_data.find(f => fieldNames.includes(f.name))?.values;
+  };
+
+  const emailAddresses = getValues([ 'email', 'email_address', 'email address' ]);
   if (!emailAddresses || emailAddresses.length === 0) {
     return failure(Error(`No email addresses found in change ${change.value.leadgen_id}`));
   }
 
-  const firstName = data.value.field_data.find(f => f.name === 'first name')?.values[0];
+  const firstName = getValues([ 'first name', 'first_name' ])?.[0];
 
-  const telephoneNumber = data.value.field_data.find(f => f.name === 'phone')?.values[0];
+  const telephoneNumber = getValues([ 'phone', 'phone number', 'phone_number', 'tel', 'telephone number', 'telephone_number' ])?.[0];
 
   const emailOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('additional_emails') && r.is_checked === '1') !== -1;
   const smsOptIn = data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes('sms_offers') && r.is_checked === '1') !== -1;
 
   return store(page, form, emailAddresses, data.value.field_data, emailOptIn, smsOptIn, firstName, telephoneNumber);
-};
-
-const store = async (page: Page, form: Form, emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
-  const errors: Error[] = [];
-
-  const leadPayload: LeadPayload = {
-    ipAddress: '127.0.0.1',
-    school: page.schoolName,
-    emailAddress: emailAddresses[0],
-    firstName: firstName ?? null,
-    lastName: null,
-    telephoneNumber: telephoneNumber ?? null,
-    emailOptIn,
-    smsOptIn,
-    countryCode: null,
-    provinceCode: null,
-    city: null,
-    referrer: null,
-    gclid: null,
-    msclkid: null,
-    browserName: null,
-    browserVersion: null,
-    os: null,
-    mobile: null,
-    fbFields: fields,
-  };
-  const storeResult = await storeLead(leadPayload);
-  if (!storeResult.success) {
-    errors.push(storeResult.error);
-  }
-
-  const listIds: number[] = [];
-  if (emailOptIn) {
-    listIds.push(...form.listIds);
-  }
-  if (smsOptIn) {
-    listIds.push(...form.smsListIds);
-  }
-
-  for (const emailAddress of emailAddresses) {
-    const brevoResult = await addToBrevo(emailAddress, firstName, telephoneNumber, listIds, form.emailTemplateId);
-    if (!brevoResult.success) {
-      errors.push(brevoResult.error);
-    }
-  }
-
-  if (errors.length > 0) {
-    return failure(Error(errors.map(e => e.message).join('\n')));
-  }
-
-  return success();
 };
