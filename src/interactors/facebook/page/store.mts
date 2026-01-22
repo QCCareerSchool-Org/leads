@@ -45,7 +45,7 @@ export const store = async (page: Page, form: Form, emailAddresses: string[], fi
   }
 
   for (const emailAddress of emailAddresses) {
-    const brevoResult = await addToBrevo(emailAddress, firstName, telephoneNumber, listIds, form.emailTemplateId);
+    const brevoResult = await addToBrevo(page.schoolName, emailAddress, firstName, telephoneNumber, listIds, form.emailTemplateId);
     if (!brevoResult.success) {
       errors.push(brevoResult.error);
     }

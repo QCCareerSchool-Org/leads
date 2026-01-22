@@ -1,18 +1,19 @@
 import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 
+import type { SchoolName } from '#src/domain/school.mjs';
 import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
 import { logWarning } from '#src/logger.mjs';
 
-export const addToBrevo = async (emailAddress: string, firstName?: string, phoneNumber?: string, listIds?: number[], emailTemplateId?: number): Promise<Result> => {
+export const addToBrevo = async (schoolName: SchoolName, emailAddress: string, firstName?: string, phoneNumber?: string, listIds?: number[], emailTemplateId?: number): Promise<Result> => {
   const errors: Error[] = [];
   if (listIds) {
     if (listIds.length === 0) {
       logWarning(`no list ids found`);
     }
-    const attributes: BrevoAttributes = { SOURCE: 'Facebook' };
+    const attributes = getAttributes(schoolName);
     const createContactResult = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, attributes, listIds, phoneNumber);
     if (!createContactResult.success) {
       const createContactResult2 = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, attributes, listIds);
@@ -35,4 +36,28 @@ export const addToBrevo = async (emailAddress: string, firstName?: string, phone
   }
 
   return success();
+};
+
+const getAttributes = (schoolName: SchoolName): BrevoAttributes => {
+  const attributes: BrevoAttributes = { SOURCE: 'Facebook' };
+  switch (schoolName) {
+    case 'QC Design School':
+      attributes.STATUS_DESIGN_LEAD = true;
+      break;
+    case 'QC Event School':
+      attributes.STATUS_EVENT_LEAD = true;
+      break;
+    case 'QC Makeup Academy':
+      attributes.STATUS_MAKEUP_LEAD = true;
+      break;
+    case 'QC Pet Studies':
+      attributes.STATUS_PET_LEAD = true;
+      break;
+    case 'QC Wellness Studies':
+      attributes.STATUS_WELLNESS_LEAD = true;
+      break;
+    default:
+      logWarning(`Unexpected school name${schoolName}--attribute not set`);
+  }
+  return attributes;
 };
