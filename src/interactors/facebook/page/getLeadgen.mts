@@ -17,10 +17,10 @@ export const getLeadgen = async (id: string, pageAccessToken: string): Promise<R
       return failure(Error(response.statusText));
     }
     const body = await response.json();
+    logDebug('Leadgen', body);
     if (!isLeadgen(body)) {
       return failure(Error('Unexpected response'));
     }
-    logDebug('Leadgen', body);
     return success(body);
   } catch (err: unknown) {
     return failure(coerceError(err, 'Unknown error fetching leadgen'));
