@@ -106,24 +106,26 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const additionalParameters: Record<string, string> = {};
 
-  additionalParameters.emailAddress = request.emailAddress;
+  if (request.forward) {
+    additionalParameters.emailAddress = request.emailAddress;
 
-  additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
+    additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
 
-  if (firstName) {
-    additionalParameters.firstName = firstName;
-  }
+    if (firstName) {
+      additionalParameters.firstName = firstName;
+    }
 
-  if (lastName) {
-    additionalParameters.lastName = lastName;
-  }
+    if (lastName) {
+      additionalParameters.lastName = lastName;
+    }
 
-  if (countryCode) {
-    additionalParameters.countryCode = countryCode;
-  }
+    if (countryCode) {
+      additionalParameters.countryCode = countryCode;
+    }
 
-  if (provinceCode) {
-    additionalParameters.provinceCode = provinceCode;
+    if (provinceCode) {
+      additionalParameters.provinceCode = provinceCode;
+    }
   }
 
   // don't do any processing if we've already recorded a lead with this nonce
@@ -253,6 +255,7 @@ const schema = zfd.formData({
   'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
+  'forward': zfd.checkbox().default(true),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
