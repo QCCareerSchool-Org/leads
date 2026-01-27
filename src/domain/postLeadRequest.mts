@@ -23,5 +23,5 @@ export interface PostLeadRequest {
   nonce?: string;
   'g-recaptcha-response': string;
   referrer?: string;
-  forward: boolean;
+  forward: number;
 }

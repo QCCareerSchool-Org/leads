@@ -255,7 +255,7 @@ const schema = zfd.formData({
   'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
-  'forward': zfd.checkbox().default(true),
+  'forward': zfd.numeric().default(1),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
