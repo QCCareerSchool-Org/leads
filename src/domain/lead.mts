@@ -4,6 +4,7 @@ export interface Lead {
   telephoneNumber: string | null;
   firstName: string | null;
   lastName: string | null;
+  city: string | null;
   countryCode: string | null;
   provinceCode: string | null;
 }

@@ -25,11 +25,12 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
   return success({
     leadId,
     emailAddress: lead.emailAddress,
+    telephoneNumber: lead.telephoneNumber,
     firstName: lead.firstName,
     lastName: lead.lastName,
+    city: lead.city,
     countryCode: lead.telephoneNumber,
     provinceCode: lead.provinceCode,
-    telephoneNumber: lead.telephoneNumber,
   });
 };
 
