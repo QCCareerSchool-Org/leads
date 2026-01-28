@@ -29,8 +29,8 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
     firstName: lead.firstName,
     lastName: lead.lastName,
     city: lead.city,
-    countryCode: lead.countryCode,
     provinceCode: lead.provinceCode,
+    countryCode: lead.countryCode,
   });
 };
 
