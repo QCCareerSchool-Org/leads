@@ -24,4 +24,5 @@ export interface PostLeadRequest {
   'g-recaptcha-response': string;
   referrer?: string;
   forward: number;
+  ip?: string;
 }

@@ -153,7 +153,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     : request.telephoneNumber;
 
   const newLeadResult = await storeLead({
-    ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    ipAddress: request.ip ?? (res.locals.ipAddress || null), // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     school: request.school,
     emailAddress: request.emailAddress,
     firstName: firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
@@ -256,6 +256,7 @@ const schema = zfd.formData({
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
   'forward': zfd.numeric().default(1),
+  'ip': zfd.text().optional(),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
