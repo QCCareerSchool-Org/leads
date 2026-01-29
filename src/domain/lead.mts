@@ -7,4 +7,5 @@ export interface Lead {
   city: string | null;
   countryCode: string | null;
   provinceCode: string | null;
+  ip: string | null;
 }

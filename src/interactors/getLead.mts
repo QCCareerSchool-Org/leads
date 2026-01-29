@@ -2,6 +2,7 @@ import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 
 import type { Lead } from '#src/domain/lead.mjs';
+import { stringifyBuffer } from '#src/ipAddress.mjs';
 import { uuidToBin } from '#src/lib/uuid.mjs';
 import { prismaLeads } from '#src/prismaLeads.mjs';
 
@@ -31,6 +32,7 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
     city: lead.city,
     provinceCode: lead.provinceCode,
     countryCode: lead.countryCode,
+    ip: lead.ipAddress ? stringifyBuffer(lead.ipAddress) : null,
   });
 };
 
