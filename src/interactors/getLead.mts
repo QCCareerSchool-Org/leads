@@ -33,6 +33,7 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
     provinceCode: lead.provinceCode,
     countryCode: lead.countryCode,
     ip: lead.ipAddress ? stringifyBuffer(lead.ipAddress) : null,
+    created: lead.created.getTime(),
   });
 };
 
