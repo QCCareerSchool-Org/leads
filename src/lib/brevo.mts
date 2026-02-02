@@ -63,8 +63,8 @@ export const createBrevoContact = async (
 
     const result = await contactsApi.createContact(body);
 
-    if (result.body.id) {
-      return success(result.body.id);
+    if (result.response.statusCode && (result.response.statusCode >= 200 && result.response.statusCode < 300)) {
+      return success(result.response.statusCode);
     }
 
     return failure(Error(result.response.statusMessage));
