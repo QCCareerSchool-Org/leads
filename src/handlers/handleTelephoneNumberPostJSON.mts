@@ -27,7 +27,7 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
   const updateResult = await updateLeadTelephoneNumber({ leadId: request.leadId, telephoneNumber });
 
   if (updateResult.success) {
-    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);
+    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);
     if (!updateContactResult.success) {
       logError('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
     }
