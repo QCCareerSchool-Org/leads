@@ -133,6 +133,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     const leadResult = await getLeadByNonce(request.nonce);
     if (leadResult.success && leadResult.value !== false) {
       successUrl.searchParams.set('leadId', leadResult.value);
+      if (typeof request.telephoneListId !== 'undefined') {
+        successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
+      }
       res.redirect(303, successUrl.href);
       return;
     }
@@ -219,6 +222,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     additionalParameters.leadId = newLeadResult.value;
     for (const key of Object.keys(additionalParameters)) {
       successUrl.searchParams.set(key, additionalParameters[key]);
+    }
+    if (typeof request.telephoneListId !== 'undefined') {
+      successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
     }
     res.redirect(303, successUrl.href);
   } else {
