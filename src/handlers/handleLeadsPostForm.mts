@@ -190,14 +190,14 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     listIds.push(request.telephoneListId);
   }
 
-  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
+  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
   if (createContactResult.success) {
     logInfo('Created contact', createContactResult.value);
   } else {
     logWarning('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
     // make a second attempt without the telephone number
     if (telephoneNumber) {
-      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
+      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
       if (createContactResult2.success) {
         logInfo('Created contact', createContactResult2.value);
       } else {

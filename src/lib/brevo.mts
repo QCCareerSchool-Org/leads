@@ -7,6 +7,13 @@ const brevoApiKey = process.env.BREVO_API_KEY ?? '';
 export type Source = 'Facebook';
 
 export interface BrevoAttributes {
+  FIRSTNAME?: string;
+  LASTNAME?: string;
+  COUNTRY_CODE?: string;
+  PROVINCE_CODE?: string;
+  CITY?: string;
+  SMS?: string;
+
   STATUS_DESIGN_LEAD?: true;
   STATUS_DESIGN_STUDENT?: true;
   STATUS_EVENT_LEAD?: true;
@@ -28,6 +35,7 @@ export const createBrevoContact = async (
   lastName?: string,
   countryCode?: string,
   provinceCode?: string | null,
+  city?: string | null,
   attributes?: BrevoAttributes,
   listIds?: number[],
   telephoneNumber?: string,
@@ -42,23 +50,26 @@ export const createBrevoContact = async (
       updateEnabled: true,
       attributes: {
         ...attributes,
-      },
+      } as BrevoAttributes,
     } satisfies brevo.CreateContact;
 
     if (typeof firstName !== 'undefined') {
-      (body.attributes as Record<string, unknown>).FIRSTNAME = firstName;
+      (body.attributes).FIRSTNAME = firstName;
     }
     if (typeof lastName !== 'undefined') {
-      (body.attributes as Record<string, unknown>).LASTNAME = lastName;
+      (body.attributes).LASTNAME = lastName;
     }
     if (typeof countryCode !== 'undefined') {
-      (body.attributes as Record<string, unknown>).COUNTRY_CODE = countryCode.toLocaleUpperCase();
+      (body.attributes).COUNTRY_CODE = countryCode.toLocaleUpperCase();
     }
     if (typeof provinceCode !== 'undefined') {
-      (body.attributes as Record<string, unknown>).PROVINCE_CODE = provinceCode === null ? '' : provinceCode.toLocaleUpperCase();
+      (body.attributes).PROVINCE_CODE = provinceCode === null ? '' : provinceCode.toLocaleUpperCase();
+    }
+    if (typeof city !== 'undefined') {
+      (body.attributes).CITY = city ?? '';
     }
     if (typeof telephoneNumber !== 'undefined') {
-      (body.attributes as Record<string, unknown>).SMS = telephoneNumber;
+      (body.attributes).SMS = telephoneNumber;
     }
 
     const result = await contactsApi.createContact(body);
