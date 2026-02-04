@@ -14,9 +14,9 @@ export const addToBrevo = async (schoolName: SchoolName, emailAddress: string, f
       logWarning(`no list ids found`);
     }
     const attributes = getAttributes(schoolName);
-    const createContactResult = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, attributes, listIds, phoneNumber);
+    const createContactResult = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, undefined, attributes, listIds, phoneNumber);
     if (!createContactResult.success) {
-      const createContactResult2 = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, attributes, listIds);
+      const createContactResult2 = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, undefined, attributes, listIds);
       if (!createContactResult2.success) {
         errors.push(Error(`Could not create brevo contact`));
       }
