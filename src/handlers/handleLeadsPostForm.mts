@@ -106,24 +106,26 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const additionalParameters: Record<string, string> = {};
 
-  additionalParameters.emailAddress = request.emailAddress;
+  if (request.forward) {
+    additionalParameters.emailAddress = request.emailAddress;
 
-  additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
+    additionalParameters.emailOptIn = request.emailOptIn ? '1' : '0';
 
-  if (firstName) {
-    additionalParameters.firstName = firstName;
-  }
+    if (firstName) {
+      additionalParameters.firstName = firstName;
+    }
 
-  if (lastName) {
-    additionalParameters.lastName = lastName;
-  }
+    if (lastName) {
+      additionalParameters.lastName = lastName;
+    }
 
-  if (countryCode) {
-    additionalParameters.countryCode = countryCode;
-  }
+    if (countryCode) {
+      additionalParameters.countryCode = countryCode;
+    }
 
-  if (provinceCode) {
-    additionalParameters.provinceCode = provinceCode;
+    if (provinceCode) {
+      additionalParameters.provinceCode = provinceCode;
+    }
   }
 
   // don't do any processing if we've already recorded a lead with this nonce
@@ -151,7 +153,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     : request.telephoneNumber;
 
   const newLeadResult = await storeLead({
-    ipAddress: res.locals.ipAddress || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
+    ipAddress: request.ip ?? (res.locals.ipAddress || null), // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     school: request.school,
     emailAddress: request.emailAddress,
     firstName: firstName || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
@@ -188,14 +190,14 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     listIds.push(request.telephoneListId);
   }
 
-  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds, telephoneNumber);
+  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
   if (createContactResult.success) {
     logInfo('Created contact', createContactResult.value);
   } else {
     logWarning('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
     // make a second attempt without the telephone number
     if (telephoneNumber) {
-      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, attributes, listIds);
+      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
       if (createContactResult2.success) {
         logInfo('Created contact', createContactResult2.value);
       } else {
@@ -253,6 +255,8 @@ const schema = zfd.formData({
   'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
+  'forward': zfd.numeric().default(1),
+  'ip': zfd.text().optional(),
 });
 
 const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {

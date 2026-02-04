@@ -3,6 +3,7 @@ import { failure } from 'generic-result-type';
 
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
+import { isLeadgenFieldDataValues } from '#src/domain/facebook/leadgen.mjs';
 import { logDebug } from '#src/logger.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.mjs';
@@ -40,7 +41,10 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   }
 
   const getValues = (fieldNames: string[]): string[] | undefined => {
-    return data.value.field_data.find(f => fieldNames.includes(f.name))?.values;
+    const field = data.value.field_data.find(f => fieldNames.includes(f.name));
+    if (field && 'values' in field && isLeadgenFieldDataValues(field.values)) {
+      return field.values;
+    }
   };
 
   const emailAddresses = getValues([ 'email', 'email_address', 'email address' ]);

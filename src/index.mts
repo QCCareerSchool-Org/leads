@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import config from './config.mjs';
 import { fbRouter } from './fbRouter.mjs';
 import { globalErrorHandler } from './handlers/globalErrorHandler.mjs';
+import { handleLeadGet } from './handlers/handleLeadGet.mjs';
 import { handleLeadsPost } from './handlers/handleLeadsPost.mjs';
 import { handleTelephoneNumberPost } from './handlers/handleTelephoneNumberPost.mjs';
 import { logInfo } from './logger.mjs';
@@ -55,6 +56,7 @@ app.use(browserDetectMiddleware);
 app.use(logRequest);
 
 app.post('/', handleLeadsPost);
+app.get('/leads/:leadId', handleLeadGet);
 app.post('/telephoneNumber', handleTelephoneNumberPost);
 app.use('/fb', fbRouter);
 

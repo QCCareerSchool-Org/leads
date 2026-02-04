@@ -8,6 +8,6 @@ export const parseIpAddress = (ip: string): Uint8Array<ArrayBuffer> | null => {
   }
 };
 
-export const stringifyBuffer = (buf: Buffer): string => {
+export const stringifyBuffer = (buf: Uint8Array<ArrayBuffer>): string => {
   return ipaddr.fromByteArray(Array.from(buf)).toString();
 };

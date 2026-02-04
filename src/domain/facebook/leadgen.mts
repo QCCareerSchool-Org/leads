@@ -18,7 +18,6 @@ interface CustomDisclaimerResponse {
 interface LeadgenFieldData {
   [k: string]: JsonValue; // needed for typescript to consider this a JSON value
   name: string;
-  values: string[];
 }
 
 export const isLeadgen = (obj: unknown): obj is Leadgen => {
@@ -32,7 +31,11 @@ export const isLeadgen = (obj: unknown): obj is Leadgen => {
 const isLeadgenFieldData = (obj: unknown): obj is LeadgenFieldData => {
   return obj !== null && typeof obj === 'object' &&
     'name' in obj && typeof obj.name === 'string' &&
-    'values' in obj && Array.isArray(obj.values) && obj.values.every(v => typeof v === 'string');
+    'values' in obj ? isLeadgenFieldDataValues(obj.values) : true;
+};
+
+export const isLeadgenFieldDataValues = (obj: unknown): obj is string[] => {
+  return Array.isArray(obj) && obj.every(o => typeof o === 'string');
 };
 
 const isLeadgenCustomDislaimerResponse = (obj: unknown): obj is CustomDisclaimerResponse => {

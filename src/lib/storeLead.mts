@@ -3,7 +3,7 @@ import { failure, success } from 'generic-result-type';
 
 import type { JsonValue } from '#src/domain/json.mjs';
 import type { SchoolName } from '#src/domain/school.mjs';
-import { parseIpAddress } from '#src/ipAddress.mjs';
+import { parseIpAddress } from '#src/lib/ipAddress.mjs';
 import { logError, logWarning } from '#src/logger.mjs';
 import { prismaGeneral } from '#src/prismaGeneral.mjs';
 import { prismaLeads } from '#src/prismaLeads.mjs';
