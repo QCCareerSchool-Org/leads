@@ -24,7 +24,6 @@ export const addToBrevo = async (schoolName: SchoolName, emailAddress: string, f
   }
 
   if (emailTemplateId) {
-    console.log(`sending email template ${emailTemplateId}`);
     const sendTemplateResult = await sendBrevoEmail(emailTemplateId, emailAddress, firstName);
     if (!sendTemplateResult.success) {
       errors.push(Error('Unable to send template'));
