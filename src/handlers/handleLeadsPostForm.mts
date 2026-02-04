@@ -223,6 +223,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     for (const key of Object.keys(additionalParameters)) {
       successUrl.searchParams.set(key, additionalParameters[key]);
     }
+    if (typeof request.telephoneListId !== 'undefined') {
+      successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
+    }
     res.redirect(303, successUrl.href);
   } else {
     logError('Unable to store lead', newLeadResult.error, createPayload(req, res));
