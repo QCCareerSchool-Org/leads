@@ -32,7 +32,8 @@ export const pageMap: PageMap = {
     schoolName: 'QC Event School',
     accessToken: required('313411673642'),
     formMap: {
-      1764882231136307: { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
+      '1764882231136307': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
+      '26567715712868345': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 }, // Lisa webinar
     },
   },
   165425206839810: {
