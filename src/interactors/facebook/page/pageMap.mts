@@ -33,7 +33,7 @@ export const pageMap: PageMap = {
     accessToken: required('313411673642'),
     formMap: {
       '1764882231136307': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
-      '26567715712868345': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 }, // Lisa webinar
+      '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
     },
   },
   165425206839810: {
