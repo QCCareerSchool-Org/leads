@@ -31,7 +31,7 @@
     "generate": "prisma generate --schema ./prisma/schema.general.prisma && prisma generate --schema ./prisma/schema.leads.prisma"
   },
   "dependencies": {
-    "@getbrevo/brevo": "^3.0.1",
+    "@getbrevo/brevo": "^5.0.4",
     "@prisma/adapter-mariadb": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@qccareerschool/winston-nodemailer": "^6.0.0",

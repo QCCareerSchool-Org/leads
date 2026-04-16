@@ -1,8 +1,11 @@
-import * as brevo from '@getbrevo/brevo';
+import type { Brevo } from '@getbrevo/brevo';
+import { BrevoClient } from '@getbrevo/brevo';
 import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 
-const brevoApiKey = process.env.BREVO_API_KEY ?? '';
+const apiKey = process.env.BREVO_API_KEY ?? '';
+
+const brevo = new BrevoClient({ apiKey, baseUrl: 'https://proxy.qccareerschool.com/brevo', headers: { 'X-Secret': process.env.PROXY_SECRET } });
 
 export type Source = 'Facebook';
 
@@ -40,45 +43,29 @@ export const createBrevoContact = async (
   listIds?: number[],
   telephoneNumber?: string,
 ): Promise<Result<number>> => {
+  const request: Brevo.CreateContactRequest = {
+    email: emailAddress,
+    listIds,
+    updateEnabled: true,
+    attributes: {
+      ...attributes,
+      ...(typeof firstName !== 'undefined' ? { FIRSTNAME: firstName } : undefined),
+      ...(typeof lastName !== 'undefined' ? { LASTNAME: lastName } : undefined),
+      ...(typeof countryCode !== 'undefined' ? { COUNTRY_CODE: countryCode.toLocaleUpperCase() } : undefined),
+      ...(typeof provinceCode !== 'undefined' ? { PROVINCE_CODE: provinceCode?.toLocaleUpperCase() } : undefined),
+      ...(typeof city !== 'undefined' ? { CITY: city ?? '' } : undefined),
+      ...(typeof telephoneNumber !== 'undefined' ? { SMS: telephoneNumber } : undefined),
+    },
+  };
+
   try {
-    const contactsApi = new brevo.ContactsApi();
-    contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, brevoApiKey);
+    const response = await brevo.contacts.createContact(request);
 
-    const body = {
-      email: emailAddress,
-      listIds,
-      updateEnabled: true,
-      attributes: {
-        ...attributes,
-      } as BrevoAttributes,
-    } satisfies brevo.CreateContact;
-
-    if (typeof firstName !== 'undefined') {
-      (body.attributes).FIRSTNAME = firstName;
-    }
-    if (typeof lastName !== 'undefined') {
-      (body.attributes).LASTNAME = lastName;
-    }
-    if (typeof countryCode !== 'undefined') {
-      (body.attributes).COUNTRY_CODE = countryCode.toLocaleUpperCase();
-    }
-    if (typeof provinceCode !== 'undefined') {
-      (body.attributes).PROVINCE_CODE = provinceCode === null ? '' : provinceCode.toLocaleUpperCase();
-    }
-    if (typeof city !== 'undefined') {
-      (body.attributes).CITY = city ?? '';
-    }
-    if (typeof telephoneNumber !== 'undefined') {
-      (body.attributes).SMS = telephoneNumber;
+    if (typeof response?.id !== 'undefined') {
+      return success(response.id);
     }
 
-    const result = await contactsApi.createContact(body);
-
-    if (result.response.statusCode && (result.response.statusCode >= 200 && result.response.statusCode < 300)) {
-      return success(result.response.statusCode);
-    }
-
-    return failure(Error(result.response.statusMessage));
+    return failure(Error('Could not add contact'));
   } catch (err) {
     if (err instanceof Error) {
       return failure(err);
@@ -88,24 +75,18 @@ export const createBrevoContact = async (
 };
 
 export const sendBrevoEmail = async (templateId: number, emailAddress: string, name?: string): Promise<Result<string>> => {
+  const to = name ? [ { email: emailAddress, name } ] : [ { email: emailAddress } ];
+
+  const request: Brevo.SendTransacEmailRequest = { to, templateId };
+
   try {
-    const transactionalEmailsApi = new brevo.TransactionalEmailsApi();
-    transactionalEmailsApi.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
+    const response = await brevo.transactionalEmails.sendTransacEmail(request);
 
-    const result = await transactionalEmailsApi.sendTransacEmail({
-      to: name ? [ { email: emailAddress, name } ] : [ { email: emailAddress } ],
-      templateId,
-      // params: { name },
-      // headers: {
-      //   'X-Mailin-custom': 'custom_header_1:custom_value_1|custom_header_2:custom_value_2',
-      // },
-    });
-
-    if (result.body.messageId) {
-      return success(result.body.messageId);
+    if (typeof response.messageId !== 'undefined') {
+      return success(response.messageId);
     }
 
-    return failure(Error(result.response.statusMessage));
+    return failure(Error('Could send email'));
   } catch (err) {
     if (err instanceof Error) {
       return failure(err);
