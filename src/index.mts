@@ -64,7 +64,7 @@ app.post('/course-compare/:schoolSlug/:courseCode', handleCourseComparePost);
 app.use(globalErrorHandler);
 
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(8080);
+  app.listen(process.env.PORT ?? 8080);
 }
 
 export default app;
