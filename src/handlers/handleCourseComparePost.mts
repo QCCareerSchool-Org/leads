@@ -49,6 +49,7 @@ export const handleCourseComparePost: RequestHandler<Params> = async (req, res) 
     os: null,
     mobile: null,
     fbFields: null,
+    userId: res.locals.user?.id,
   });
   if (!result.success) {
     res.status(500).send(result.error.message);

@@ -29,12 +29,14 @@ model Lead {
   created               DateTime               @default(now()) @db.DateTime(6)
   updated               DateTime               @updatedAt @db.DateTime(6)
   nonce                 Bytes?                 @db.Binary(16)
+  fbFields              Json?
+  userId                Int?
   // country               Country?               @relation(fields: [countryCode], references: [code], onDelete: Cascade, map: "FK_leads_general.countries")
   // province              Province?              @relation(fields: [countryCode, provinceCode], references: [countryCode, code], onDelete: Cascade, map: "FK_leads_general.provinces")
   // school                School                 @relation(fields: [schoolName], references: [name], onDelete: Cascade, map: "FK_leads_general.schools")
   marketingParameterSet MarketingParameterSet?
   courses               LeadsOnCourses[]
-  fbFields              Json?
+  user                  User?                  @relation(fields: [userId], references: [id], map: "FK_leads_users")
 
   @@map("leads")
   @@index([schoolName])
@@ -71,6 +73,7 @@ model User {
   enabled         Boolean
   apiKeys         ApiKey[]
   whitelistRanges WhitelistRange[]
+  leads           Lead[]
 
   @@map("users")
 }

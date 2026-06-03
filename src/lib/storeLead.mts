@@ -39,6 +39,7 @@ export interface LeadPayload {
   mobile: boolean | null;
   nonce?: string;
   fbFields: JsonValue;
+  userId?: number;
 }
 
 export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string>> => {
@@ -107,6 +108,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
         },
         nonce: typeof leadPayload.nonce === 'undefined' ? null : uuidToBin(leadPayload.nonce),
         fbFields: leadPayload.fbFields ?? undefined,
+        userId: leadPayload.userId ?? null,
       },
     });
 
