@@ -25,12 +25,12 @@ const required = (name: string): string => {
 export const pageMap: PageMap = {
   26583883957: {
     schoolName: 'QC Design School',
-    accessToken: required('26583883957'),
+    accessToken: required('FB_PAGE_ACCESS_TOKEN_26583883957'),
     formMap: {},
   },
   313411673642: {
     schoolName: 'QC Event School',
-    accessToken: required('313411673642'),
+    accessToken: required('FB_PAGE_ACCESS_TOKEN_313411673642'),
     formMap: {
       '1764882231136307': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
       '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
@@ -38,20 +38,20 @@ export const pageMap: PageMap = {
   },
   165425206839810: {
     schoolName: 'QC Makeup Academy',
-    accessToken: required('165425206839810'),
+    accessToken: required('FB_PAGE_ACCESS_TOKEN_165425206839810'),
     formMap: {
       2712154659184754: { listIds: [ 74 ], smsListIds: [ 81 ], emailTemplateId: 2648 },
     },
   },
   344662312548309: {
     schoolName: 'QC Pet Studies',
-    accessToken: required('344662312548309'),
+    accessToken: required('FB_PAGE_ACCESS_TOKEN_344662312548309'),
     formMap: {},
   },
   // Paw Parent Academy
   507770375746161: {
     schoolName: 'QC Pet Studies',
-    accessToken: required('507770375746161'),
+    accessToken: required('FB_PAGE_ACCESS_TOKEN_507770375746161'),
     formMap: {},
   },
 };
