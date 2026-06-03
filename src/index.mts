@@ -64,7 +64,10 @@ app.post('/course-compare/:schoolSlug/:courseCode', handleCourseComparePost);
 app.use(globalErrorHandler);
 
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(process.env.PORT ?? 8080);
+  const port = process.env.PORT ?? 8080;
+  app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+  });
 }
 
 export default app;
