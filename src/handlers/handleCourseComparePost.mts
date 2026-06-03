@@ -16,7 +16,7 @@ export const handleCourseComparePost: RequestHandler<Params> = async (req, res) 
   ]);
 
   if (!paramsResult.success) {
-    res.status(400).send(paramsResult.error.message);
+    res.status(404).send(paramsResult.error.message);
     return;
   }
 
@@ -40,7 +40,7 @@ export const handleCourseComparePost: RequestHandler<Params> = async (req, res) 
     provinceCode: body.provinceCode ?? null,
     telephoneNumber,
     emailOptIn: true,
-    smsOptIn: false,
+    smsOptIn: true,
     referrer: null,
     gclid: null,
     msclkid: null,
