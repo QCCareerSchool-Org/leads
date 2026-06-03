@@ -5,9 +5,9 @@ import { failure, success } from 'generic-result-type';
 
 const apiKey = process.env.BREVO_API_KEY ?? '';
 
-const brevo = new BrevoClient({ apiKey, baseUrl: 'https://proxy.qccareerschool.com/brevo', headers: { 'X-Secret': process.env.PROXY_SECRET } });
+const brevo = new BrevoClient({ apiKey, baseUrl: 'https://proxy.qccareerschool.com/brevo/v3/', headers: { 'X-Secret': process.env.PROXY_SECRET } });
 
-export type Source = 'Facebook';
+export type Source = 'Facebook' | 'Course Compare';
 
 export interface BrevoAttributes {
   FIRSTNAME?: string;

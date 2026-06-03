@@ -8,3 +8,4 @@ mysql-client.crt
 mysql-client.key
 mysql-client.pfx
 coverage
+prisma/generated
