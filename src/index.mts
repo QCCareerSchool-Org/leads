@@ -59,7 +59,7 @@ app.use('/fb', fbRouter);
 
 // everything requires api key from here one
 app.use(apiKeyMiddleware);
-app.post('/courseCompare', handleCourseComparePost);
+app.post('/course-compare/:schoolSlug/:courseCode', handleCourseComparePost);
 
 app.use(globalErrorHandler);
 
