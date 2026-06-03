@@ -40,6 +40,7 @@
     "dotenv": "^17.4.2",
     "escape-html": "^1.0.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "generic-result-type": "^2.3.0",
     "helmet": "^8.2.0",
     "maxmind": "^5.0.6",
