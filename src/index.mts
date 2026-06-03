@@ -16,6 +16,7 @@ import { apiKeyMiddleware } from './middleware/apiKey.mjs';
 import { browserDetectMiddleware } from './middleware/browserDetect.mjs';
 import { geoLocationMiddleware } from './middleware/geoLocation.mjs';
 import { ipAddressMiddleware } from './middleware/ipAddress.mjs';
+import { rateLimitMiddleware } from './middleware/rateLimit.mjs';
 
 const corsOptions: CorsOptions = {
   origin: process.env.NODE_ENV === 'production'
@@ -48,6 +49,7 @@ app.use(compression());
 app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }));
 app.use(express.urlencoded({ extended: false }));
 
+app.use(rateLimitMiddleware);
 app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
@@ -57,9 +59,9 @@ app.get('/leads/:leadId', handleLeadGet);
 app.post('/telephoneNumber', handleTelephoneNumberPost);
 app.use('/fb', fbRouter);
 
-// everything requires api key from here one
+// all routes require an api key from here on
 app.use(apiKeyMiddleware);
-app.post('/course-compare/:schoolSlug/:courseCode', handleCourseComparePost);
+app.post('/course-compare', handleCourseComparePost);
 
 app.use(globalErrorHandler);
 
