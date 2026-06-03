@@ -12,7 +12,7 @@
     // "types": [],
     // For nodejs:
     "lib": ["esnext"],
-    "types": ["node", "jest" ],
+    "types": ["node", "jest"],
     // and npm install -D @types/node
 
     // Other Outputs
@@ -42,9 +42,9 @@
     "skipLibCheck": true,
 
     "noEmit": true,
-    "baseUrl": "./",
     "paths": {
-      "#test/*": [ "__test__/*" ]
+      "#src/*": [ "./src/*" ],
+      "#test/*": [ "./__test__/*" ],
     }
   },
 }

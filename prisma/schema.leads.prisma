@@ -65,3 +65,30 @@ model MarketingParameterSet {
   @@map("marketing_parameter_sets")
 }
 
+model User {
+  id              Int              @id
+  name            String
+  enabled         Boolean
+  apiKeys         ApiKey[]
+  whitelistRanges WhitelistRange[]
+
+  @@map("users")
+}
+
+model ApiKey {
+  hashedKey Bytes @id @db.Binary(32)
+  userId    Int
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "FK_api_keys_users")
+
+  @@map("api_keys")
+}
+
+model WhitelistRange {
+  id           Int   @id
+  userId       Int
+  ipAddress    Bytes @db.Binary(16)
+  prefixLength Int   @db.TinyInt
+  user         User  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "FK_whitelist_ranges_users")
+
+  @@map("whitelist_ranges")
+}
