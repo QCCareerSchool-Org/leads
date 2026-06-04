@@ -5,7 +5,6 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { JsonValue } from '#src/domain/json.mjs';
 import type { SchoolName } from '#src/domain/school.mjs';
 import { parseIpAddress } from '#src/lib/ipAddress.mjs';
-import { logError, logWarning } from '#src/logger.mjs';
 import { pool } from '#src/pool.mjs';
 import { torontoDateTime } from './torontoDateTime.js';
 import { createUUID, uuidToBin } from './uuid.mjs';
@@ -68,7 +67,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
         countryCode = province.country_code;
         provinceCode = province.code;
       } else {
-        logWarning(`province not found: ${leadPayload.provinceCode}/${leadPayload.countryCode}`);
+        console.log(`province not found: ${leadPayload.provinceCode}/${leadPayload.countryCode}`);
       }
     }
 
@@ -79,7 +78,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
       if (country) {
         countryCode = country.code;
       } else {
-        logWarning(`country not found: ${leadPayload.countryCode}`);
+        console.log(`country not found: ${leadPayload.countryCode}`);
       }
     }
 
@@ -136,7 +135,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
       throw err;
     }
   } catch (err) {
-    logError('error inserting lead', err instanceof Error ? err.message : err);
+    console.error('error inserting lead', err instanceof Error ? err.message : err);
     return failure(err instanceof Error ? err : Error('unknown error'));
   } finally {
     connection.release();

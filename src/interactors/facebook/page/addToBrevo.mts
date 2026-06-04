@@ -5,13 +5,12 @@ import type { SchoolName } from '#src/domain/school.mjs';
 import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
-import { logWarning } from '#src/logger.mjs';
 
 export const addToBrevo = async (schoolName: SchoolName, emailAddress: string, firstName?: string, phoneNumber?: string, listIds?: number[], emailTemplateId?: number): Promise<Result> => {
   const errors: Error[] = [];
   if (listIds) {
     if (listIds.length === 0) {
-      logWarning(`no list ids found`);
+      console.log(`no list ids found`);
     }
     const attributes = getAttributes(schoolName);
     const createContactResult = await createBrevoContact(emailAddress, firstName, undefined, undefined, undefined, undefined, attributes, listIds, phoneNumber);
@@ -56,7 +55,7 @@ const getAttributes = (schoolName: SchoolName): BrevoAttributes => {
       attributes.STATUS_WELLNESS_LEAD = true;
       break;
     default:
-      logWarning(`Unexpected school name${schoolName}--attribute not set`);
+      console.log(`Unexpected school name${schoolName}--attribute not set`);
   }
   return attributes;
 };

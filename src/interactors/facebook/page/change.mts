@@ -4,7 +4,6 @@ import { failure } from 'generic-result-type';
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isLeadgenFieldDataValues } from '#src/domain/facebook/leadgen.mjs';
-import { logDebug } from '#src/logger.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.mjs';
 import { store } from './store.mjs';
@@ -23,8 +22,6 @@ export const fbChange = async (change: FBChange): Promise<Result> => {
  * @returns a Result type
  */
 const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
-  logDebug('Processing change');
-
   const page = pageMap[change.value.page_id];
   if (!page) {
     return failure(Error(`page id ${change.value.page_id} not found`));
