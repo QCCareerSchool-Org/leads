@@ -54,7 +54,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
   const connection = await pool.getConnection();
   try {
     const leadId = createUUID();
-    const leadIdBin = uuidToBin(createUUID());
+    const leadIdBin = uuidToBin(leadId);
 
     let countryCode = null;
     let provinceCode = null;

@@ -5,7 +5,7 @@ import { logError } from '#src/logger.mjs';
 import { verifySignature } from '../lib/verifySignature.mjs';
 
 export const verifyFBSignature: RequestHandler = (req, res, next) => {
-  if (process.env.MODE === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     next();
     return;
   }

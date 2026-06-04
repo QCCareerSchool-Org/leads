@@ -23,11 +23,12 @@ const config: PoolOptions = {
     ca: fs.readFileSync(path.resolve('./mysql-ca.pem')),
     verifyIdentity: false,
   },
-  connectionLimit: 2,
 };
 
 const rawPool = createPool(config);
 
-attachDatabasePool(rawPool);
+if (process.env.NODE_ENV === 'production') {
+  attachDatabasePool(rawPool);
+}
 
 export const pool = rawPool.promise();

@@ -18,6 +18,7 @@ declare global {
 }
 
 export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
+  const start = performance.now();
   const authorizationHeader = req.headers.authorization;
 
   if (!authorizationHeader) {
@@ -42,7 +43,7 @@ export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const [ whitelistRangeRows ] = await connection.query<WhitelistRangeRow[]>(selectWhitelistRangesSql);
+    const [ whitelistRangeRows ] = await connection.query<WhitelistRangeRow[]>(selectWhitelistRangesSql, [ user.id ]);
     if (whitelistRangeRows.length) {
       if (!inRange(res.locals.ipAddress, whitelistRangeRows)) {
         res.sendStatus(401);
@@ -59,6 +60,8 @@ export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
     connection.release();
   }
 
+  const end = performance.now();
+  console.log('apiKeyMiddleware', end - start);
   next();
 };
 
@@ -72,7 +75,7 @@ LIMIT 1`;
 const selectWhitelistRangesSql = `
 SELECT id, userId, ipAddress, prefixLength
 FROM leads.whitelist_ranges
-`;
+WHERE userId = ?`;
 
 interface UserRow extends RowDataPacket {
   id: number;

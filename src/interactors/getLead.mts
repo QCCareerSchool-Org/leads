@@ -21,7 +21,7 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
 
   const connection = await pool.getConnection();
   try {
-    const [ rows ] = await connection.query<LeadRow[]>('SELECT * FROM leads.leads WHERE leadId = ?', [ leadIdBin ]);
+    const [ rows ] = await connection.query<LeadRow[]>(sql, [ leadIdBin ]);
     const lead = rows[0];
     if (!lead) {
       return failure(new GetLeadError('NotFound'));
@@ -65,3 +65,18 @@ class GetLeadError extends Error {
     super(message);
   }
 }
+
+const sql = `
+SELECT
+  leadId,
+  emailAddress,
+  telephoneNumber,
+  firstName,
+  lastName,
+  city,
+  provinceCode,
+  countryCode,
+  ipAddress,
+  created,
+FROM leads.leads
+WHERE leadId = ?`;
