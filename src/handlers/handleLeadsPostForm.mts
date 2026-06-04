@@ -22,7 +22,6 @@ import { delay } from '../lib/delay.mjs';
 import { getName } from '../lib/getName.mjs';
 import { isBot } from '../lib/isBot.mjs';
 import { validateCaptcha } from '../lib/reCaptcha.mjs';
-import { logError, logInfo, logWarning } from '../logger.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,7 +48,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       ? [ req.body.school, req.body.emailAddress ]
       : [ undefined, undefined ];
 
-    logWarning('Validation error', validated.error, createPayload(req, res));
+    console.log('Validation error', validated.error, createPayload(req, res));
 
     try {
       const errors = JSON.parse(validated.error.message) as { path: string[] }[];
@@ -73,7 +72,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   try {
     successUrl = new URL(request.successLocation);
   } catch (err) {
-    logWarning('Invalid URL', err, createPayload(req, res));
+    console.log('Invalid URL', err, createPayload(req, res));
     res.status(400).send(err);
     return;
   }
@@ -81,7 +80,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const botStatus = isBot(req.body as Record<string, string | undefined>, countryCode);
   if (botStatus.result) {
     await delay(8000);
-    logWarning(botStatus.message, createPayload(req, res));
+    console.log(botStatus.message, createPayload(req, res));
     res.redirect(303, successUrl.href);
     return;
   }
@@ -91,7 +90,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
     if (captchaResult.success) {
       if (!captchaResult.value.success) {
-        logWarning('Captcha validation failed', captchaResult.value, createPayload(req, res));
+        console.log('Captcha validation failed', captchaResult.value, createPayload(req, res));
         if (captchaResult.value['error-codes']?.includes('browser-error')) {
           res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(request.school)));
           return;
@@ -100,7 +99,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
         return;
       }
     } else {
-      logError('Unable to process captcha', captchaResult.error, createPayload(req, res));
+      console.log('Unable to process captcha', captchaResult.error, createPayload(req, res));
     }
   }
 
@@ -197,16 +196,16 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
   if (createContactResult.success) {
-    logInfo('Created contact', createContactResult.value);
+    console.log('Created contact', createContactResult.value);
   } else {
-    logWarning('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
+    console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
     // make a second attempt without the telephone number
     if (telephoneNumber) {
       const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
       if (createContactResult2.success) {
-        logInfo('Created contact', createContactResult2.value);
+        console.log('Created contact', createContactResult2.value);
       } else {
-        logError('Could not create contact', createContactResult2.error, createPayload(req, res));
+        console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
       }
     }
   }
@@ -214,9 +213,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (request.emailTemplateId) {
     const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
     if (sendEmailResult.success) {
-      logInfo('Email sent', sendEmailResult.value);
+      console.log('Email sent', sendEmailResult.value);
     } else {
-      logError('Could not send email', sendEmailResult.error, createPayload(req, res));
+      console.error('Could not send email', sendEmailResult.error, createPayload(req, res));
     }
   }
 
@@ -233,7 +232,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     res.redirect(303, successUrl.href);
   } else {
-    logError('Unable to store lead', newLeadResult.error, createPayload(req, res));
+    console.error('Unable to store lead', newLeadResult.error, createPayload(req, res));
     switch (newLeadResult.error.constructor) {
       default:
         res.status(500).send(newLeadResult.error.message);

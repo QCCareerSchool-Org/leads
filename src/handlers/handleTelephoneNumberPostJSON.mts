@@ -7,13 +7,12 @@ import type { PostTelephoneNumberRequest } from '../domain/postTelephoneNumberRe
 import { updateLeadTelephoneNumber } from '../interactors/leads.mjs';
 import { createBrevoContact } from '../lib/brevo.mjs';
 import { createPayload } from '../lib/createPayload.mjs';
-import { logError } from '../logger.mjs';
 
 export const handleTelephoneNumberPostJSON = async (req: Request, res: Response): Promise<void> => {
   const validated = await validateTelephoneNumberRequest(req.body);
 
   if (!validated.success) {
-    logError('Validation error', validated.error, createPayload(req, res));
+    console.error('Validation error', validated.error, createPayload(req, res));
     res.status(400).send(validated.error.message);
     return;
   }
@@ -29,14 +28,14 @@ export const handleTelephoneNumberPostJSON = async (req: Request, res: Response)
   if (updateResult.success) {
     const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ request.listId ], request.telephoneNumber);
     if (!updateContactResult.success) {
-      logError('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
+      console.error('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
     }
   }
 
   if (updateResult.success) {
     res.sendStatus(200);
   } else {
-    logError('Unable to update lead', updateResult.error.message, createPayload(req, res));
+    console.error('Unable to update lead', updateResult.error.message, createPayload(req, res));
     switch (updateResult.error.constructor) {
       default:
         res.status(500).send(updateResult.error.message);
