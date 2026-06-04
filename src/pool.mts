@@ -23,6 +23,7 @@ const config: PoolOptions = {
     ca: fs.readFileSync(path.resolve('./mysql-ca.pem')),
     verifyIdentity: false,
   },
+  timezone: 'America/Toronto',
 };
 
 const rawPool = createPool(config);
