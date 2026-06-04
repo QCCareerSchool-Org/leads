@@ -23,7 +23,6 @@ const config: PoolOptions = {
     ca: fs.readFileSync(path.resolve('./mysql-ca.pem')),
     verifyIdentity: false,
   },
-  timezone: process.env.NODE_ENV === 'production' ? 'Z' : 'local',
 };
 
 const rawPool = createPool(config);
