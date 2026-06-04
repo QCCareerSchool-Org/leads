@@ -43,6 +43,7 @@ declare module 'node:http' {
 
 const app = express();
 
+app.set('trust proxy', 1);
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression());
@@ -62,6 +63,10 @@ app.use('/fb', fbRouter);
 // all routes require an api key from here on
 app.use(apiKeyMiddleware);
 app.post('/course-compare', handleCourseComparePost);
+
+app.get('/proxy-hops', (req, res) => {
+  res.send(req.ip);
+});
 
 app.use(globalErrorHandler);
 
