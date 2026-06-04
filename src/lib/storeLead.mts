@@ -104,7 +104,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
         leadPayload.mobile,
         leadPayload.gclid,
         leadPayload.msclkid,
-        leadPayload.nonce,
+        leadPayload.nonce ? uuidToBin(leadPayload.nonce) : null,
         leadPayload.fbFields,
         leadPayload.userId,
       ]);
