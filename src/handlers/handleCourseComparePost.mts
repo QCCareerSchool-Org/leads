@@ -91,7 +91,7 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
     }
   }
 
-  res.status(202).send({ id: result.value });
+  res.status(201).send({ id: result.value });
 };
 
 interface Body {
