@@ -47,4 +47,11 @@
       "#test/*": [ "./__test__/*" ],
     }
   },
+  "include": [
+    "src",
+    "__test__"
+  ],
+  "exclude": [
+    "prisma"
+  ]
 }

@@ -1,56 +1,53 @@
-import dotenv from 'dotenv';
 import type { RequestHandler } from 'express';
-import type { CityResponse } from 'maxmind';
-import maxmind from 'maxmind';
 
-import { logError } from '../logger.mjs';
-
-dotenv.config();
+interface GeoLocation {
+  countryCode: string;
+  provinceCode: string | null;
+  city: string | null;
+  latitude?: number;
+  longitude?: number;
+};
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Locals {
-      geoLocation?: {
-        countryCode?: string;
-        provinceCode?: string | null;
-        city?: string;
-        latitude?: number;
-        longitude?: number;
-      };
+      geoLocation?: GeoLocation;
     }
   }
 }
-
-if (typeof process.env.MMDB_LOCATION === 'undefined') {
-  throw Error('MMDB_LOCATION environment variable is missing');
-}
-
-const cityReaderPromise = maxmind.open<CityResponse>(process.env.MMDB_LOCATION);
 
 export const geoLocationMiddleware: RequestHandler = (req, res, next) => {
-  const ipAddress = res.locals.ipAddress;
-
-  if (!ipAddress) {
-    next(); return;
-  }
-
-  cityReaderPromise.then(reader => {
-    const cityResponse = reader.get(ipAddress);
-    if (cityResponse) {
-      const countryCode = cityResponse.country?.iso_code;
-      res.locals.geoLocation = {
-        countryCode,
-        provinceCode: needsProvinceCode(countryCode) ? cityResponse.subdivisions?.[0].iso_code : null,
-        city: cityResponse.city?.names.en,
-        latitude: cityResponse.location?.latitude,
-        longitude: cityResponse.location?.latitude,
-      };
+  const getHeader = (headerName: string): string | null => {
+    const rawHeader = req.headers[headerName];
+    if (Array.isArray(rawHeader)) {
+      return rawHeader[0] ?? null;
     }
-    next();
-  }).catch((err: unknown) => {
-    logError('Error determining geo location', err);
-  });
+    return rawHeader ?? null;
+  };
+
+  const countryCode = getHeader('x-vercel-ip-country') ?? 'US';
+  const provinceCode = needsProvinceCode(countryCode)
+    ? getHeader('x-vercel-ip-country-region')
+    : null;
+  const city = getHeader('x-vercel-ip-city');
+  const rawLatitude = getHeader('x-vercel-ip-latitude');
+  const rawLongitude = getHeader('x-vercel-ip-longitude');
+
+  const latitude = rawLatitude ? parseFloat(rawLatitude) : null;
+  const longitude = rawLongitude ? parseFloat(rawLongitude) : null;
+
+  const geoLocation: GeoLocation = {
+    countryCode,
+    provinceCode,
+    city,
+    latitude: latitude && !isNaN(latitude) ? latitude : undefined,
+    longitude: longitude && !isNaN(longitude) ? longitude : undefined,
+  };
+
+  res.locals.geoLocation = geoLocation;
+
+  next();
 };
 
 const needsProvinceCode = (countryCode?: string): boolean => {
