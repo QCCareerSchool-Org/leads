@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "node dist/index.mjs",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "prisma generate --schema ./prisma/schema.general.prisma && prisma generate --schema ./prisma/schema.leads.prisma && tsc -p tsconfig.build.json",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "test": "jest --verbose",
