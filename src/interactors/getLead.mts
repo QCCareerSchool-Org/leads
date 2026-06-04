@@ -77,6 +77,6 @@ SELECT
   provinceCode,
   countryCode,
   ipAddress,
-  created,
+  created
 FROM leads.leads
 WHERE leadId = ?`;
