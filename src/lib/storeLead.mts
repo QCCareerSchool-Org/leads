@@ -84,6 +84,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
 
     await connection.beginTransaction();
     try {
+      const now = new Date();
       await connection.query<ResultSetHeader>(insertLeadSql, [
         leadIdBin,
         leadPayload.school,
@@ -107,6 +108,8 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
         leadPayload.nonce ? uuidToBin(leadPayload.nonce) : null,
         leadPayload.fbFields,
         leadPayload.userId,
+        now,
+        now,
       ]);
 
       if (leadPayload.courses) {
@@ -163,7 +166,9 @@ SET
   msclkid = ?,
   nonce = ?,
   fbFields = ?,
-  userId = ?`;
+  userId = ?,
+  created = ?,
+  updated = ?`;
 
 const insertMarketingPayloadSql = `
 INSERT INTO leads.marketing_parameter_sets
