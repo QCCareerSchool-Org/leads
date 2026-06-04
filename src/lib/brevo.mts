@@ -42,7 +42,7 @@ export const createBrevoContact = async (
   attributes?: BrevoAttributes,
   listIds?: number[],
   telephoneNumber?: string,
-): Promise<Result<number>> => {
+): Promise<Result> => {
   const request: Brevo.CreateContactRequest = {
     email: emailAddress,
     listIds,
@@ -59,13 +59,8 @@ export const createBrevoContact = async (
   };
 
   try {
-    const response = await brevo.contacts.createContact(request);
-
-    if (typeof response?.id !== 'undefined') {
-      return success(response.id);
-    }
-
-    return failure(Error('Could not add contact'));
+    await brevo.contacts.createContact(request);
+    return success();
   } catch (err) {
     if (err instanceof Error) {
       return failure(err);
