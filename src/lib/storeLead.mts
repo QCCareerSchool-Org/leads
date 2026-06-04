@@ -1,14 +1,13 @@
 import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 import type { JsonValue } from '#src/domain/json.mjs';
 import type { SchoolName } from '#src/domain/school.mjs';
 import { parseIpAddress } from '#src/lib/ipAddress.mjs';
 import { logError, logWarning } from '#src/logger.mjs';
-import { prismaGeneral } from '#src/prismaGeneral.mjs';
-import { prismaLeads } from '#src/prismaLeads.mjs';
-import { fixPrismaWriteDate, getDate } from './date.mjs';
-import { binToUUID, createUUID, uuidToBin } from './uuid.mjs';
+import { pool } from '#src/pool.mjs';
+import { createUUID, uuidToBin } from './uuid.mjs';
 
 export interface LeadPayload {
   ipAddress: string | null;
@@ -42,21 +41,31 @@ export interface LeadPayload {
   userId?: number;
 }
 
+interface CountryRow extends RowDataPacket {
+  code: string;
+}
+
+interface ProvinceRow extends RowDataPacket {
+  country_code: string;
+  code: string;
+}
+
 export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string>> => {
+  const connection = await pool.getConnection();
   try {
-    const prismaNow = fixPrismaWriteDate(getDate());
-    const leadId = uuidToBin(createUUID());
+    const leadId = createUUID();
+    const leadIdBin = uuidToBin(leadId);
 
     let countryCode = null;
     let provinceCode = null;
 
     // try to find the matching country and province
     if (leadPayload.provinceCode && leadPayload.countryCode) {
-      // eslint-disable-next-line camelcase
-      const provinceResult = await prismaGeneral.province.findUnique({ where: { countryCode_code: { countryCode: leadPayload.countryCode, code: leadPayload.provinceCode } } });
-      if (provinceResult) {
-        countryCode = provinceResult.countryCode;
-        provinceCode = provinceResult.code;
+      const [ rows ] = await connection.query<ProvinceRow[]>('SELECT country_code, code FROM general.provinces WHERE country_code = ? AND code = ? LIMIT 1', [ leadPayload.countryCode, leadPayload.provinceCode ]);
+      const province = rows[0];
+      if (province) {
+        countryCode = province.country_code;
+        provinceCode = province.code;
       } else {
         logWarning(`province not found: ${leadPayload.provinceCode}/${leadPayload.countryCode}`);
       }
@@ -64,57 +73,98 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
 
     // we didn't find a province above so try to find just the country
     if (provinceCode === null && leadPayload.countryCode) {
-      const countryResult = await prismaGeneral.country.findUnique({ where: { code: leadPayload.countryCode } });
-      if (countryResult) {
-        countryCode = countryResult.code;
+      const [ rows ] = await connection.query<CountryRow[]>('SELECT code FROM general.countries WHERE code = ? LIMIT 1', [ leadPayload.countryCode ]);
+      const country = rows[0];
+      if (country) {
+        countryCode = country.code;
       } else {
         logWarning(`country not found: ${leadPayload.countryCode}`);
       }
     }
 
-    const lead = await prismaLeads.lead.create({
-      data: {
-        leadId,
-        schoolName: leadPayload.school,
-        emailAddress: leadPayload.emailAddress,
-        ipAddress: leadPayload.ipAddress === null ? null : parseIpAddress(leadPayload.ipAddress),
-        firstName: leadPayload.firstName,
-        lastName: leadPayload.lastName,
-        telephoneNumber: leadPayload.telephoneNumber,
-        emailOptIn: leadPayload.emailOptIn ?? false,
-        smsOptIn: leadPayload.smsOptIn ?? false,
-        city: leadPayload.city,
+    await connection.beginTransaction();
+    try {
+      await connection.query<ResultSetHeader>(insertLeadSql, [
+        leadIdBin,
+        leadPayload.school,
+        leadPayload.emailAddress,
+        leadPayload.ipAddress === null ? null : parseIpAddress(leadPayload.ipAddress),
+        leadPayload.firstName,
+        leadPayload.lastName,
+        leadPayload.telephoneNumber,
+        leadPayload.emailOptIn ?? false,
+        leadPayload.smsOptIn ?? false,
+        leadPayload.city,
         provinceCode,
         countryCode,
-        referrer: leadPayload.referrer,
-        browserName: leadPayload.browserName,
-        browserVersion: leadPayload.browserVersion,
-        os: leadPayload.os,
-        mobile: leadPayload.mobile,
-        gclid: leadPayload.gclid,
-        msclkid: leadPayload.msclkid,
-        created: prismaNow,
-        courses: {
-          create: leadPayload.courses?.map(c => ({ courseCode: c.toUpperCase() })) ?? [],
-        },
-        marketingParameterSet: typeof leadPayload.marketing === 'undefined' ? undefined : {
-          create: {
-            source: leadPayload.marketing.source,
-            medium: leadPayload.marketing.medium,
-            campaign: leadPayload.marketing.campaign,
-            content: leadPayload.marketing.content,
-            term: leadPayload.marketing.term,
-          },
-        },
-        nonce: typeof leadPayload.nonce === 'undefined' ? null : uuidToBin(leadPayload.nonce),
-        fbFields: leadPayload.fbFields ?? undefined,
-        userId: leadPayload.userId ?? null,
-      },
-    });
+        leadPayload.referrer,
+        leadPayload.browserName,
+        leadPayload.browserVersion,
+        leadPayload.os,
+        leadPayload.mobile,
+        leadPayload.gclid,
+        leadPayload.msclkid,
+        leadPayload.nonce,
+        leadPayload.fbFields,
+        leadPayload.userId,
+      ]);
 
-    return success(binToUUID(lead.leadId));
+      if (leadPayload.courses) {
+        await Promise.all(leadPayload.courses.map(async c => connection.query('INSERT INTO leads.leads_courses SET leadId = ?, courseCode = ?', [ leadIdBin, c.toUpperCase() ])));
+      }
+
+      if (leadPayload.marketing) {
+        await connection.query(insertMarketingPayloadSql, [
+          leadId,
+          leadPayload.marketing.source,
+          leadPayload.marketing.medium,
+          leadPayload.marketing.campaign,
+          leadPayload.marketing.content,
+          leadPayload.marketing.term,
+        ]);
+      }
+
+      await connection.commit();
+
+      return success(leadId);
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    }
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
     return failure(err instanceof Error ? err : Error('unknown error'));
+  } finally {
+    connection.release();
   }
 };
+
+const insertLeadSql = `
+INSERT INTO leads.leads
+SET
+  leadId = ?,
+  schoolName = ?,
+  emailAddress = ?,
+  ipAddress = ?,
+  firstName = ?,
+  lastName = ?,
+  telephoneNumber = ?,
+  emailOptIn = ?,
+  smsOptIn = ?,
+  city = ?,
+  provinceCode = ?,
+  countryCode = ?,
+  referrer = ?,
+  browserName = ?,
+  browserVersion = ?,
+  os = ?,
+  mobile = ?,
+  gclid = ?,
+  msclkid = ?,
+  nonce = ?,
+  fbFields = ?,
+  userId = ?`;
+
+const insertMarketingPayloadSql = `
+INSERT INTO leads.marketing_parameter_sets
+SET leadId = ?, source = ?, medium = ?, campaign = ?, content = ?, term = ?`;

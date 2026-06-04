@@ -32,17 +32,13 @@ const swap = (buffer: Uint8Array): Uint8Array<ArrayBuffer> => {
     throw Error('Invalid buffer length');
   }
   const swappedBuffer = Buffer.alloc(16);
-  swappedBuffer[0] = buffer[6];
-  swappedBuffer[1] = buffer[7];
-  swappedBuffer[2] = buffer[4];
-  swappedBuffer[3] = buffer[5];
-  swappedBuffer[4] = buffer[0];
-  swappedBuffer[5] = buffer[1];
-  swappedBuffer[6] = buffer[2];
-  swappedBuffer[7] = buffer[3];
-  for (let i = 8; i < 16; i++) {
-    swappedBuffer[i] = buffer[i];
-  }
+  const source = Buffer.from(buffer);
+
+  source.copy(swappedBuffer, 0, 6, 8);
+  source.copy(swappedBuffer, 2, 4, 6);
+  source.copy(swappedBuffer, 4, 0, 4);
+  source.copy(swappedBuffer, 8, 8, 16);
+
   return swappedBuffer;
 };
 
@@ -51,16 +47,12 @@ const unswap = (buffer: Uint8Array): Uint8Array<ArrayBuffer> => {
     throw Error('Invalid buffer length');
   }
   const unswappedBuffer = Buffer.alloc(16);
-  unswappedBuffer[0] = buffer[4];
-  unswappedBuffer[1] = buffer[5];
-  unswappedBuffer[2] = buffer[6];
-  unswappedBuffer[3] = buffer[7];
-  unswappedBuffer[4] = buffer[2];
-  unswappedBuffer[5] = buffer[3];
-  unswappedBuffer[6] = buffer[0];
-  unswappedBuffer[7] = buffer[1];
-  for (let i = 8; i < 16; i++) {
-    unswappedBuffer[i] = buffer[i];
-  }
+  const source = Buffer.from(buffer);
+
+  source.copy(unswappedBuffer, 0, 4, 8);
+  source.copy(unswappedBuffer, 4, 2, 4);
+  source.copy(unswappedBuffer, 6, 0, 2);
+  source.copy(unswappedBuffer, 8, 8, 16);
+
   return unswappedBuffer;
 };

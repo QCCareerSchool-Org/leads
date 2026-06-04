@@ -1,4 +1,6 @@
+import { getCache } from '@vercel/functions';
 import type { RequestHandler } from 'express';
+import type { RowDataPacket } from 'mysql2';
 import { z } from 'zod';
 
 import type { SchoolName } from '#src/domain/school.mjs';
@@ -6,7 +8,7 @@ import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
-import { prismaGeneral } from '#src/prismaGeneral.mjs';
+import { pool } from '#src/pool.mjs';
 
 export const handleCourseComparePost: RequestHandler = async (req, res) => {
   const bodyResult = await bodySchema.safeParseAsync(req.body);
@@ -163,18 +165,66 @@ const getBrevoDetails = (schoolSlug: SchoolName, courseCode: string): BrevoDetai
   }
 };
 
+interface CountryRow extends RowDataPacket {
+  code: string;
+}
+
 const getCountryCode = async (countryName: string): Promise<string | null> => {
-  const country = await prismaGeneral.country.findFirst({ where: { name: countryName } });
-  if (country) {
-    return country.code;
+  const cache = getCache();
+  const key = `countryName:${countryName}`;
+
+  const cached = await cache.get(key);
+  if (cached && typeof cached === 'string') {
+    return cached;
   }
-  return null;
+
+  const connection = await pool.getConnection();
+  try {
+    const [ rows ] = await connection.query<CountryRow[]>('SELECT code FROM general.countries WHERE name = ? LIMIT 1', [ countryName ]);
+    const country = rows[0];
+    if (country) {
+      try {
+        await cache.set(key, country.code);
+      } catch (err) {
+        console.warn(err);
+      }
+
+      return country.code;
+    }
+    return null;
+  } finally {
+    connection.release();
+  }
 };
 
+interface ProvinceRow extends RowDataPacket {
+  code: string;
+}
+
 const getProvinceCode = async (countryCode: string, provinceName: string): Promise<string | null> => {
-  const province = await prismaGeneral.province.findFirst({ where: { countryCode, name: provinceName } });
-  if (province) {
-    return province.code;
+  const cache = getCache();
+  const key = `provinceName:${countryCode}:${provinceName}`;
+
+  const cached = await cache.get(key);
+  if (cached && typeof cached === 'string') {
+    return cached;
   }
-  return null;
+
+  const connection = await pool.getConnection();
+  try {
+    const [ rows ] = await connection.query<ProvinceRow[]>('SELECT code FROM general.provinces WHERE country_code = ? AND name = ? LIMIT 1', [ countryCode, provinceName ]);
+    const province = rows[0];
+    if (province) {
+      try {
+        await cache.set(key, province.code);
+      } catch (err) {
+        console.warn(err);
+      }
+
+      return province.code;
+    }
+    return null;
+  } finally {
+    connection.release();
+  }
 };

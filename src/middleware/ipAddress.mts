@@ -12,12 +12,23 @@ declare global {
 export const ipAddressMiddleware: RequestHandler = (req, res, next) => {
   let ipAddress: string | null = null;
 
-  const forwardedFor = req.headers['x-forwarded-for'];
+  const forwardedForRaw = req.headers['x-forwarded-for'];
 
-  if (Array.isArray(forwardedFor) && forwardedFor.length) {
-    ipAddress = forwardedFor[0].split(',')[0].trim();
-  } else if (typeof forwardedFor === 'string') {
-    ipAddress = forwardedFor.split(',')[0].trim();
+  if (Array.isArray(forwardedForRaw)) {
+    const forwardedFor = forwardedForRaw[0];
+    if (typeof forwardedFor !== 'undefined') {
+      const split = forwardedFor.split(',');
+      const first = split[0];
+      if (typeof first !== 'undefined') {
+        ipAddress = first.trim();
+      }
+    }
+  } else if (typeof forwardedForRaw === 'string') {
+    const split = forwardedForRaw.split(',');
+    const first = split[0];
+    if (typeof first !== 'undefined') {
+      ipAddress = first.trim();
+    }
   } else if (req.socket.remoteAddress) {
     ipAddress = req.socket.remoteAddress;
   }

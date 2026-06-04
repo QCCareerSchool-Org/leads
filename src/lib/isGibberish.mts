@@ -22,8 +22,13 @@ export const isGibberish = (input: string): boolean => {
   // Case alternation rate
   let flips = 0;
   for (let i = 1; i < n; i++) {
-    const prevU = letters[i - 1] === letters[i - 1].toUpperCase();
-    const curU = letters[i] === letters[i].toUpperCase();
+    const curLetter = letters[i];
+    const prevLetter = letters[i - 1];
+    if (typeof curLetter === 'undefined' || typeof prevLetter === 'undefined') {
+      throw Error('unexpected array');
+    }
+    const prevU = prevLetter === prevLetter.toUpperCase();
+    const curU = curLetter === curLetter.toUpperCase();
     if (prevU !== curU) {
       flips++;
     }

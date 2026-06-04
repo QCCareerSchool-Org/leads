@@ -1,12 +1,12 @@
 import net from 'node:net';
 
 interface IpRange {
-  ipAddress: Uint8Array<ArrayBuffer>;
+  ipAddress: Buffer;
   prefixLength: number;
 }
 
 interface ParsedIpAddress {
-  bytes: Uint8Array<ArrayBuffer>;
+  bytes: Buffer;
   version: 4 | 6;
 }
 
@@ -22,8 +22,8 @@ declare global {
   }
 }
 
-const isIpv4MappedAddress = (ipAddress: Uint8Array<ArrayBuffer>): boolean => (
-  ipAddress.slice(0, 10).every(byte => byte === 0)
+const isIpv4MappedAddress = (ipAddress: Buffer): boolean => (
+  ipAddress.subarray(0, 10).every(byte => byte === 0)
   && ipAddress[10] === 0xff
   && ipAddress[11] === 0xff
 );
@@ -34,7 +34,7 @@ const parseIpAddress = (ipAddress: string): ParsedIpAddress | null => {
     : ipAddress;
 
   if (net.isIPv4(normalizedIpAddress)) {
-    const bytes = new Uint8Array(16);
+    const bytes = Buffer.alloc(16);
     bytes[10] = 0xff;
     bytes[11] = 0xff;
 
@@ -59,6 +59,9 @@ const parseIpAddress = (ipAddress: string): ParsedIpAddress | null => {
     }
 
     const ipv4Bytes = embeddedIpv4Address.split('.').map(Number);
+    if (typeof ipv4Bytes[0] === 'undefined' || typeof ipv4Bytes[1] === 'undefined' || typeof ipv4Bytes[2] === 'undefined' || typeof ipv4Bytes[3] === 'undefined') {
+      throw Error('Unexpected buffer');
+    }
     // eslint-disable-next-line no-bitwise
     const firstIpv6Group = (ipv4Bytes[0] << 8) + ipv4Bytes[1];
     // eslint-disable-next-line no-bitwise
@@ -85,7 +88,7 @@ const parseIpAddress = (ipAddress: string): ParsedIpAddress | null => {
     return null;
   }
 
-  const bytes = new Uint8Array(16);
+  const bytes = Buffer.alloc(16);
   ipv6Groups.forEach((group, index) => {
     // eslint-disable-next-line no-bitwise
     bytes[index * 2] = group >> 8;
@@ -97,8 +100,8 @@ const parseIpAddress = (ipAddress: string): ParsedIpAddress | null => {
 };
 
 const hasPrefix = (
-  ipAddress: Uint8Array<ArrayBuffer>,
-  rangeAddress: Uint8Array<ArrayBuffer>,
+  ipAddress: Buffer,
+  rangeAddress: Buffer,
   prefixLength: number,
   offset = 0,
 ): boolean => {
@@ -118,8 +121,14 @@ const hasPrefix = (
   // eslint-disable-next-line no-bitwise
   const mask = (0xff << (8 - remainingBits)) & 0xff;
 
+  const a = ipAddress[fullBytes + offset];
+  const b = rangeAddress[fullBytes + offset];
+  if (typeof a === 'undefined' || typeof b === 'undefined') {
+    throw Error('Unexpected buffer');
+  }
+
   // eslint-disable-next-line no-bitwise
-  return (ipAddress[fullBytes + offset] & mask) === (rangeAddress[fullBytes + offset] & mask);
+  return (a & mask) === (b & mask);
 };
 
 export const inRange = (ipAddress: string | null, ranges: IpRange[]): boolean => {

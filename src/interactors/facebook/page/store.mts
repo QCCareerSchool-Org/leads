@@ -10,10 +10,15 @@ import type { Form, Page } from './pageMap.mjs';
 export const store = async (page: Page, form: Form, emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
   const errors: Error[] = [];
 
+  const emailAddress = emailAddresses[0];
+  if (typeof emailAddress === 'undefined') {
+    throw Error('No email addresses');
+  }
+
   const leadPayload: LeadPayload = {
     ipAddress: '127.0.0.1',
     school: page.schoolName,
-    emailAddress: emailAddresses[0],
+    emailAddress,
     firstName: firstName ?? null,
     lastName: null,
     telephoneNumber: telephoneNumber ?? null,
@@ -44,8 +49,8 @@ export const store = async (page: Page, form: Form, emailAddresses: string[], fi
     listIds.push(...form.smsListIds);
   }
 
-  for (const emailAddress of emailAddresses) {
-    const brevoResult = await addToBrevo(page.schoolName, emailAddress, firstName, telephoneNumber, listIds, form.emailTemplateId);
+  for (const e of emailAddresses) {
+    const brevoResult = await addToBrevo(page.schoolName, e, firstName, telephoneNumber, listIds, form.emailTemplateId);
     if (!brevoResult.success) {
       errors.push(brevoResult.error);
     }
