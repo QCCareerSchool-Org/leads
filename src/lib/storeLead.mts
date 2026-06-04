@@ -118,7 +118,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
 
       if (leadPayload.marketing) {
         await connection.query(insertMarketingPayloadSql, [
-          leadId,
+          leadIdBin,
           leadPayload.marketing.source,
           leadPayload.marketing.medium,
           leadPayload.marketing.campaign,
