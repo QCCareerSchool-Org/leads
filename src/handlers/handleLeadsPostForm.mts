@@ -178,7 +178,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     mobile: res.locals.browser?.mobile ?? null,
-    nonce: request.nonce,
+    nonce: undefined,
     fbFields: null,
   });
 
