@@ -250,7 +250,7 @@ const schema = zfd.formData({
   'city': zfd.text(z.string().max(64).optional()),
   'hp_city': zfd.text(z.string().max(64).optional()),
   'telephoneNumber': zfd.text(z.string().optional()),
-  'emailOptIn': zfd.checkbox(),
+  'emailOptIn': zfd.checkbox().optional(),
   'smsOptIn': zfd.checkbox().optional(),
   'gclid': zfd.text(z.string().optional()),
   'msclkid': zfd.text(z.string().optional()),
