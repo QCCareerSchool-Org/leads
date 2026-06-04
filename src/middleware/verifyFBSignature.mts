@@ -41,7 +41,6 @@ export const verifyFBSignature: RequestHandler = (req, res, next) => {
   }
 
   if (!req.rawBody) {
-    console.error('Raw buffer not detected');
     res.status(500).send('Raw buffer not detected');
     return;
   }
