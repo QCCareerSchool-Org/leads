@@ -87,7 +87,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   // captcha check
-  if (process.env.NOV_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
     if (captchaResult.success) {
       if (!captchaResult.value.success) {
@@ -178,7 +178,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     browserVersion: res.locals.browser?.version || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     os: res.locals.browser?.os || null, // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     mobile: res.locals.browser?.mobile ?? null,
-    nonce: undefined,
+    nonce: request.nonce,
     fbFields: null,
   });
 
@@ -263,7 +263,7 @@ const schema = zfd.formData({
   'emailTemplateId': zfd.numeric(z.number().optional()),
   'listId': zfd.numeric(z.number().multipleOf(1).optional()),
   'telephoneListId': zfd.numeric(z.number().multipleOf(1).optional()),
-  'nonce': zfd.text().optional(),
+  'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
   'forward': zfd.numeric().default(1),
