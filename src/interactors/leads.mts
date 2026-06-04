@@ -1,10 +1,10 @@
 import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 
-import { fixPrismaWriteDate, getDate } from '../lib/date.mjs';
+import { pool } from '#src/pool.mjs';
+import type { LeadRow } from './getLead.mjs';
 import { binToUUID, uuidToBin } from '../lib/uuid.mjs';
 import { logError } from '../logger.mjs';
-import { prismaLeads } from '../prismaLeads.mjs';
 
 interface TelephoneNumberPayload {
   leadId: string;
@@ -12,9 +12,11 @@ interface TelephoneNumberPayload {
 }
 
 export const getLeadByNonce = async (nonce: string): Promise<Result<string | false>> => {
+  const connection = await pool.getConnection();
   try {
     const nonceBin = uuidToBin(nonce);
-    const lead = await prismaLeads.lead.findFirst({ where: { nonce: nonceBin } });
+    const [ rows ] = await connection.query<LeadRow[]>('SELECT * FROM leads.leads WHERE nonce = ? LIMIT 1', [ nonceBin ]);
+    const lead = rows[0];
     if (lead) {
       return success(binToUUID(lead.leadId));
     }
@@ -22,25 +24,26 @@ export const getLeadByNonce = async (nonce: string): Promise<Result<string | fal
   } catch (err) {
     logError('error checking nonce', err instanceof Error ? err.message : err);
     return failure(err instanceof Error ? err : Error('unknown error'));
+  } finally {
+    connection.release();
   }
 };
 
 export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload): Promise<Result<string>> => {
+  const connection = await pool.getConnection();
   try {
     const leadIdBin = uuidToBin(request.leadId);
-    const prismaNow = fixPrismaWriteDate(getDate());
-
-    const lead = await prismaLeads.lead.update({
-      data: {
-        telephoneNumber: request.telephoneNumber,
-        updated: prismaNow,
-      },
-      where: { leadId: leadIdBin },
-    });
-
+    await connection.query('UPDATE leads.lead SET telephoneNumber = ? WHERE leadId = ?', [ leadIdBin, request.telephoneNumber ]);
+    const [ rows ] = await connection.query<LeadRow[]>('SELECT emailAddress from leads.lead WHERE leadId = ?', [ leadIdBin ]);
+    const lead = rows[0];
+    if (!lead) {
+      return failure(Error('Lead does not exist'));
+    }
     return success(lead.emailAddress);
   } catch (err) {
     logError('error inserting lead', err instanceof Error ? err.message : err);
     return failure(err instanceof Error ? err : Error('unknown error'));
+  } finally {
+    connection.release();
   }
 };

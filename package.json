@@ -23,19 +23,18 @@
   },
   "scripts": {
     "start": "node dist/index.mjs",
-    "build:only": "tsc -p tsconfig.build.json",
-    "build": "prisma generate --schema ./prisma/schema.general.prisma && prisma generate --schema ./prisma/schema.leads.prisma && tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "test": "jest --verbose",
-    "test:watch": "jest --verbose --watch",
-    "generate": "prisma generate --schema ./prisma/schema.general.prisma && prisma generate --schema ./prisma/schema.leads.prisma"
+    "test:watch": "jest --verbose --watch"
   },
   "dependencies": {
     "@getbrevo/brevo": "^5.0.4",
     "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@vercel/config": "^0.5.1",
+    "@vercel/functions": "^3.6.2",
     "browser-detect": "^0.2.28",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
@@ -45,6 +44,7 @@
     "express-rate-limit": "^8.5.2",
     "generic-result-type": "^2.3.0",
     "helmet": "^8.2.0",
+    "mysql2": "^3.22.4",
     "uuid": "^13.0.2",
     "winston": "^3.19.0",
     "yup": "^1.7.1",

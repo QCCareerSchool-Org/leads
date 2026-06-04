@@ -87,19 +87,21 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   // captcha check
-  const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
-  if (captchaResult.success) {
-    if (!captchaResult.value.success) {
-      logWarning('Captcha validation failed', captchaResult.value, createPayload(req, res));
-      if (captchaResult.value['error-codes']?.includes('browser-error')) {
-        res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(request.school)));
+  if (process.env.NOV_ENV === 'production') {
+    const captchaResult = await validateCaptcha(request['g-recaptcha-response'], res.locals.ipAddress);
+    if (captchaResult.success) {
+      if (!captchaResult.value.success) {
+        logWarning('Captcha validation failed', captchaResult.value, createPayload(req, res));
+        if (captchaResult.value['error-codes']?.includes('browser-error')) {
+          res.status(400).send(browserErrorHtml.replace(/\$\{contactUrl\}/gu, getContactURL(request.school)));
+          return;
+        }
+        res.status(400).send('captcha validation failed');
         return;
       }
-      res.status(400).send('captcha validation failed');
-      return;
+    } else {
+      logError('Unable to process captcha', captchaResult.error, createPayload(req, res));
     }
-  } else {
-    logError('Unable to process captcha', captchaResult.error, createPayload(req, res));
   }
 
   const [ firstName, lastName ] = getName(request.firstName, request.lastName);
@@ -221,7 +223,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   if (newLeadResult.success) {
     additionalParameters.leadId = newLeadResult.value;
     for (const key of Object.keys(additionalParameters)) {
-      successUrl.searchParams.set(key, additionalParameters[key]);
+      const param = additionalParameters[key];
+      if (typeof param !== 'undefined') {
+        successUrl.searchParams.set(key, param);
+      }
     }
     if (typeof request.telephoneListId !== 'undefined') {
       successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
@@ -246,7 +251,7 @@ const schema = zfd.formData({
   'hp_city': zfd.text(z.string().max(64).optional()),
   'telephoneNumber': zfd.text(z.string().optional()),
   'emailOptIn': zfd.checkbox(),
-  'smsOptIn': zfd.checkbox(),
+  'smsOptIn': zfd.checkbox().optional(),
   'gclid': zfd.text(z.string().optional()),
   'msclkid': zfd.text(z.string().optional()),
   'utmSource': zfd.text(z.string().optional()),

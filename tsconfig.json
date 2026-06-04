@@ -21,7 +21,7 @@
     // "declarationMap": true,
 
     // Stricter Typechecking Options
-    // "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true,
     // "exactOptionalPropertyTypes": true,
 
     // Style Options
@@ -49,7 +49,7 @@
   },
   "include": [
     "src",
-    "__test__"
+    "__test__",
   ],
   "exclude": [
     "prisma"

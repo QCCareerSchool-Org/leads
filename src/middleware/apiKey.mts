@@ -1,8 +1,9 @@
 import type { RequestHandler } from 'express';
+import type { RowDataPacket } from 'mysql2';
 import crypto from 'node:crypto';
 
 import { inRange } from '#src/lib/inRange.mjs';
-import { prismaLeads } from '#src/prismaLeads.mjs';
+import { pool } from '#src/pool.mjs';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -30,28 +31,57 @@ export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  const hashedKey = crypto.createHash('sha256').update(match[1]).digest();
+  const hashedKey = match[1] ? crypto.createHash('sha256').update(match[1]).digest() : null;
 
-  const apiKey = await prismaLeads.apiKey.findUnique({
-    where: { hashedKey, user: { enabled: true } },
-    include: { user: { include: { whitelistRanges: true } } },
-  });
-  if (!apiKey) {
-    res.sendStatus(401);
-    return;
-  }
-
-  if (apiKey.user.whitelistRanges.length) {
-    if (!inRange(res.locals.ipAddress, apiKey.user.whitelistRanges)) {
+  const connection = await pool.getConnection();
+  try {
+    const [ userRows ] = await connection.query<UserRow[]>(selectUserSql, [ hashedKey ]);
+    const user = userRows[0];
+    if (!user) {
       res.sendStatus(401);
       return;
     }
-  }
 
-  res.locals.user = {
-    id: apiKey.userId,
-    name: apiKey.user.name,
-  };
+    const [ whitelistRangeRows ] = await connection.query<WhitelistRangeRow[]>(selectWhitelistRangesSql);
+    if (whitelistRangeRows.length) {
+      if (!inRange(res.locals.ipAddress, whitelistRangeRows)) {
+        res.sendStatus(401);
+        return;
+      }
+    }
+
+    res.locals.user = {
+      id: user.id,
+      name: user.name,
+    };
+
+  } finally {
+    connection.release();
+  }
 
   next();
 };
+
+const selectUserSql = `
+SELECT u.id, u.name
+FROM leads.users u
+JOIN leads.api_keys a ON u.id = a.userId
+WHERE a.hashedKey = ? AND u.enabled <> 0
+LIMIT 1`;
+
+const selectWhitelistRangesSql = `
+SELECT id, userId, ipAddress, prefixLength
+FROM leads.whitelist_ranges
+`;
+
+interface UserRow extends RowDataPacket {
+  id: number;
+  name: string;
+}
+
+interface WhitelistRangeRow extends RowDataPacket {
+  id: number;
+  userId: number;
+  ipAddress: Buffer;
+  prefixLength: number;
+}
