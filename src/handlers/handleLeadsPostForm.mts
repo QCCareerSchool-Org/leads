@@ -263,7 +263,7 @@ const schema = zfd.formData({
   'emailTemplateId': zfd.numeric(z.number().optional()),
   'listId': zfd.numeric(z.number().multipleOf(1).optional()),
   'telephoneListId': zfd.numeric(z.number().multipleOf(1).optional()),
-  'nonce': zfd.text(z.uuid().optional()),
+  'nonce': zfd.text().optional(),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
   'forward': zfd.numeric().default(1),
