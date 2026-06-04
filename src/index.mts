@@ -60,9 +60,7 @@ app.get('/leads/:leadId', handleLeadGet);
 app.post('/telephoneNumber', handleTelephoneNumberPost);
 app.use('/fb', fbRouter);
 
-// all routes require an api key from here on
-app.use(apiKeyMiddleware);
-app.post('/course-compare', handleCourseComparePost);
+app.post('/course-compare', apiKeyMiddleware, handleCourseComparePost);
 
 app.get('/proxy-hops', (req, res) => {
   res.send(req.ip);
