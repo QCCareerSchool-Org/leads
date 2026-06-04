@@ -7,6 +7,7 @@ import type { SchoolName } from '#src/domain/school.mjs';
 import { parseIpAddress } from '#src/lib/ipAddress.mjs';
 import { logError, logWarning } from '#src/logger.mjs';
 import { pool } from '#src/pool.mjs';
+import { torontoDateTime } from './torontoDateTime.js';
 import { createUUID, uuidToBin } from './uuid.mjs';
 
 export interface LeadPayload {
@@ -84,7 +85,7 @@ export const storeLead = async (leadPayload: LeadPayload): Promise<Result<string
 
     await connection.beginTransaction();
     try {
-      const now = new Date();
+      const now = torontoDateTime(new Date());
       await connection.query<ResultSetHeader>(insertLeadSql, [
         leadIdBin,
         leadPayload.school,
