@@ -4,6 +4,7 @@ import type { RowDataPacket } from 'mysql2';
 import { z } from 'zod';
 
 import type { SchoolName } from '#src/domain/school.mjs';
+import { schools } from '#src/domain/school.mjs';
 import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
@@ -58,7 +59,8 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
     userId: res.locals.user?.id,
   });
   if (!result.success) {
-    res.status(500).send(result.error.message);
+    console.error(result.error.message);
+    res.sendStatus(500);
     return;
   }
 
@@ -109,18 +111,18 @@ interface Body {
 
 const bodySchema: z.ZodType<Body> = z.object({
   ipAddress: z.union([ z.ipv4(), z.ipv6() ]),
-  school: z.string<SchoolName>(),
-  courseCode: z.string().length(2),
-  emailAddress: z.email(),
-  firstName: z.string(),
-  lastName: z.string().optional(),
+  school: z.enum(schools),
+  courseCode: z.string().trim().length(2),
+  emailAddress: z.email().trim().min(1).max(255),
+  firstName: z.string().trim().min(1).max(100),
+  lastName: z.string().trim().min(1).max(100).optional(),
   telephone: z.object({
     countryCode: z.int().min(1).max(999),
-    number: z.string(),
+    number: z.string().trim().min(1).max(32),
   }).optional(),
-  city: z.string(),
-  provinceName: z.string().optional(),
-  countryName: z.string(),
+  city: z.string().trim().min(1).max(100),
+  provinceName: z.string().trim().min(1).max(100).optional(),
+  countryName: z.string().trim().min(1).max(100),
 });
 
 interface BrevoDetails {

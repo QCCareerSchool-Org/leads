@@ -1,5 +1,8 @@
 import type { RequestHandler } from 'express';
 
+import { firstCommaSeparatedValue } from '#src/lib/firstCommaSeparatedValue.mjs';
+import { firstHeaderValue } from '#src/lib/firstHeaderValue.mjs';
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
@@ -9,30 +12,16 @@ declare global {
   }
 }
 
+/**
+ * Get the client IP address and stores it in res.locals
+ */
 export const ipAddressMiddleware: RequestHandler = (req, res, next) => {
-  let ipAddress: string | null = null;
+  // Vercel overwrites x-forwarded-for, so this is trusted for direct-to-Vercel traffic
+  const forwardedFor = firstHeaderValue(req.headers['x-forwarded-for']);
 
-  const forwardedForRaw = req.headers['x-forwarded-for'];
+  res.locals.ipAddress = firstCommaSeparatedValue(forwardedFor)
+    ?? req.socket.remoteAddress
+    ?? null;
 
-  if (Array.isArray(forwardedForRaw)) {
-    const forwardedFor = forwardedForRaw[0];
-    if (typeof forwardedFor !== 'undefined') {
-      const split = forwardedFor.split(',');
-      const first = split[0];
-      if (typeof first !== 'undefined') {
-        ipAddress = first.trim();
-      }
-    }
-  } else if (typeof forwardedForRaw === 'string') {
-    const split = forwardedForRaw.split(',');
-    const first = split[0];
-    if (typeof first !== 'undefined') {
-      ipAddress = first.trim();
-    }
-  } else if (req.socket.remoteAddress) {
-    ipAddress = req.socket.remoteAddress;
-  }
-
-  res.locals.ipAddress = ipAddress;
   next();
 };

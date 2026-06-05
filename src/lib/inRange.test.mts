@@ -1,14 +1,8 @@
-import { inRange } from '../src/lib/inRange.mjs';
-
-interface IpRange {
-  ipAddress: Uint8Array<ArrayBuffer>;
-  prefixLength: number;
-}
-
-const bytes = (values: number[]): Uint8Array<ArrayBuffer> => new Uint8Array(values);
+import type { IpRange } from './inRange.mjs';
+import { inRange } from './inRange.mjs';
 
 const ipv4Range = (ipAddress: string, prefixLength: number): IpRange => ({
-  ipAddress: bytes([
+  ipAddress: Buffer.from([
     ...Array<number>(10).fill(0),
     0xff,
     0xff,
@@ -18,7 +12,7 @@ const ipv4Range = (ipAddress: string, prefixLength: number): IpRange => ({
 });
 
 const ipv6Range = (groups: number[], prefixLength: number): IpRange => ({
-  ipAddress: bytes(groups.flatMap(group => [
+  ipAddress: Buffer.from(groups.flatMap(group => [
     Math.floor(group / 256),
     group % 256,
   ])),
@@ -88,7 +82,7 @@ describe('inRange', () => {
 
   it('ignores malformed range records', () => {
     const shortRange: IpRange = {
-      ipAddress: bytes([ 192, 0, 2, 10 ]),
+      ipAddress: Buffer.from([ 192, 0, 2, 10 ]),
       prefixLength: 32,
     };
 
