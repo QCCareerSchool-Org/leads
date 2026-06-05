@@ -196,14 +196,14 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
   if (createContactResult.success) {
-    console.log('Created contact', createContactResult.value);
+    console.log('Created contact');
   } else {
     console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
     // make a second attempt without the telephone number
     if (telephoneNumber) {
       const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
       if (createContactResult2.success) {
-        console.log('Created contact', createContactResult2.value);
+        console.log('Created contact');
       } else {
         console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
       }

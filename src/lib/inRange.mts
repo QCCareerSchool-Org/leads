@@ -1,6 +1,6 @@
 import net from 'node:net';
 
-interface IpRange {
+export interface IpRange {
   ipAddress: Buffer;
   prefixLength: number;
 }
