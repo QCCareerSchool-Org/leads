@@ -32,7 +32,7 @@ export const updateLeadTelephoneNumber = async (request: TelephoneNumberPayload)
   const connection = await pool.getConnection();
   try {
     const leadIdBin = uuidToBin(request.leadId);
-    await connection.query('UPDATE leads.lead SET telephoneNumber = ? WHERE leadId = ?', [ leadIdBin, request.telephoneNumber ]);
+    await connection.query('UPDATE leads.leads SET telephoneNumber = ? WHERE leadId = ?', [ leadIdBin, request.telephoneNumber ]);
     const [ rows ] = await connection.query<LeadRow[]>('SELECT emailAddress from leads.lead WHERE leadId = ?', [ leadIdBin ]);
     const lead = rows[0];
     if (!lead) {
