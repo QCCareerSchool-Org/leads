@@ -8,6 +8,7 @@ import { schools } from '#src/domain/school.mjs';
 import type { BrevoAttributes } from '#src/lib/brevo.mjs';
 import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
+import { formatTelephoneNumber } from '#src/lib/formatTelephoneNumber.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
 import { pool } from '#src/pool.mjs';
 
@@ -36,7 +37,7 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
     }
   }
 
-  const telephoneNumber = body.telephone ? `+${body.telephone.countryCode} ${body.telephone.number}` : null;
+  const telephoneNumber = body.telephone ? formatTelephoneNumber(body.telephone.countryCode, body.telephone.number) : null;
 
   const result = await storeLead({
     ...body,
