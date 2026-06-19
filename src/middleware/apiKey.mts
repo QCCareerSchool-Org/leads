@@ -18,7 +18,6 @@ declare global {
 }
 
 export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
-  const start = performance.now();
   const authorizationHeader = req.headers.authorization;
 
   if (!authorizationHeader) {
@@ -60,8 +59,6 @@ export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
     connection.release();
   }
 
-  const end = performance.now();
-  console.log('apiKeyMiddleware', end - start);
   next();
 };
 
