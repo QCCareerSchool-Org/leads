@@ -12,7 +12,6 @@ import { handleCourseComparePost } from './handlers/handleCourseComparePost.mjs'
 import { handleLeadGet } from './handlers/handleLeadGet.mjs';
 import { handleLeadsPost } from './handlers/handleLeadsPost.mjs';
 import { handleTelephoneNumberPost } from './handlers/handleTelephoneNumberPost.mjs';
-import { getMethodNotAllowedHandler } from './handlers/methodNotAllowedHandler.mjs';
 import { apiKeyMiddleware } from './middleware/apiKey.mjs';
 import { browserDetectMiddleware } from './middleware/browserDetect.mjs';
 import { geoLocationMiddleware } from './middleware/geoLocation.mjs';
@@ -56,27 +55,16 @@ app.use(ipAddressMiddleware);
 app.use(geoLocationMiddleware);
 app.use(browserDetectMiddleware);
 
-app.route('/')
-  .post(handleLeadsPost)
-  .all(getMethodNotAllowedHandler([ 'POST' ]));
-
-app.route('/leads/:leadId')
-  .get(handleLeadGet)
-  .all(getMethodNotAllowedHandler([ 'GET' ]));
-
-app.route('/telephoneNumber')
-  .post(handleTelephoneNumberPost)
-  .all(getMethodNotAllowedHandler([ 'POST' ]));
+app.post('/', handleLeadsPost); // deprecated
+app.post('/leads', handleLeadsPost);
+app.get('/leads/:leadId', handleLeadGet);
+app.post('/telephoneNumber', handleTelephoneNumberPost);
 
 app.use('/fb', fbRouter);
 
-app.route('/course-compare')
-  .post(apiKeyMiddleware, handleCourseComparePost)
-  .all(getMethodNotAllowedHandler([ 'POST' ]));
+app.post('/course-compare', apiKeyMiddleware, handleCourseComparePost);
 
-app.route('/proxy-hops')
-  .get((req, res) => { res.send(req.ip); })
-  .all(getMethodNotAllowedHandler([ 'GET' ]));
+app.get('/proxy-hops', (req, res) => { res.send(req.ip); });
 
 app.use(globalErrorHandler);
 
