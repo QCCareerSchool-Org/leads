@@ -1,6 +1,4 @@
-import { getCache } from '@vercel/functions';
 import type { RequestHandler } from 'express';
-import type { RowDataPacket } from 'mysql2';
 import { z } from 'zod';
 
 import type { SchoolName } from '#src/domain/school.mjs';
@@ -10,7 +8,6 @@ import { sendBrevoEmail } from '#src/lib/brevo.mjs';
 import { createBrevoContact } from '#src/lib/brevo.mjs';
 import { formatTelephoneNumber } from '#src/lib/formatTelephoneNumber.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
-import { pool } from '#src/pool.mjs';
 
 export const handleCourseComparePost: RequestHandler = async (req, res) => {
   const bodyResult = await bodySchema.safeParseAsync(req.body);
@@ -22,30 +19,17 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
 
   const body = bodyResult.data;
 
-  const countryCode = await getCountryCode(body.countryName);
-  if (!countryCode) {
-    res.status(400).send('invalid country');
-    return;
-  }
-
-  let provinceCode: string | null = null;
-  if (body.provinceName) {
-    provinceCode = await getProvinceCode(countryCode, body.provinceName);
-    if (!provinceCode) {
-      res.status(400).send('invalid province');
-      return;
-    }
-  }
-
   const telephoneNumber = body.telephone ? formatTelephoneNumber(body.telephone.countryCode, body.telephone.number) : null;
 
   const result = await storeLead({
     ...body,
+    ipAddress: null,
     firstName: body.firstName,
     lastName: body.lastName ?? null,
     school: body.school,
-    provinceCode,
-    countryCode,
+    city: null,
+    provinceCode: null,
+    countryCode: 'CA',
     telephoneNumber,
     emailOptIn: true,
     smsOptIn: true,
@@ -68,14 +52,14 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
   const details = getBrevoDetails(body.school, body.courseCode);
 
   if (details) {
-    const createContactResult = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, countryCode, provinceCode, body.city, details.attributes, details.listIds, telephoneNumber ?? undefined);
+    const createContactResult = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, 'CA', null, null, details.attributes, details.listIds, telephoneNumber ?? undefined);
     if (createContactResult.success) {
       console.log('Created contact', createContactResult.value);
     } else {
       console.log('Could not create contact with telephone number', createContactResult.error.message);
       // make a second attempt without the telephone number
       if (telephoneNumber) {
-        const createContactResult2 = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, countryCode, provinceCode, body.city, details.attributes, details.listIds);
+        const createContactResult2 = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, 'CA', null, null, details.attributes, details.listIds);
         if (createContactResult2.success) {
           console.log('Created contact', createContactResult2.value);
         } else {
@@ -98,20 +82,15 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
 };
 
 interface Body {
-  ipAddress: string;
   school: SchoolName;
   courseCode: string;
   emailAddress: string;
   firstName: string;
   lastName?: string;
   telephone?: { countryCode: number; number: string };
-  city: string;
-  provinceName?: string;
-  countryName: string;
 }
 
 const bodySchema: z.ZodType<Body> = z.object({
-  ipAddress: z.union([ z.ipv4(), z.ipv6() ]),
   school: z.enum(schools),
   courseCode: z.string().trim().length(2),
   emailAddress: z.email().trim().min(1).max(255),
@@ -121,9 +100,6 @@ const bodySchema: z.ZodType<Body> = z.object({
     countryCode: z.int().min(1).max(999),
     number: z.string().trim().min(1).max(32),
   }).optional(),
-  city: z.string().trim().min(1).max(100),
-  provinceName: z.string().trim().min(1).max(100).optional(),
-  countryName: z.string().trim().min(1).max(100),
 });
 
 interface BrevoDetails {
@@ -165,69 +141,5 @@ const getBrevoDetails = (schoolSlug: SchoolName, courseCode: string): BrevoDetai
         default:
           return { emailTemplateId: 1660, listIds: [ 31 ], attributes: { ...baseAttributes, STATUS_PET_LEAD: true } };
       }
-  }
-};
-
-interface CountryRow extends RowDataPacket {
-  code: string;
-}
-
-const getCountryCode = async (countryName: string): Promise<string | null> => {
-  const cache = getCache();
-  const key = `countryName:${countryName}`;
-
-  const cached = await cache.get(key);
-  if (cached && typeof cached === 'string') {
-    return cached;
-  }
-
-  const connection = await pool.getConnection();
-  try {
-    const [ rows ] = await connection.query<CountryRow[]>('SELECT code FROM general.countries WHERE name = ? LIMIT 1', [ countryName ]);
-    const country = rows[0];
-    if (country) {
-      try {
-        await cache.set(key, country.code);
-      } catch (err) {
-        console.warn(err);
-      }
-
-      return country.code;
-    }
-    return null;
-  } finally {
-    connection.release();
-  }
-};
-
-interface ProvinceRow extends RowDataPacket {
-  code: string;
-}
-
-const getProvinceCode = async (countryCode: string, provinceName: string): Promise<string | null> => {
-  const cache = getCache();
-  const key = `provinceName:${countryCode}:${provinceName}`;
-
-  const cached = await cache.get(key);
-  if (cached && typeof cached === 'string') {
-    return cached;
-  }
-
-  const connection = await pool.getConnection();
-  try {
-    const [ rows ] = await connection.query<ProvinceRow[]>('SELECT code FROM general.provinces WHERE country_code = ? AND name = ? LIMIT 1', [ countryCode, provinceName ]);
-    const province = rows[0];
-    if (province) {
-      try {
-        await cache.set(key, province.code);
-      } catch (err) {
-        console.warn(err);
-      }
-
-      return province.code;
-    }
-    return null;
-  } finally {
-    connection.release();
   }
 };
