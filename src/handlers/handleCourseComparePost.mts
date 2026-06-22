@@ -108,10 +108,10 @@ interface BrevoDetails {
   attributes: BrevoAttributes;
 }
 
-const getBrevoDetails = (schoolSlug: SchoolName, courseCode: string): BrevoDetails | undefined => {
+const getBrevoDetails = (schoolName: SchoolName, courseCode: string): BrevoDetails | undefined => {
   const baseAttributes: BrevoAttributes = { SOURCE: 'Course Compare' };
 
-  switch (schoolSlug) {
+  switch (schoolName) {
     case 'QC Design School':
       switch (courseCode) {
         case 'cc':
@@ -131,9 +131,9 @@ const getBrevoDetails = (schoolSlug: SchoolName, courseCode: string): BrevoDetai
           return { emailTemplateId: 1598, listIds: [ 18 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
       }
     case 'QC Event School':
-      return { emailTemplateId: 32, listIds: [ 2 ], attributes: { ...baseAttributes, STATUS_EVENT_LEAD: true } };
+      return { emailTemplateId: 32, listIds: [ 115 ], attributes: { ...baseAttributes, STATUS_EVENT_LEAD: true } };
     case 'QC Makeup Academy':
-      return { emailTemplateId: 821, listIds: [ 9 ], attributes: { ...baseAttributes, STATUS_MAKEUP_LEAD: true } };
+      return { emailTemplateId: 3385, listIds: [ 114 ], attributes: { ...baseAttributes, STATUS_MAKEUP_LEAD: true } };
     case 'QC Pet Studies':
       switch (courseCode) {
         case 'dt':

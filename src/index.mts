@@ -12,6 +12,7 @@ import { handleCourseComparePost } from './handlers/handleCourseComparePost.mjs'
 import { handleLeadGet } from './handlers/handleLeadGet.mjs';
 import { handleLeadsPost } from './handlers/handleLeadsPost.mjs';
 import { handleTelephoneNumberPost } from './handlers/handleTelephoneNumberPost.mjs';
+import { handleTelephoneNumberPut } from './handlers/handleTelephoneNumberPut.mjs';
 import { apiKeyMiddleware } from './middleware/apiKey.mjs';
 import { browserDetectMiddleware } from './middleware/browserDetect.mjs';
 import { geoLocationMiddleware } from './middleware/geoLocation.mjs';
@@ -58,7 +59,8 @@ app.use(browserDetectMiddleware);
 app.post('/', handleLeadsPost); // deprecated
 app.post('/leads', handleLeadsPost);
 app.get('/leads/:leadId', handleLeadGet);
-app.post('/telephoneNumber', handleTelephoneNumberPost);
+app.post('/telephoneNumber', handleTelephoneNumberPost); // deprecated
+app.put('/leads/:leadId/telephoneNumber', handleTelephoneNumberPut);
 
 app.use('/fb', fbRouter);
 
