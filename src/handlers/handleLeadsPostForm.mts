@@ -34,10 +34,10 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   const provinceCode = res.locals.geoLocation?.provinceCode;
   const city = res.locals.geoLocation?.city;
 
-  const validated = await validatePostLeadRequest(req.body);
+  const validationResult = await validate(req.body);
 
   // not a valid request
-  if (!validated.success) {
+  if (!validationResult.success) {
     const isBody = (obj: unknown): obj is { school: string; emailAddress: string } => {
       return typeof obj === 'object' && obj !== null
         && 'school' in obj && typeof obj.school === 'string'
@@ -48,10 +48,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       ? [ req.body.school, req.body.emailAddress ]
       : [ undefined, undefined ];
 
-    console.log('Validation error', validated.error, createPayload(req, res));
-
     try {
-      const errors = JSON.parse(validated.error.message) as { path: string[] }[];
+      const errors = JSON.parse(validationResult.error.message) as { path: string[] }[];
       if (errors.some(e => e.path.includes('emailAddress'))) {
         res.status(400).send(invalidEmailAddressHtml.replace(/\$\{contactUrl\}/gu, getContactURL(school)).replace(/\$\{emailAddress\}/gu, escapeHtml(emailAddress)));
         return;
@@ -62,11 +60,11 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       }
     } catch { /* empty */ }
 
-    res.status(400).send(validated.error.message);
+    res.status(400).send(validationResult.error.message);
     return;
   }
 
-  const request = validated.value;
+  const request = validationResult.value;
 
   let successUrl: URL;
   try {
@@ -269,7 +267,7 @@ const schema = zfd.formData({
   'ip': zfd.text().optional(),
 });
 
-const validatePostLeadRequest = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
+const validate = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
   try {
     const body = await schema.parseAsync(await requestBody);
     return success(body);

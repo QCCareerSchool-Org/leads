@@ -7,8 +7,8 @@ import { updateLeadTelephoneNumber } from '../interactors/leads.mjs';
 import { createBrevoContact } from '../lib/brevo.mjs';
 import { createPayload } from '../lib/createPayload.mjs';
 
-export const handleTelephoneNumberPost = async (req: Request, res: Response): Promise<void> => {
-  if (req.method.toLowerCase() !== 'post') {
+export const handleTelephoneNumberPut = async (req: Request, res: Response): Promise<void> => {
+  if (req.method.toLowerCase() !== 'put') {
     res.sendStatus(405);
   }
 
@@ -17,7 +17,7 @@ export const handleTelephoneNumberPost = async (req: Request, res: Response): Pr
     return;
   }
 
-  const validationResult = await validate(req.body);
+  const validationResult = await validate(req);
 
   if (!validationResult.success) {
     console.error('Validation error', validationResult.error, createPayload(req, res));
@@ -25,13 +25,13 @@ export const handleTelephoneNumberPost = async (req: Request, res: Response): Pr
     return;
   }
 
-  const { body } = validationResult.value;
+  const { params, body } = validationResult.value;
 
   const telephoneNumber = /^\d{10}$/u.test(body.telephoneNumber)
     ? '+1' + body.telephoneNumber
     : body.telephoneNumber;
 
-  const updateResult = await updateLeadTelephoneNumber({ leadId: body.leadId, telephoneNumber });
+  const updateResult = await updateLeadTelephoneNumber({ leadId: params.leadId, telephoneNumber });
 
   if (updateResult.success) {
     const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
@@ -51,25 +51,34 @@ export const handleTelephoneNumberPost = async (req: Request, res: Response): Pr
   }
 };
 
-const bodySchema: z.ZodType<PostRequest['body']> = z.object({
-  leadId: z.uuid(),
+const bodySchema: z.ZodType<PutRequest['body']> = z.object({
   telephoneNumber: z.string(),
   listId: z.number().int().positive(),
 });
 
-const validate = async (requestBody: Request['body']): Promise<Result<PostRequest>> => {
+const paramsSchema: z.ZodType<PutRequest['params']> = z.object({
+  leadId: z.uuid(),
+});
+
+const validate = async (request: Request): Promise<Result<PutRequest>> => {
   try {
-    const body = await bodySchema.parseAsync(await requestBody);
-    return success({ body });
+    const [ params, body ] = await Promise.all([
+      paramsSchema.parseAsync(request.params),
+      bodySchema.parseAsync(request.body),
+    ]);
+    return success({ params, body });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
     return failure(Error(message));
   }
 };
 
-interface PostRequest {
-  body: {
+export interface PutRequest {
+  params: {
+    /** UUID string */
     leadId: string;
+  };
+  body: {
     telephoneNumber: string;
     listId: number;
   };

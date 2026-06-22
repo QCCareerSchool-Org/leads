@@ -7,5 +7,7 @@ import { verifyFBSignature } from './middleware/verifyFBSignature.mjs';
 export const fbRouter = Router();
 
 fbRouter.use(verifyFBSignature);
-fbRouter.get('/pages', handleVerification);
-fbRouter.post('/pages', handlePage);
+
+fbRouter.route('/pages')
+  .get(handleVerification)
+  .post(handlePage);
