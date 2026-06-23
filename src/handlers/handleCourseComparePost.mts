@@ -131,9 +131,9 @@ const getBrevoDetails = (schoolName: SchoolName, courseCode: string): BrevoDetai
           return { emailTemplateId: 1598, listIds: [ 18 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
       }
     case 'QC Event School':
-      return { emailTemplateId: 32, listIds: [ 115 ], attributes: { ...baseAttributes, STATUS_EVENT_LEAD: true } };
+      return { emailTemplateId: 3402, listIds: [ 115 ], attributes: { ...baseAttributes, STATUS_EVENT_LEAD: true } };
     case 'QC Makeup Academy':
-      return { emailTemplateId: 3385, listIds: [ 114 ], attributes: { ...baseAttributes, STATUS_MAKEUP_LEAD: true } };
+      return { emailTemplateId: 3403, listIds: [ 114 ], attributes: { ...baseAttributes, STATUS_MAKEUP_LEAD: true } };
     case 'QC Pet Studies':
       switch (courseCode) {
         case 'dt':
