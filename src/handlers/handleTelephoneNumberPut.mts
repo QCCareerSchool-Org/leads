@@ -3,6 +3,7 @@ import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 import { z } from 'zod';
 
+import { getLead } from '#src/interactors/getLead.mjs';
 import { updateTelephoneNumber } from '#src/lib/activecampaign.mjs';
 import { updateLeadTelephoneNumber } from '../interactors/leads.mjs';
 import { createBrevoContact } from '../lib/brevo.mjs';
@@ -34,10 +35,17 @@ export const handleTelephoneNumberPut = async (req: Request, res: Response): Pro
 
   const updateResult = await updateLeadTelephoneNumber({ leadId: params.leadId, telephoneNumber });
 
+  const leadResult = await getLead(params.leadId);
+  if (!leadResult.success) {
+    console.error(leadResult.error.message);
+    res.status(500).send(leadResult.error.message);
+    return;
+  }
+
   if (updateResult.success) {
     let updateContactResult: Result;
     if (body.esp === 'ActiveCampaign') {
-      updateContactResult = await updateTelephoneNumber(updateResult.value, body.telephoneNumber);
+      updateContactResult = await updateTelephoneNumber(updateResult.value, body.telephoneNumber, leadResult.value.schoolName);
     } else {
       updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
     }

@@ -67,7 +67,7 @@ export const createContact = async (
     console.error(`Email list id not specified for ${schoolName}`);
   }
 
-  if (smsOptIn) {
+  if (smsOptIn && telephoneNumber) {
     // if the contact opts in, add them to the sms list for this school
     if (smsListIds[schoolName]) {
       const postContactListsResult = await postContactLists({
@@ -119,15 +119,34 @@ export const createContact = async (
   return success();
 };
 
-export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string): Promise<Result> => {
+export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string, schoolName: SchoolName): Promise<Result> => {
   const contactResult = await getContactByEmailAddress(emailAddress);
   if (!contactResult.success) {
     return contactResult;
   }
 
-  const contact = contactResult.value;
+  const contactId = contactResult.value.id;
 
-  return await putContact(contact.id, { phone: telephoneNumber });
+  const updateResult = await putContact(contactId, { phone: telephoneNumber });
+  if (!updateResult.success) {
+    return updateResult;
+  }
+
+  if (smsListIds[schoolName]) {
+    const postContactListsResult = await postContactLists({
+      contact: contactId,
+      list: smsListIds[schoolName],
+      status: ContactListStatus.ACTIVE,
+    });
+
+    if (!postContactListsResult.success) {
+      console.error(postContactListsResult.error);
+    }
+  } else {
+    console.error(`SMS list id not specified for ${schoolName}`);
+  }
+
+  return success();
 };
 
 const emailListIds: Partial<Record<SchoolName, bigint>> = {
