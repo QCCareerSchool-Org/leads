@@ -9,6 +9,8 @@ import { postContactTags } from './activecampaign/contactTags/post.mjs';
 
 export const createContact = async (
   emailAddress: string,
+  emailOptIn: boolean,
+  smsOptIn: boolean,
   schoolName: SchoolName,
   firstName: string | undefined,
   lastName: string | undefined,
@@ -16,7 +18,8 @@ export const createContact = async (
   provinceCode?: string | null,
   city?: string | null,
   telephoneNumber?: string,
-  automationId?: bigint,
+  requiredAutomationIds?: bigint[],
+  optionalAutomationIds?: bigint[],
   source?: Source,
 ): Promise<Result> => {
   const contact = {
@@ -47,10 +50,11 @@ export const createContact = async (
     }
   }
 
-  if (generalListIds[schoolName]) {
+  // the contact is always added to the email list
+  if (emailListIds[schoolName]) {
     const postContactListsResult = await postContactLists({
       contact: contactId,
-      list: generalListIds[schoolName],
+      list: emailListIds[schoolName],
       status: ContactListStatus.ACTIVE,
     });
 
@@ -58,31 +62,73 @@ export const createContact = async (
       console.error(postContactListsResult.error);
     }
   } else {
-    console.error(`List id not specified for ${schoolName}`);
+    console.error(`Email list id not specified for ${schoolName}`);
   }
 
-  if (automationId) {
-    const postContactAutomationsResult = await postContactAutomations({
-      contact: contactId,
-      automation: automationId,
-    });
+  if (smsOptIn) {
+    // if the contact opts in, add them to the sms list for this school
+    if (smsListIds[schoolName]) {
+      const postContactListsResult = await postContactLists({
+        contact: contactId,
+        list: smsListIds[schoolName],
+        status: ContactListStatus.ACTIVE,
+      });
 
-    if (!postContactAutomationsResult.success) {
-      console.error(postContactAutomationsResult.error);
+      if (!postContactListsResult.success) {
+        console.error(postContactListsResult.error);
+      }
+    } else {
+      console.error(`SMS list id not specified for ${schoolName}`);
     }
-  } else {
-    console.warn(`No automation id set for contact, ${contactId}`);
+  }
+
+  // these are the automations that fullfill the forms stated purpose (e.g., send the brochure email)
+  if (requiredAutomationIds) {
+    for (const automationId of requiredAutomationIds) {
+      const postContactAutomationsResult = await postContactAutomations({
+        contact: contactId,
+        automation: automationId,
+      });
+
+      if (!postContactAutomationsResult.success) {
+        console.error(postContactAutomationsResult.error);
+      }
+    }
+  }
+
+  if (emailOptIn) {
+    // these are the automations that the contact can opt into (e.g., join the mailing list)
+    if (optionalAutomationIds) {
+      for (const automationId of optionalAutomationIds) {
+        const postContactAutomationsResult = await postContactAutomations({
+          contact: contactId,
+          automation: automationId,
+        });
+
+        if (!postContactAutomationsResult.success) {
+          console.error(postContactAutomationsResult.error);
+        }
+      }
+    } else {
+      console.warn(`No optional automation ids found for contact, ${contactId}`);
+    }
   }
 
   return success();
 };
 
-const generalListIds: Partial<Record<SchoolName, bigint>> = {
+const emailListIds: Partial<Record<SchoolName, bigint>> = {
   'QC Design School': 35n,
   'QC Event School': 32n,
   'QC Makeup Academy': 37n,
   'QC Pet Studies': 39n,
   'QC Wellness Studies': 36n,
+} as const;
+
+const smsListIds: Partial<Record<SchoolName, bigint>> = {
+  'QC Design School': 34n,
+  'QC Event School': 33n,
+  'QC Makeup Academy': 38n,
 } as const;
 
 const sourceTags = {

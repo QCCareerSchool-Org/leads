@@ -19,7 +19,8 @@ export interface PostLeadRequest {
   courseCodes?: string[];
   emailTemplateId?: number;
   listId?: number;
-  automationId?: bigint;
+  requiredAutomations?: bigint[];
+  optionalAutomations?: bigint[];
   telephoneListId?: number;
   nonce?: string;
   'g-recaptcha-response': string;

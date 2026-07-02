@@ -193,35 +193,35 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     listIds.push(request.telephoneListId);
   }
 
-  // if (request.esp === 'ActiveCampaign') {
-  await createContact(request.emailAddress, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.automationId);
-  // } else {
-
-  const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
-  if (createContactResult.success) {
-    console.log('Created contact');
+  if (request.esp === 'ActiveCampaign') {
+    await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations);
   } else {
-    console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
-    // make a second attempt without the telephone number
-    if (telephoneNumber) {
-      const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
-      if (createContactResult2.success) {
-        console.log('Created contact');
+
+    const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
+    if (createContactResult.success) {
+      console.log('Created contact');
+    } else {
+      console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
+      // make a second attempt without the telephone number
+      if (telephoneNumber) {
+        const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
+        if (createContactResult2.success) {
+          console.log('Created contact');
+        } else {
+          console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
+        }
+      }
+    }
+
+    if (request.emailTemplateId) {
+      const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
+      if (sendEmailResult.success) {
+        console.log('Email sent', sendEmailResult.value);
       } else {
-        console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
+        console.error('Could not send email', sendEmailResult.error, createPayload(req, res));
       }
     }
   }
-
-  if (request.emailTemplateId) {
-    const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
-    if (sendEmailResult.success) {
-      console.log('Email sent', sendEmailResult.value);
-    } else {
-      console.error('Could not send email', sendEmailResult.error, createPayload(req, res));
-    }
-  }
-  // }
 
   if (newLeadResult.success) {
     additionalParameters.leadId = newLeadResult.value;
@@ -265,7 +265,8 @@ const schema = zfd.formData({
   'courseCodes': zfd.repeatableOfType(z.string()).optional(),
   'emailTemplateId': zfd.numeric(z.number().optional()),
   'listId': zfd.numeric(z.number().multipleOf(1).optional()),
-  'automationId': zfd.text(z.coerce.bigint().optional()),
+  'requiredAutomations': zfd.repeatableOfType(zfd.text(z.coerce.bigint())).optional(),
+  'optionalAutomations': zfd.repeatableOfType(zfd.text(z.coerce.bigint())).optional(),
   'telephoneListId': zfd.numeric(z.number().multipleOf(1).optional()),
   'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
