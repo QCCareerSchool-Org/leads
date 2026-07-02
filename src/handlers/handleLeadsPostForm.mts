@@ -279,6 +279,7 @@ const schema = zfd.formData({
 const validate = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
   try {
     const body = await schema.parseAsync(await requestBody);
+    console.log(body);
     return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
