@@ -2,6 +2,8 @@ import type { Result } from 'generic-result-type';
 import { success } from 'generic-result-type';
 
 import type { SchoolName } from '#src/domain/school.mjs';
+import { getContactByEmailAddress } from './activecampaign/contact/get.mjs';
+import { putContact } from './activecampaign/contact/put.mjs';
 import { postContact } from './activecampaign/contact/sync/post.mjs';
 import { postContactAutomations } from './activecampaign/contactAutomations/post.mjs';
 import { ContactListStatus, postContactLists } from './activecampaign/contactLists/post.mjs';
@@ -65,7 +67,7 @@ export const createContact = async (
     console.error(`Email list id not specified for ${schoolName}`);
   }
 
-  if (smsOptIn) {
+  if (smsOptIn && telephoneNumber) {
     // if the contact opts in, add them to the sms list for this school
     if (smsListIds[schoolName]) {
       const postContactListsResult = await postContactLists({
@@ -112,6 +114,36 @@ export const createContact = async (
     } else {
       console.warn(`No optional automation ids found for contact, ${contactId}`);
     }
+  }
+
+  return success();
+};
+
+export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string, schoolName: SchoolName): Promise<Result> => {
+  const contactResult = await getContactByEmailAddress(emailAddress);
+  if (!contactResult.success) {
+    return contactResult;
+  }
+
+  const contactId = contactResult.value.id;
+
+  const updateResult = await putContact(contactId, { phone: telephoneNumber });
+  if (!updateResult.success) {
+    return updateResult;
+  }
+
+  if (smsListIds[schoolName]) {
+    const postContactListsResult = await postContactLists({
+      contact: contactId,
+      list: smsListIds[schoolName],
+      status: ContactListStatus.ACTIVE,
+    });
+
+    if (!postContactListsResult.success) {
+      console.error(postContactListsResult.error);
+    }
+  } else {
+    console.error(`SMS list id not specified for ${schoolName}`);
   }
 
   return success();

@@ -1,5 +1,8 @@
+import type { SchoolName } from './school.mjs';
+
 export interface Lead {
   leadId: string;
+  schoolName: SchoolName;
   emailAddress: string;
   telephoneNumber: string | null;
   firstName: string | null;

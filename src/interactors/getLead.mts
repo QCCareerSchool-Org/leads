@@ -3,6 +3,7 @@ import { failure, success } from 'generic-result-type';
 import type { RowDataPacket } from 'mysql2';
 
 import type { Lead } from '#src/domain/lead.mjs';
+import type { SchoolName } from '#src/domain/school.mjs';
 import { stringifyBuffer } from '#src/lib/ipAddress.mjs';
 import { uuidToBin } from '#src/lib/uuid.mjs';
 import { pool } from '#src/pool.mjs';
@@ -29,6 +30,7 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
 
     return success({
       leadId,
+      schoolName: lead.schoolName,
       emailAddress: lead.emailAddress,
       telephoneNumber: lead.telephoneNumber,
       firstName: lead.firstName,
@@ -47,6 +49,7 @@ export const getLead = async (leadId: string): Promise<Result<Lead, GetLeadError
 
 export interface LeadRow extends RowDataPacket {
   leadId: Buffer;
+  schoolName: SchoolName;
   emailAddress: string;
   telephoneNumber: string | null;
   firstName: string | null;
@@ -69,6 +72,7 @@ class GetLeadError extends Error {
 const sql = `
 SELECT
   leadId,
+  schoolName,
   emailAddress,
   telephoneNumber,
   firstName,

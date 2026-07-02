@@ -3,6 +3,8 @@ import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 import { z } from 'zod';
 
+import { getLead } from '#src/interactors/getLead.mjs';
+import { updateTelephoneNumber } from '#src/lib/activecampaign.mjs';
 import { updateLeadTelephoneNumber } from '../interactors/leads.mjs';
 import { createBrevoContact } from '../lib/brevo.mjs';
 import { createPayload } from '../lib/createPayload.mjs';
@@ -33,8 +35,20 @@ export const handleTelephoneNumberPut = async (req: Request, res: Response): Pro
 
   const updateResult = await updateLeadTelephoneNumber({ leadId: params.leadId, telephoneNumber });
 
+  const leadResult = await getLead(params.leadId);
+  if (!leadResult.success) {
+    console.error(leadResult.error.message);
+    res.status(500).send(leadResult.error.message);
+    return;
+  }
+
   if (updateResult.success) {
-    const updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
+    let updateContactResult: Result;
+    if (body.esp === 'ActiveCampaign') {
+      updateContactResult = await updateTelephoneNumber(updateResult.value, body.telephoneNumber, leadResult.value.schoolName);
+    } else {
+      updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
+    }
     if (!updateContactResult.success) {
       console.error('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
     }
@@ -54,6 +68,7 @@ export const handleTelephoneNumberPut = async (req: Request, res: Response): Pro
 const bodySchema: z.ZodType<PutRequest['body']> = z.object({
   telephoneNumber: z.string(),
   listId: z.number().int().positive(),
+  esp: z.enum([ 'Brevo', 'ActiveCampaign' ]).optional(),
 });
 
 const paramsSchema: z.ZodType<PutRequest['params']> = z.object({
@@ -81,5 +96,6 @@ export interface PutRequest {
   body: {
     telephoneNumber: string;
     listId: number;
+    esp?: 'Brevo' | 'ActiveCampaign';
   };
 }

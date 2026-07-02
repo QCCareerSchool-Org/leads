@@ -16,7 +16,7 @@ interface Contact {
   contactLists: bigint[];
 }
 
-export const getContact = async (id: bigint, signal?: AbortSignal): Promise<Result<Contact>> => {
+export const getContactById = async (id: bigint, signal?: AbortSignal): Promise<Result<Contact>> => {
   try {
     const response = await activeCampaignFetch(`/contacts/${id}`, { signal });
 
@@ -31,6 +31,43 @@ export const getContact = async (id: bigint, signal?: AbortSignal): Promise<Resu
     }
 
     const contact = await schema.parseAsync(responseBody.contact);
+
+    return success(contact);
+
+  } catch (err) {
+    if (!signal?.aborted) {
+      console.error(err);
+    }
+    return failure(err instanceof Error ? err : Error(String(err)));
+  }
+};
+
+export const getContactByEmailAddress = async (emailAddress: string, signal?: AbortSignal): Promise<Result<Contact>> => {
+  const searchParams = new URLSearchParams({ email: emailAddress });
+
+  try {
+
+    const response = await activeCampaignFetch(`/contacts?${searchParams.toString()}`, { signal });
+
+    if (!response.ok) {
+      return failure(Error(response.statusText));
+    }
+
+    const responseBody = await response.json();
+
+    if (!(typeof responseBody === 'object' && responseBody !== null && 'contacts' in responseBody)) {
+      return failure(Error('contacts key missing'));
+    }
+
+    if (!Array.isArray(responseBody.contacts)) {
+      return failure(Error('contacts is not an array'));
+    }
+
+    if (responseBody.contacts.length < 1) {
+      return failure(Error('contact not found'));
+    }
+
+    const contact = await schema.parseAsync(responseBody.contacts[0]);
 
     return success(contact);
 
