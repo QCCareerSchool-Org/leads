@@ -1,49 +1,93 @@
-import { failure, type Result } from 'generic-result-type';
+import type { Result } from 'generic-result-type';
+import { success } from 'generic-result-type';
 
-import { type ACCreateContactResult, isACCreateContactResult } from '#src/domain/activecampaign.mjs';
-import { fetchWithRetry } from './fetchWithRetry.mjs';
+import type { SchoolName } from '#src/domain/school.mjs';
+import { postContact } from './activecampaign/contact/sync/post.mjs';
+import { postContactAutomations } from './activecampaign/contactAutomations/post.mjs';
+import { ContactListStatus, postContactLists } from './activecampaign/contactLists/post.mjs';
+import { postContactTags } from './activecampaign/contactTags/post.mjs';
 
-const activeCampaignAccount = process.env.ACTIVE_CAMPAIGN_ACCOUNT;
-if (activeCampaignAccount === undefined) {
-  throw Error('Environment variable ACTIVE_CAMPAIGN_ACCOUNT is undefined');
-}
+export const createContact = async (
+  emailAddress: string,
+  schoolName: SchoolName,
+  firstName: string | undefined,
+  lastName: string | undefined,
+  countryCode: string,
+  provinceCode?: string | null,
+  city?: string | null,
+  telephoneNumber?: string,
+  automationId?: bigint,
+  source?: Source,
+): Promise<Result> => {
+  const contact = {
+    email: emailAddress,
+    firstName: firstName ?? '',
+    lastName: lastName ?? '',
+    phone: telephoneNumber ?? '',
+  };
 
-const baseUrl = `https://${activeCampaignAccount}.api-us1.com/api/3/`;
+  const fields = { countryCode, provinceCode: provinceCode ?? undefined, city: city ?? undefined };
 
-export const createActiveCampaignContact = async (signal?: AbortSignal): Promise<Result<ACCreateContactResult>> => {
-  const url = `${baseUrl}foo`;
+  const postContactResult = await postContact(contact, fields);
 
-  const body = {};
-
-  try {
-    const response = await fetchWithRetry(url, {
-      method: 'post',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json' },
-      signal,
-    });
-
-    if (!response.ok) {
-      return failure(Error(response.statusText));
-    }
-
-    const responseBody = await response.json();
-
-    if (!isACCreateContactResult(responseBody)) {
-      return failure(Error('Unexpected response'));
-    }
-
-  } catch (err) {
-    if (!signal?.aborted) {
-      console.error(err);
-    }
-    return failure(err instanceof Error ? err : Error(String(err)));
+  if (!postContactResult.success) {
+    return postContactResult;
   }
 
-  return failure(Error('Not implemented'));
+  const contactId = postContactResult.value;
+
+  if (source) {
+    const postSourceContactTagsResult = await postContactTags({
+      contact: contactId,
+      tag: sourceTags[source],
+    });
+
+    if (!postSourceContactTagsResult.success) {
+      console.error(postSourceContactTagsResult.error);
+    }
+  }
+
+  if (generalListIds[schoolName]) {
+    const postContactListsResult = await postContactLists({
+      contact: contactId,
+      list: generalListIds[schoolName],
+      status: ContactListStatus.ACTIVE,
+    });
+
+    if (!postContactListsResult.success) {
+      console.error(postContactListsResult.error);
+    }
+  } else {
+    console.error(`List id not specified for ${schoolName}`);
+  }
+
+  if (automationId) {
+    const postContactAutomationsResult = await postContactAutomations({
+      contact: contactId,
+      automation: automationId,
+    });
+
+    if (!postContactAutomationsResult.success) {
+      console.error(postContactAutomationsResult.error);
+    }
+  } else {
+    console.warn(`No automation id set for contact, ${contactId}`);
+  }
+
+  return success();
 };
 
-export const sendActiveCampaignEmail = async (): Promise<Result> => {
-  await new Promise(res => setTimeout(res, 2000));
-  return failure(Error('Not implemented'));
-};
+const generalListIds: Partial<Record<SchoolName, bigint>> = {
+  'QC Design School': 35n,
+  'QC Event School': 32n,
+  'QC Makeup Academy': 37n,
+  'QC Pet Studies': 39n,
+  'QC Wellness Studies': 36n,
+} as const;
+
+const sourceTags = {
+  'Meta': 27n,
+  'Course Compare': 28n,
+} as const;
+
+type Source = keyof typeof sourceTags;

@@ -1,5 +1,10 @@
 import { sleep } from './sleep.mjs';
 
+/**
+ * Fetch with automatic retries on 429 responses
+ *
+ * Good for a single connection at a time. We should switch to a global queue to handle multiple connections.
+ */
 export const fetchWithRetry = async (url: string, options: RequestInit = {}, retries = 5, backoff = 1000): Promise<Response> => {
   try {
     const response = await fetch(url, options);

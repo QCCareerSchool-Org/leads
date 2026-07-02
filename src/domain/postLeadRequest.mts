@@ -19,10 +19,12 @@ export interface PostLeadRequest {
   courseCodes?: string[];
   emailTemplateId?: number;
   listId?: number;
+  automationId?: bigint;
   telephoneListId?: number;
   nonce?: string;
   'g-recaptcha-response': string;
   referrer?: string;
   forward: number;
   ip?: string;
+  esp?: 'Brevo' | 'ActiveCampaign';
 }
