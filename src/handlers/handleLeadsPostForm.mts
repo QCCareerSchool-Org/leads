@@ -136,6 +136,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       if (typeof request.telephoneListId !== 'undefined') {
         successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
       }
+      if (typeof request.esp !== 'undefined') {
+        successUrl.searchParams.set('esp', request.esp);
+      }
       res.redirect(303, successUrl.href);
       return;
     }
@@ -233,6 +236,9 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     }
     if (typeof request.telephoneListId !== 'undefined') {
       successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
+    }
+    if (typeof request.esp !== 'undefined') {
+      successUrl.searchParams.set('esp', request.esp);
     }
     res.redirect(303, successUrl.href);
   } else {
