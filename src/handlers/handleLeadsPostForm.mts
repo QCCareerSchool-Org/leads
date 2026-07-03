@@ -189,28 +189,23 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     attributes.SOURCE = 'Facebook';
   }
 
-  // add "+1" to 10-digit phone numbers
-  let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
-  if (request.telephoneListId && telephoneNumber) {
-    listIds = listIds ?? [];
-    listIds.push(request.telephoneListId);
-  }
-
   if (request.esp === 'ActiveCampaign') {
     await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations);
   } else {
 
+    let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
+    if (request.telephoneListId && telephoneNumber) {
+      listIds = listIds ?? [];
+      listIds.push(request.telephoneListId);
+    }
+
     const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
-    if (createContactResult.success) {
-      console.log('Created contact');
-    } else {
+    if (!createContactResult.success) {
       console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
       // make a second attempt without the telephone number
       if (telephoneNumber) {
         const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
-        if (createContactResult2.success) {
-          console.log('Created contact');
-        } else {
+        if (!createContactResult2.success) {
           console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
         }
       }
@@ -285,7 +280,6 @@ const schema = zfd.formData({
 const validate = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
   try {
     const body = await schema.parseAsync(await requestBody);
-    console.log(body);
     return success(body);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';

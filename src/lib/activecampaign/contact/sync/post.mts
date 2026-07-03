@@ -6,9 +6,9 @@ import { activeCampaignFetch, isErrorResponse } from '../../index.mjs';
 
 interface Contact {
   email: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 interface Fields {
@@ -21,9 +21,9 @@ interface Body {
   contact: {
     email: string;
     allowNullEmail?: boolean;
-    phone: string;
-    firstName: string;
-    lastName: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
     fieldValues?: { field: number; value: string }[];
   };
 }
@@ -38,7 +38,10 @@ export const postContact = async (contact: Contact, fields?: Fields, signal?: Ab
   try {
     const body: Body = {
       contact: {
-        ...contact,
+        email: contact.email,
+        ...(contact.firstName ? { firstName: contact.firstName } : undefined),
+        ...(contact.lastName ? { lastName: contact.lastName } : undefined),
+        ...(contact.phone ? { phone: contact.phone } : undefined),
         allowNullEmail: false,
       },
     };
