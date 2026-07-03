@@ -50,7 +50,7 @@ export const handleTelephoneNumberPost = async (req: Request, res: Response): Pr
       updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
     }
     if (!updateContactResult.success) {
-      console.error('Could not update Brevo contact', updateContactResult.error, createPayload(req, res));
+      console.error('Could not update contact', updateContactResult.error, createPayload(req, res));
     }
   }
 
