@@ -5,6 +5,7 @@ import type { SchoolName } from '#src/domain/school.mjs';
 import { getContactByEmailAddress } from './activecampaign/contact/get.mjs';
 import { putContact } from './activecampaign/contact/put.mjs';
 import { postContact } from './activecampaign/contact/sync/post.mjs';
+import { getContactAutomations } from './activecampaign/contactAutomations/get.mjs';
 import { postContactAutomations } from './activecampaign/contactAutomations/post.mjs';
 import { ContactListStatus, postContactLists } from './activecampaign/contactLists/post.mjs';
 import { postContactTags } from './activecampaign/contactTags/post.mjs';
@@ -40,6 +41,9 @@ export const createContact = async (
   }
 
   const contactId = postContactResult.value;
+
+  const contactAutomationsResult = await getContactAutomations(contactId);
+  const contactAutomations = contactAutomationsResult.success ? contactAutomationsResult.value : [];
 
   if (source) {
     const postSourceContactTagsResult = await postContactTags({
@@ -87,6 +91,11 @@ export const createContact = async (
   // these are the automations that fullfill the forms stated purpose (e.g., send the brochure email)
   if (requiredAutomationIds) {
     for (const automationId of requiredAutomationIds) {
+      // skip this automation the contact is already in it
+      if (contactAutomations.findIndex(c => c.automation === automationId && !c.completed) !== -1) {
+        continue;
+      }
+
       const postContactAutomationsResult = await postContactAutomations({
         contact: contactId,
         automation: automationId,
@@ -102,6 +111,11 @@ export const createContact = async (
     // these are the automations that the contact can opt into (e.g., join the mailing list)
     if (optionalAutomationIds) {
       for (const automationId of optionalAutomationIds) {
+        // skip this automation the contact is already in it
+        if (contactAutomations.findIndex(c => c.automation === automationId && !c.completed) !== -1) {
+          continue;
+        }
+
         const postContactAutomationsResult = await postContactAutomations({
           contact: contactId,
           automation: automationId,
