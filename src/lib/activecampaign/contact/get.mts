@@ -13,7 +13,7 @@ interface Contact {
   lastName: string;
   deleted: number;
   anonymized: number;
-  contactLists: bigint[];
+  contactLists?: bigint[];
 }
 
 export const getContactById = async (id: bigint, signal?: AbortSignal): Promise<Result<Contact>> => {
@@ -88,5 +88,5 @@ const schema: zod.ZodType<Contact> = zod.object({
   lastName: zod.string(),
   deleted: zod.coerce.number().int(),
   anonymized: zod.coerce.number().int(),
-  contactLists: zod.array(zod.coerce.bigint()),
+  contactLists: zod.array(zod.coerce.bigint()).optional(),
 });

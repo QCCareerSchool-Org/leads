@@ -121,6 +121,7 @@ export const createContact = async (
 
 export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string, schoolName: SchoolName): Promise<Result> => {
   const contactResult = await getContactByEmailAddress(emailAddress);
+  console.log(contactResult);
   if (!contactResult.success) {
     return contactResult;
   }
