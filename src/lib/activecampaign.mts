@@ -26,9 +26,9 @@ export const createContact = async (
 ): Promise<Result> => {
   const contact = {
     email: emailAddress,
-    firstName: firstName ?? '',
-    lastName: lastName ?? '',
-    phone: telephoneNumber ?? '',
+    firstName,
+    lastName,
+    phone: telephoneNumber,
   };
 
   const fields = { countryCode, provinceCode: provinceCode ?? undefined, city: city ?? undefined };
