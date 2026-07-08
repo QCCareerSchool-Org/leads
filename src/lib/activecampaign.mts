@@ -108,7 +108,7 @@ export const createContact = async (
   }
 
   if (emailOptIn) {
-    // these are the automations that the contact can opt into (e.g., join the mailing list)
+    // these are the automations that the contact can opt into (nuture streams)
     if (optionalAutomationIds) {
       for (const automationId of optionalAutomationIds) {
         // skip this automation the contact is already in it
