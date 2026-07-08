@@ -3,9 +3,7 @@ import { z } from 'zod';
 
 import type { SchoolName } from '#src/domain/school.mjs';
 import { schools } from '#src/domain/school.mjs';
-import type { BrevoAttributes } from '#src/lib/brevo.mjs';
-import { sendBrevoEmail } from '#src/lib/brevo.mjs';
-import { createBrevoContact } from '#src/lib/brevo.mjs';
+import { createContact } from '#src/lib/activecampaign.mjs';
 import { formatTelephoneNumber } from '#src/lib/formatTelephoneNumber.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
 
@@ -49,33 +47,10 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
     return;
   }
 
-  const details = getBrevoDetails(body.school, body.courseCode);
+  const automationIds = getAutomationIds(body.school, body.courseCode);
 
-  if (details) {
-    const createContactResult = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, 'CA', null, null, details.attributes, details.listIds, telephoneNumber ?? undefined);
-    if (createContactResult.success) {
-      console.log('Created contact', createContactResult.value);
-    } else {
-      console.log('Could not create contact with telephone number', createContactResult.error.message);
-      // make a second attempt without the telephone number
-      if (telephoneNumber) {
-        const createContactResult2 = await createBrevoContact(body.emailAddress, body.firstName, body.lastName ?? undefined, 'CA', null, null, details.attributes, details.listIds);
-        if (createContactResult2.success) {
-          console.log('Created contact', createContactResult2.value);
-        } else {
-          console.error('Could not create contact', createContactResult2.error.message);
-        }
-      }
-    }
-
-    if (details.emailTemplateId) {
-      const sendEmailResult = await sendBrevoEmail(details.emailTemplateId, body.emailAddress, body.firstName);
-      if (sendEmailResult.success) {
-        console.log('Email sent', sendEmailResult.value);
-      } else {
-        console.error('Could not send email', sendEmailResult.error);
-      }
-    }
+  if (automationIds) {
+    await createContact(body.emailAddress, true, false, body.school, body.firstName, body.lastName, 'CA', null, null, telephoneNumber ?? undefined, automationIds);
   }
 
   res.status(201).send({ id: result.value });
@@ -102,44 +77,12 @@ const bodySchema: z.ZodType<Body> = z.object({
   }).optional(),
 });
 
-interface BrevoDetails {
-  emailTemplateId?: number;
-  listIds?: number[];
-  attributes: BrevoAttributes;
-}
-
-const getBrevoDetails = (schoolName: SchoolName, courseCode: string): BrevoDetails | undefined => {
-  const baseAttributes: BrevoAttributes = { SOURCE: 'Course Compare' };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getAutomationIds = (schoolName: SchoolName, courseCode: string): bigint[] | undefined => {
   switch (schoolName) {
-    case 'QC Design School':
-      switch (courseCode) {
-        case 'cc':
-          return { emailTemplateId: 58, listIds: [ 18 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        case 'fd':
-          return { emailTemplateId: 1998, listIds: [ 12 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        case 'fs':
-          return { emailTemplateId: 2205, listIds: [ 64 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        case 'po':
-          return { emailTemplateId: 1939, listIds: [ 19 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        case 'ld':
-          return { emailTemplateId: 1967, listIds: [ 21 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        case 'ms':
-        case 'st':
-          return { emailTemplateId: 1985, listIds: [ 20 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-        default:
-          return { emailTemplateId: 1598, listIds: [ 18 ], attributes: { ...baseAttributes, STATUS_DESIGN_LEAD: true } };
-      }
     case 'QC Event School':
-      return { emailTemplateId: 3402, listIds: [ 115 ], attributes: { ...baseAttributes, STATUS_EVENT_LEAD: true } };
+      return [ 41n, 40n ];
     case 'QC Makeup Academy':
-      return { emailTemplateId: 3403, listIds: [ 114 ], attributes: { ...baseAttributes, STATUS_MAKEUP_LEAD: true } };
-    case 'QC Pet Studies':
-      switch (courseCode) {
-        case 'dt':
-          return { emailTemplateId: 1635, listIds: [ 30 ], attributes: { ...baseAttributes, STATUS_PET_LEAD: true } };
-        default:
-          return { emailTemplateId: 1660, listIds: [ 31 ], attributes: { ...baseAttributes, STATUS_PET_LEAD: true } };
-      }
+      return [ 43n, 44n ];
   }
 };
