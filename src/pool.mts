@@ -34,3 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const pool = rawPool.promise();
+
+export async function closePool(): Promise<void> {
+  await rawPool.promise().end();
+};
