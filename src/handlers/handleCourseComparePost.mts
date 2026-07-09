@@ -17,13 +17,16 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
 
   const body = bodyResult.data;
 
+  const firstName = body.firstName.startsWith('-') ? undefined : body.firstName;
+  const lastName = body.firstName.startsWith('-') ? undefined : body.lastName;
+
   const telephoneNumber = body.telephone ? formatTelephoneNumber(body.telephone.countryCode, body.telephone.number) : null;
 
   const result = await storeLead({
     ...body,
     ipAddress: null,
-    firstName: body.firstName,
-    lastName: body.lastName ?? null,
+    firstName: firstName ?? null,
+    lastName: lastName ?? null,
     school: body.school,
     city: null,
     provinceCode: null,
@@ -50,7 +53,7 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
   const automationIds = getAutomationIds(body.school, body.courseCode);
 
   if (automationIds) {
-    await createContact(body.emailAddress, true, false, body.school, body.firstName, body.lastName, 'CA', null, null, telephoneNumber ?? undefined, automationIds);
+    await createContact(body.emailAddress, true, false, body.school, firstName, lastName, 'CA', null, null, telephoneNumber ?? undefined, automationIds);
   }
 
   res.status(201).send({ id: result.value });
