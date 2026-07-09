@@ -23,6 +23,8 @@ const config: PoolOptions = {
     ca: fs.readFileSync(path.resolve('./mysql-ca.pem')),
     verifyIdentity: false,
   },
+  idleTimeout: 5000, // five seconds as per https://vercel.com/kb/guide/connection-pooling-with-functions
+  maxIdle: 0, // how many connections to keep regardless of the timeout
 };
 
 const rawPool = createPool(config);
