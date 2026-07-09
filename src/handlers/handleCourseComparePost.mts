@@ -17,13 +17,16 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
 
   const body = bodyResult.data;
 
+  const firstName = body.firstName.startsWith('-') ? null : body.firstName;
+  const lastName = body.firstName.startsWith('-') ? null : body.lastName;
+
   const telephoneNumber = body.telephone ? formatTelephoneNumber(body.telephone.countryCode, body.telephone.number) : null;
 
   const result = await storeLead({
     ...body,
     ipAddress: null,
-    firstName: body.firstName,
-    lastName: body.lastName ?? null,
+    firstName,
+    lastName: lastName ?? null,
     school: body.school,
     city: null,
     provinceCode: null,
