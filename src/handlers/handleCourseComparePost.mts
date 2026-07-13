@@ -53,7 +53,7 @@ export const handleCourseComparePost: RequestHandler = async (req, res) => {
   const automationIds = getAutomationIds(body.school, body.courseCode);
 
   if (automationIds) {
-    await createContact(body.emailAddress, true, false, body.school, firstName, lastName, 'CA', null, null, telephoneNumber ?? undefined, automationIds);
+    await createContact(body.emailAddress, true, false, body.school, firstName, lastName, 'CA', null, null, telephoneNumber ?? undefined, automationIds, undefined, 'Course Compare');
   }
 
   res.status(201).send({ id: result.value });
