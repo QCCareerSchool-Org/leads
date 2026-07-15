@@ -133,9 +133,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     const leadResult = await getLeadByNonce(request.nonce);
     if (leadResult.success && leadResult.value !== false) {
       successUrl.searchParams.set('leadId', leadResult.value);
-      if (typeof request.telephoneListId !== 'undefined') {
-        successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
-      }
       if (typeof request.esp !== 'undefined') {
         successUrl.searchParams.set('esp', request.esp);
       }
@@ -228,9 +225,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       if (typeof param !== 'undefined') {
         successUrl.searchParams.set(key, param);
       }
-    }
-    if (typeof request.telephoneListId !== 'undefined') {
-      successUrl.searchParams.set('t', '1'); // let the thank-you page know we already asked for a phone number
     }
     if (typeof request.esp !== 'undefined') {
       successUrl.searchParams.set('esp', request.esp);
