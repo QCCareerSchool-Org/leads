@@ -177,7 +177,7 @@ const smsListIds: Partial<Record<SchoolName, { [key: string]: bigint; default: b
   'QC Design School': { default: 34n },
   'QC Event School': { default: 33n },
   'QC Makeup Academy': { default: 38n },
-  'QC Pet Studies': { default: 92n, DT: 93n },
+  'QC Pet Studies': { default: 92n, dt: 93n },
 } as const;
 
 const sourceTags = {
