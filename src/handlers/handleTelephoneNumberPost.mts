@@ -45,7 +45,7 @@ export const handleTelephoneNumberPost = async (req: Request, res: Response): Pr
   if (updateResult.success) {
     let updateContactResult: Result;
     if (body.esp === 'ActiveCampaign') {
-      updateContactResult = await updateTelephoneNumber(updateResult.value, body.telephoneNumber, leadResult.value.schoolName);
+      updateContactResult = await updateTelephoneNumber(updateResult.value, body.telephoneNumber, leadResult.value.schoolName, body.courseCodes?.[0]);
     } else {
       updateContactResult = await createBrevoContact(updateResult.value, undefined, undefined, undefined, undefined, undefined, undefined, [ body.listId ], body.telephoneNumber);
     }
@@ -70,6 +70,7 @@ const bodySchema: z.ZodType<PostRequest['body']> = z.object({
   telephoneNumber: z.string(),
   listId: z.number().int().positive(),
   esp: z.enum([ 'Brevo', 'ActiveCampaign' ]).optional(),
+  courseCodes: z.array(z.string().nonempty()).optional(),
 });
 
 const validate = async (requestBody: Request['body']): Promise<Result<PostRequest>> => {
@@ -88,5 +89,6 @@ interface PostRequest {
     telephoneNumber: string;
     listId: number;
     esp?: 'Brevo' | 'ActiveCampaign';
+    courseCodes?: string[];
   };
 }

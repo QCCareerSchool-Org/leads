@@ -24,6 +24,7 @@ export const createContact = async (
   requiredAutomationIds?: bigint[],
   optionalAutomationIds?: bigint[],
   source?: Source,
+  courseCode?: string,
 ): Promise<Result> => {
   const contact = {
     email: emailAddress,
@@ -76,7 +77,7 @@ export const createContact = async (
     if (smsListIds[schoolName]) {
       const postContactListsResult = await postContactLists({
         contact: contactId,
-        list: smsListIds[schoolName],
+        list: courseCode ? smsListIds[schoolName][courseCode] ?? smsListIds[schoolName].default : smsListIds[schoolName].default,
         status: ContactListStatus.ACTIVE,
       });
 
@@ -133,7 +134,7 @@ export const createContact = async (
   return success();
 };
 
-export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string, schoolName: SchoolName): Promise<Result> => {
+export const updateTelephoneNumber = async (emailAddress: string, telephoneNumber: string, schoolName: SchoolName, courseCode?: string): Promise<Result> => {
   const contactResult = await getContactByEmailAddress(emailAddress);
   console.log(contactResult);
   if (!contactResult.success) {
@@ -150,7 +151,7 @@ export const updateTelephoneNumber = async (emailAddress: string, telephoneNumbe
   if (smsListIds[schoolName]) {
     const postContactListsResult = await postContactLists({
       contact: contactId,
-      list: smsListIds[schoolName],
+      list: courseCode ? smsListIds[schoolName][courseCode] ?? smsListIds[schoolName].default : smsListIds[schoolName].default,
       status: ContactListStatus.ACTIVE,
     });
 
@@ -172,10 +173,11 @@ const emailListIds: Partial<Record<SchoolName, bigint>> = {
   'QC Wellness Studies': 36n,
 } as const;
 
-const smsListIds: Partial<Record<SchoolName, bigint>> = {
-  'QC Design School': 34n,
-  'QC Event School': 33n,
-  'QC Makeup Academy': 38n,
+const smsListIds: Partial<Record<SchoolName, { [key: string]: bigint; default: bigint }>> = {
+  'QC Design School': { default: 34n },
+  'QC Event School': { default: 33n },
+  'QC Makeup Academy': { default: 38n },
+  'QC Pet Studies': { default: 92n, DT: 93n },
 } as const;
 
 const sourceTags = {
