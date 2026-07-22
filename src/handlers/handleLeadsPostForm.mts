@@ -187,7 +187,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
   }
 
   if (request.esp === 'ActiveCampaign') {
-    await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations);
+    await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations, undefined, request.courseCodes?.[0]);
   } else {
 
     let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
