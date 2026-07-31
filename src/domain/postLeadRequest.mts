@@ -17,15 +17,11 @@ export interface PostLeadRequest {
   utmContent?: string;
   utmTerm?: string;
   courseCodes?: string[];
-  emailTemplateId?: number;
-  listId?: number;
   requiredAutomations?: bigint[];
   optionalAutomations?: bigint[];
-  telephoneListId?: number;
   nonce?: string;
   'g-recaptcha-response': string;
   referrer?: string;
   forward: number;
   ip?: string;
-  esp?: 'Brevo' | 'ActiveCampaign';
 }
