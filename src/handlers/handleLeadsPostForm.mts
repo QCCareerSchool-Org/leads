@@ -11,12 +11,9 @@ import { zfd } from 'zod-form-data';
 import { createContact } from '#src/lib/activecampaign.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
 import type { PostLeadRequest } from '../domain/postLeadRequest.mjs';
-import type { SchoolName } from '../domain/school.mjs';
 import { isSchoolName } from '../domain/school.mjs';
 import { schools } from '../domain/school.mjs';
 import { getLeadByNonce } from '../interactors/leads.mjs';
-import type { BrevoAttributes } from '../lib/brevo.mjs';
-import { createBrevoContact, sendBrevoEmail } from '../lib/brevo.mjs';
 import { getContactURL } from '../lib/contactUrl.mjs';
 import { createPayload } from '../lib/createPayload.mjs';
 import { delay } from '../lib/delay.mjs';
@@ -133,9 +130,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     const leadResult = await getLeadByNonce(request.nonce);
     if (leadResult.success && leadResult.value !== false) {
       successUrl.searchParams.set('leadId', leadResult.value);
-      if (typeof request.esp !== 'undefined') {
-        successUrl.searchParams.set('esp', request.esp);
-      }
       res.redirect(303, successUrl.href);
       return;
     }
@@ -180,43 +174,13 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     fbFields: null,
   });
 
-  const attributes = getAttributes(request.school);
+  const source = (request.referrer && /facebook/iu.test(request.referrer)) || (marketing?.source && /facebook/iu.test(marketing.source))
+    ? 'Meta'
+    : marketing?.source && /chatgpt/iu.test(marketing.source)
+      ? 'OpenAI'
+      : undefined;
 
-  if (request.referrer && /facebook/iu.test(request.referrer)) {
-    attributes.SOURCE = 'Facebook';
-  }
-
-  if (request.esp === 'ActiveCampaign') {
-    await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations, undefined, request.courseCodes?.[0]);
-  } else {
-
-    let listIds = request.emailOptIn && typeof request.listId !== 'undefined' ? [ request.listId ] : undefined;
-    if (request.telephoneListId && telephoneNumber) {
-      listIds = listIds ?? [];
-      listIds.push(request.telephoneListId);
-    }
-
-    const createContactResult = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds, telephoneNumber);
-    if (!createContactResult.success) {
-      console.info('Could not create contact with telephone number', createContactResult.error, createPayload(req, res));
-      // make a second attempt without the telephone number
-      if (telephoneNumber) {
-        const createContactResult2 = await createBrevoContact(request.emailAddress, firstName, lastName, countryCode, provinceCode, city, attributes, listIds);
-        if (!createContactResult2.success) {
-          console.error('Could not create contact', createContactResult2.error, createPayload(req, res));
-        }
-      }
-    }
-
-    if (request.emailTemplateId) {
-      const sendEmailResult = await sendBrevoEmail(request.emailTemplateId, request.emailAddress, firstName);
-      if (sendEmailResult.success) {
-        console.log('Email sent', sendEmailResult.value);
-      } else {
-        console.error('Could not send email', sendEmailResult.error, createPayload(req, res));
-      }
-    }
-  }
+  await createContact(request.emailAddress, request.emailOptIn ?? false, request.smsOptIn ?? false, request.school, firstName, lastName, countryCode, provinceCode, city, telephoneNumber, request.requiredAutomations, request.optionalAutomations, source, request.courseCodes?.[0]);
 
   if (newLeadResult.success) {
     additionalParameters.leadId = newLeadResult.value;
@@ -225,9 +189,6 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
       if (typeof param !== 'undefined') {
         successUrl.searchParams.set(key, param);
       }
-    }
-    if (typeof request.esp !== 'undefined') {
-      successUrl.searchParams.set('esp', request.esp);
     }
     res.redirect(303, successUrl.href);
   } else {
@@ -258,17 +219,13 @@ const schema = zfd.formData({
   'utmContent': zfd.text(z.string().optional()),
   'utmTerm': zfd.text(z.string().optional()),
   'courseCodes': zfd.repeatableOfType(z.string()).optional(),
-  'emailTemplateId': zfd.numeric(z.number().optional()),
-  'listId': zfd.numeric(z.number().multipleOf(1).optional()),
   'requiredAutomations': zfd.repeatableOfType(zfd.text(z.coerce.bigint())).optional(),
   'optionalAutomations': zfd.repeatableOfType(zfd.text(z.coerce.bigint())).optional(),
-  'telephoneListId': zfd.numeric(z.number().multipleOf(1).optional()),
   'nonce': zfd.text(z.uuid().optional()),
   'g-recaptcha-response': zfd.text(),
   'referrer': zfd.text(z.string().optional()),
   'forward': zfd.numeric().default(1),
   'ip': zfd.text().optional(),
-  'esp': zfd.text(z.enum([ 'Brevo', 'ActiveCampaign' ])).optional(),
 });
 
 const validate = async (requestBody: Request['body']): Promise<Result<PostLeadRequest>> => {
@@ -278,24 +235,5 @@ const validate = async (requestBody: Request['body']): Promise<Result<PostLeadRe
   } catch (err) {
     const message = err instanceof Error ? err.message : 'invalid request';
     return failure(Error(message));
-  }
-};
-
-const getAttributes = (schoolName: SchoolName): BrevoAttributes => {
-  switch (schoolName) {
-    case 'QC Design School':
-      return { STATUS_DESIGN_LEAD: true };
-    case 'QC Event School':
-      return { STATUS_EVENT_LEAD: true };
-    case 'QC Makeup Academy':
-      return { STATUS_MAKEUP_LEAD: true };
-    case 'QC Pet Studies':
-      return { STATUS_PET_LEAD: true };
-    case 'QC Wellness Studies':
-      return { STATUS_WELLNESS_LEAD: true };
-    case 'Winghill Writing School':
-      return { STATUS_WRITING_LEAD: true };
-    case 'Paw Parent Academy':
-      return {};
   }
 };
