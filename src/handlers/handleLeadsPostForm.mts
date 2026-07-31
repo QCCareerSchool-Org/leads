@@ -176,7 +176,7 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
 
   const source = (request.referrer && /facebook/iu.test(request.referrer)) || (marketing?.source && /facebook/iu.test(marketing.source))
     ? 'Meta'
-    : marketing?.source && /chatgpt/iu.test(marketing.source)
+    : marketing?.source && /chatgpt|openai/iu.test(marketing.source)
       ? 'OpenAI'
       : undefined;
 
