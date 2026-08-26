@@ -27,8 +27,8 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
     return failure(Error(`page id ${change.value.page_id} not found`));
   }
 
-  const form = page.formMap[change.value.form_id];
-  if (!form) {
+  const automationIds = page.formMap[change.value.form_id];
+  if (!automationIds) {
     return failure(Error(`form "${change.value.form_id}" not found in form map`));
   }
 
@@ -60,5 +60,5 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   const emailOptIn = disclaimerValue('additional_emails');
   const smsOptIn = disclaimerValue('sms_offers');
 
-  return store(page, form, emailAddresses, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
+  return store(page, automationIds, emailAddresses, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
 };

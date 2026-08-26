@@ -80,9 +80,17 @@ const bodySchema: z.ZodType<Body> = z.object({
   }).optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getAutomationIds = (schoolName: SchoolName, courseCode: string): bigint[] | undefined => {
   switch (schoolName) {
+    case 'QC Design School':
+      switch (courseCode) {
+        case 'ED': return [ 32n, 25n ];
+        case 'PO': return [ 53n, 52n ];
+        case 'LD': return [ 54n, 50n ];
+        case 'ST': return [ 51n, 37n ];
+        case 'FD': return [ 42n, 27n ];
+        default: return [ 33n, 28n ];
+      }
     case 'QC Event School':
       return [ 41n, 40n ];
     case 'QC Makeup Academy':
