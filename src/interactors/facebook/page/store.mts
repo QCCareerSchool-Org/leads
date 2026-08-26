@@ -2,12 +2,12 @@ import type { Result } from 'generic-result-type';
 import { failure, success } from 'generic-result-type';
 
 import type { JsonValue } from '#src/domain/json.mjs';
+import { createContact } from '#src/lib/activecampaign.mjs';
 import type { LeadPayload } from '#src/lib/storeLead.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
-import { addToBrevo } from './addToBrevo.mjs';
-import type { Form, Page } from './pageMap.mjs';
+import type { Page } from './pageMap.mjs';
 
-export const store = async (page: Page, form: Form, emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
+export const store = async (page: Page, automationIds: bigint[], emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
   const errors: Error[] = [];
 
   const emailAddress = emailAddresses[0];
@@ -41,19 +41,8 @@ export const store = async (page: Page, form: Form, emailAddresses: string[], fi
     errors.push(storeResult.error);
   }
 
-  const listIds: number[] = [];
-  if (emailOptIn) {
-    listIds.push(...form.listIds);
-  }
-  if (smsOptIn) {
-    listIds.push(...form.smsListIds);
-  }
-
   for (const e of emailAddresses) {
-    const brevoResult = await addToBrevo(page.schoolName, e, firstName, telephoneNumber, listIds, form.emailTemplateId);
-    if (!brevoResult.success) {
-      errors.push(brevoResult.error);
-    }
+    await createContact(e, true, false, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber ?? undefined, automationIds, undefined, 'Meta');
   }
 
   if (errors.length > 0) {

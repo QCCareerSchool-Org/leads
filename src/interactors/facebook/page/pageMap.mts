@@ -6,14 +6,8 @@ export interface Page {
   formMap: FormMap;
 }
 
-export interface Form {
-  listIds: number[];
-  smsListIds: number[];
-  emailTemplateId?: number;
-}
-
 type PageMap = Readonly<Record<string, Readonly<Page> | undefined>>;
-type FormMap = Readonly<Record<string, Readonly<Form> | undefined>>;
+type FormMap = Readonly<Record<string, bigint[] | undefined>>;
 
 const required = (name: string): string => {
   if (process.env[name]) {
@@ -32,15 +26,15 @@ export const pageMap: PageMap = {
     schoolName: 'QC Event School',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_313411673642'),
     formMap: {
-      '1764882231136307': { listIds: [ 77 ], smsListIds: [ 79 ], emailTemplateId: 32 },
-      '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
+      1764882231136307: [ 32n ],
+      // '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
     },
   },
   165425206839810: {
     schoolName: 'QC Makeup Academy',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_165425206839810'),
     formMap: {
-      2712154659184754: { listIds: [ 74 ], smsListIds: [ 81 ], emailTemplateId: 2648 },
+      // 2712154659184754: { listIds: [ 74 ], smsListIds: [ 81 ], emailTemplateId: 2648 },
     },
   },
   344662312548309: {
