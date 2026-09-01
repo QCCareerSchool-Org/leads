@@ -95,5 +95,10 @@ const getAutomationIds = (schoolName: SchoolName, courseCode: string): bigint[] 
       return [ 41n, 40n ];
     case 'QC Makeup Academy':
       return [ 43n, 44n ];
+    case 'QC Pet Studies':
+      switch (courseCode) {
+        case 'DT': return [ 56n, 36n ];
+        default: return [ 55n, 2n ];
+      }
   }
 };
