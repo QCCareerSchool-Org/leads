@@ -18,6 +18,11 @@ declare global {
 }
 
 export const apiKeyMiddleware: RequestHandler = async (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    next();
+    return;
+  }
+
   const authorizationHeader = req.headers.authorization;
 
   if (!authorizationHeader) {
