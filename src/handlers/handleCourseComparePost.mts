@@ -89,7 +89,7 @@ const getAutomationIds = (schoolName: SchoolName, courseCode: string): bigint[] 
         case 'LD': return [ 54n, 50n ];
         case 'ST': return [ 51n, 37n ];
         case 'FD': return [ 42n, 27n ];
-        default: return [ 33n, 28n ];
+        default: return [ 85n, 86n ];
       }
     case 'QC Event School':
       return [ 41n, 40n ];
@@ -98,7 +98,7 @@ const getAutomationIds = (schoolName: SchoolName, courseCode: string): bigint[] 
     case 'QC Pet Studies':
       switch (courseCode) {
         case 'DT': return [ 56n, 36n ];
-        default: return [ 55n, 2n ];
+        default: return [ 84n, 83n ];
       }
   }
 };
