@@ -60,5 +60,5 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   const emailOptIn = disclaimerValue('additional_emails');
   const smsOptIn = disclaimerValue('sms_offers');
 
-  return store(page, automationIds, emailAddresses, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
+  return store(page, automationIds.required, automationIds.optIn, emailAddresses, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
 };
