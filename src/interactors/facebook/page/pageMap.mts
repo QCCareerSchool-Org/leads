@@ -7,7 +7,7 @@ export interface Page {
 }
 
 type PageMap = Readonly<Record<string, Readonly<Page> | undefined>>;
-type FormMap = Readonly<Record<string, bigint[] | undefined>>;
+type FormMap = Readonly<Record<string, { required: bigint[]; optIn: bigint[] } | undefined>>;
 
 const required = (name: string): string => {
   if (process.env[name]) {
@@ -26,7 +26,7 @@ export const pageMap: PageMap = {
     schoolName: 'QC Event School',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_313411673642'),
     formMap: {
-      1764882231136307: [ 32n ],
+      1764882231136307: { required: [ 32n ], optIn: [ 25n ] },
       // '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
     },
   },

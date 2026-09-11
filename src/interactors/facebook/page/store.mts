@@ -7,7 +7,7 @@ import type { LeadPayload } from '#src/lib/storeLead.mjs';
 import { storeLead } from '#src/lib/storeLead.mjs';
 import type { Page } from './pageMap.mjs';
 
-export const store = async (page: Page, automationIds: bigint[], emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
+export const store = async (page: Page, requiredAutomationIds: bigint[], optInAutomationIds: bigint[], emailAddresses: string[], fields: JsonValue, emailOptIn: boolean, smsOptIn: boolean, firstName?: string, telephoneNumber?: string): Promise<Result> => {
   const errors: Error[] = [];
 
   const emailAddress = emailAddresses[0];
@@ -42,7 +42,7 @@ export const store = async (page: Page, automationIds: bigint[], emailAddresses:
   }
 
   for (const e of emailAddresses) {
-    await createContact(e, true, false, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber ?? undefined, automationIds, undefined, 'Meta');
+    await createContact(e, true, false, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber ?? undefined, requiredAutomationIds, optInAutomationIds, 'Meta');
   }
 
   if (errors.length > 0) {
