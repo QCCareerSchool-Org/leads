@@ -20,13 +20,15 @@ export const pageMap: PageMap = {
   26583883957: {
     schoolName: 'QC Design School',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_26583883957'),
-    formMap: {},
+    formMap: {
+      1347264447241538: { required: [ 87n ], optIn: [ 88n ] },
+    },
   },
   313411673642: {
     schoolName: 'QC Event School',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_313411673642'),
     formMap: {
-      1764882231136307: { required: [ 32n ], optIn: [ 25n ] },
+      1764882231136307: { required: [ 92n ], optIn: [ 91n ] },
       // '26567715712868345': { listIds: [ 93 ], smsListIds: [ 80 ], emailTemplateId: 2938 }, // Lisa webinar
     },
   },
@@ -40,7 +42,9 @@ export const pageMap: PageMap = {
   344662312548309: {
     schoolName: 'QC Pet Studies',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_344662312548309'),
-    formMap: {},
+    formMap: {
+      1629164165610169: { required: [ 90n ], optIn: [ 89n ] },
+    },
   },
   // Paw Parent Academy
   507770375746161: {
