@@ -174,7 +174,8 @@ export const handleLeadsPostForm = async (req: Request, res: Response): Promise<
     fbFields: null,
   });
 
-  const source = [ /meta/iu, /facebook/iu, /instagram/iu ].some(regex => (typeof request.referrer !== 'undefined' && regex.test(request.referrer)) || (marketing?.source && regex.test(marketing.source)))
+  const metaRegex = /meta|facebook|instagram/iu;
+  const source = (request.referrer && metaRegex.test(request.referrer)) || (marketing?.source && metaRegex.test(marketing.source))
     ? 'Meta'
     : marketing?.source && /chatgpt|openai/iu.test(marketing.source)
       ? 'OpenAI'
