@@ -53,6 +53,8 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
 
   const telephoneNumber = getValues([ 'phone', 'phone number', 'phone_number', 'tel', 'telephone number', 'telephone_number' ])?.[0];
 
+  console.log(data.value.custom_disclaimer_responses);
+
   const disclaimerValue = (searchString: string): boolean => {
     return data.value.custom_disclaimer_responses.findIndex(r => r.checkbox_key.includes(searchString) && r.is_checked === '1') !== -1;
   };
