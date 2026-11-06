@@ -31,7 +31,7 @@ export const isLeadgen = (obj: unknown): obj is Leadgen => {
 const isLeadgenFieldData = (obj: unknown): obj is LeadgenFieldData => {
   return obj !== null && typeof obj === 'object' &&
     'name' in obj && typeof obj.name === 'string' &&
-    'values' in obj ? isLeadgenFieldDataValues(obj.values) : true;
+    ('values' in obj ? isLeadgenFieldDataValues(obj.values) : true);
 };
 
 export const isLeadgenFieldDataValues = (obj: unknown): obj is string[] => {
