@@ -21,7 +21,7 @@ export const pageMap: PageMap = {
     schoolName: 'QC Design School',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_26583883957'),
     formMap: {
-      1347264447241538: { required: [ 87n ], optIn: [ 88n ] },
+      1789752402295461: { required: [ 87n ], optIn: [ 88n ] },
     },
   },
   313411673642: {
@@ -43,7 +43,7 @@ export const pageMap: PageMap = {
     schoolName: 'QC Pet Studies',
     accessToken: required('FB_PAGE_ACCESS_TOKEN_344662312548309'),
     formMap: {
-      1629164165610169: { required: [ 90n ], optIn: [ 89n ] },
+      1906533187387824: { required: [ 90n ], optIn: [ 89n ] },
     },
   },
   // Paw Parent Academy
