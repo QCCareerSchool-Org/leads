@@ -42,7 +42,7 @@ export const store = async (page: Page, requiredAutomationIds: bigint[], optInAu
   }
 
   for (const e of emailAddresses) {
-    await createContact(e, true, false, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber ?? undefined, requiredAutomationIds, optInAutomationIds, 'Meta');
+    await createContact(e, emailOptIn, smsOptIn, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber ?? undefined, requiredAutomationIds, optInAutomationIds, 'Meta');
   }
 
   if (errors.length > 0) {
