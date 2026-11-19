@@ -45,26 +45,26 @@ export const pageMap: PageMap = {
           'why_are__you_looking_into_interior_decorating?': {
             name: 'questionaire_design_why',
             valuesMap: {
-              'I want to get hired by a design firm': 'hired',
-              'I want to upskill for my current job': 'upskill',
-              'I want to start my own business': 'start business',
-              'I\'m not interested in pursuing design & decorating training': 'not interested',
+              'i_want_to_get_hired_by_a_design_firm': 'hired',
+              'i_want_to_upskill_for_my_current_job': 'upskill',
+              'i_want_to_start_my_own_business': 'start business',
+              'i\'m_not_interested_in_pursuing_design_&_decorating_training': 'not interested',
             },
           },
           'when_do_you_want_to_start_your_training?': {
             name: 'questionaire_design_when',
             valuesMap: {
-              'As soon as possible': 'soon',
-              'In 1-3 months': 'later',
-              'Just researching for now': 'just researching',
+              'as_soon_as_possible': 'soon',
+              'in_1-3_months': 'later',
+              'just_researching_for_now': 'just researching',
             },
           },
           'are_you_ready_to_invest_$1800_in_your_training?_(payment_plans_available).': {
             name: 'questionaire_design_ready',
             valuesMap: {
-              'Yes': 'yes',
-              'I\'d need a payment plan': 'payment plan',
-              'That\'s too expensive': 'too expensive',
+              'yes': 'yes',
+              'i\'d_need_a_payment_plan': 'payment plan',
+              'that\'s_too_expensive': 'too expensive',
             },
           },
         },
@@ -85,25 +85,25 @@ export const pageMap: PageMap = {
           'why_are_you_looking_into_event_planning?': {
             name: 'questionaire_event_why',
             valuesMap: {
-              'I want to get hired by an event management firm': 'hired',
-              'I want to upskill for my current job': 'upskill',
-              'I want to start my own business': 'start business',
-              'I\'m not interested in pursuing event planning training': 'not interested',
+              'i_want_to_get_hired_by_an_event_management_firm': 'hired',
+              'i_want_to_upskill_for_my_current_job': 'upskill',
+              'i_want_to_start_my_own_business': 'start business',
+              'i\'m_not_interested_in_pursuing_event_planning_training': 'not interested',
             },
           },
           'when_do_you_want_to_start_your_training?': {
             name: 'questionaire_event_when',
             valuesMap: {
-              'As soon as possible': 'soon',
-              'In 1-3 Months': 'later',
-              'Just researching for now': 'just researching',
+              'as_soon_as_possible': 'soon',
+              'in_1-3_months': 'later',
+              'just_researching_for_now': 'just researching',
             },
           },
           'are_you_ready_to_invest_$1400_in__your_training?_(payment_plans_available).': {
             name: 'questionaire_event_ready',
             valuesMap: {
-              'Yes': 'yes',
-              'That\'s too expensive': 'too expensive',
+              'yes': 'yes',
+              'that\'s_too_expensive': 'too expensive',
             },
           },
         },
@@ -129,26 +129,26 @@ export const pageMap: PageMap = {
           'why_are_you_looking_into_professional_dog_grooming?': {
             name: 'questionaire_grooming_why',
             valuesMap: {
-              'I want to get hired as a groomer': 'hired',
-              'I want to upskill for my current job': 'upskill',
-              'I want to start my own business': 'start business',
-              'I\'m not interested in pursuing pro groomer training': 'not interested',
+              'i_want_to_get_hired_as_a_groomer': 'hired',
+              'i_want_to_upskill_for_my_current_job': 'upskill',
+              'i_want_to_start_my_own_business': 'start business',
+              'i\'m_not_interested_in_pursuing_pro_groomer_training': 'not interested',
             },
           },
           'when_do_you_want_to_start_your_training?': {
             name: 'questionaire_grooming_when',
             valuesMap: {
-              'As soon as possible': 'soon',
-              'In 1-3 months': 'later',
-              'I\'m just researching for now': 'just researching',
+              'as_soon_as_possible': 'soon',
+              'in_1-3_months': 'later',
+              'i\'m_just_researching_for_now': 'just researching',
             },
           },
           'are_you_ready_to_invest_$2500_in_your_training?_(payment_plans_available).': {
             name: 'questionaire_grooming_ready',
             valuesMap: {
-              'Yes': 'yes',
-              'I\'d need a payment plan': 'payment plan',
-              'That\'s too expensive': 'too expensive',
+              'yes': 'yes',
+              'i\'d_need_a_payment_plan': 'payment plan',
+              'that\'s_too_expensive': 'too expensive',
             },
           },
         },
