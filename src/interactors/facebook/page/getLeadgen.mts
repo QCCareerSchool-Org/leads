@@ -9,7 +9,6 @@ export const getLeadgen = async (id: string, pageAccessToken: string): Promise<R
   // eslint-disable-next-line camelcase
   const params = new URLSearchParams({ fields: 'created_time,field_data,custom_disclaimer_responses', access_token: pageAccessToken });
   const url = `https://graph.facebook.com/v24.0/${id}?${params.toString()}`;
-  console.log('Fetching', url);
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -22,6 +21,9 @@ export const getLeadgen = async (id: string, pageAccessToken: string): Promise<R
     }
     for (const fieldData of body.field_data) {
       console.log(fieldData);
+    }
+    for (const customDisclaimerResponse of body.custom_disclaimer_responses) {
+      console.log(customDisclaimerResponse);
     }
     return success(body);
   } catch (err: unknown) {
