@@ -1,9 +1,10 @@
 import type { Result } from 'generic-result-type';
-import { failure } from 'generic-result-type';
+import { failure, success } from 'generic-result-type';
 
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isLeadgenFieldDataValues } from '#src/domain/facebook/leadgen.mjs';
+import { createContact } from '#src/lib/activecampaign.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.mjs';
 import { store } from './store.mjs';
@@ -47,7 +48,8 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   };
 
   const emailAddresses = getValues(form.emailAddressFieldName);
-  if (!emailAddresses || emailAddresses.length === 0) {
+  const emailAddress = emailAddresses?.[0];
+  if (!emailAddresses || typeof emailAddress === 'undefined') {
     return failure(Error(`No email addresses found in change ${change.value.leadgen_id}`));
   }
 
@@ -124,5 +126,23 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
     console.error(`field '${field.name}' not found in form ${formId}`);
   }
 
-  return store(page, form.required, form.optIn, emailAddresses, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
+  const errors: Error[] = [];
+
+  const storeResult = await store(page, emailAddress, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
+  if (!storeResult.success) {
+    errors.push(storeResult.error);
+  }
+
+  for (const e of emailAddresses) {
+    const contactResult = await createContact(e, emailOptIn, smsOptIn, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber, form.required, form.optIn, 'Meta');
+    if (!contactResult.success) {
+      errors.push(contactResult.error);
+    }
+  }
+
+  if (errors.length > 0) {
+    return failure(Error(errors.map(err => err.message).join('\n')));
+  }
+
+  return success();
 };
