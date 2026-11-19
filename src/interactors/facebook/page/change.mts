@@ -126,6 +126,8 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
     console.error(`field '${field.name}' not found in form ${formId}`);
   }
 
+  console.log('customFields', customFields);
+
   const errors: Error[] = [];
 
   const storeResult = await store(page, emailAddress, [ data.value.field_data, data.value.custom_disclaimer_responses ], emailOptIn, smsOptIn, firstName, telephoneNumber);
