@@ -4,6 +4,7 @@ import { failure, success } from 'generic-result-type';
 import type { FBChange, FBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isFBLeadgenChange } from '#src/domain/facebook/change.mjs';
 import { isLeadgenFieldDataValues } from '#src/domain/facebook/leadgen.mjs';
+import type { CustomFieldValue } from '#src/lib/activecampaign/contact/sync/post.mjs';
 import { createContact } from '#src/lib/activecampaign.mjs';
 import { getLeadgen } from './getLeadgen.mjs';
 import { pageMap } from './pageMap.mjs';
@@ -64,7 +65,7 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   const emailOptIn = disclaimerValue('additional_emails');
   const smsOptIn = disclaimerValue('sms_offers');
 
-  const customFields: Record<string, string> = {};
+  const customFields: CustomFieldValue[] = [];
 
   // go through every field we know about
   for (const [ submittedQuestion, customField ] of Object.entries(form.fieldMap)) {
@@ -106,7 +107,7 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
       continue;
     }
 
-    customFields[customField.name] = storedValue;
+    customFields.push({ field: customField.id, value: storedValue });
   }
 
   // make sure we're not missing any fields in our map
@@ -136,7 +137,7 @@ const fbLeadgenChange = async (change: FBLeadgenChange): Promise<Result> => {
   }
 
   for (const e of emailAddresses) {
-    const contactResult = await createContact(e, emailOptIn, smsOptIn, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber, form.required, form.optIn, 'Meta');
+    const contactResult = await createContact(e, emailOptIn, smsOptIn, page.schoolName, firstName, undefined, 'US', null, null, telephoneNumber, form.required, form.optIn, 'Meta', undefined, customFields);
     if (!contactResult.success) {
       errors.push(contactResult.error);
     }

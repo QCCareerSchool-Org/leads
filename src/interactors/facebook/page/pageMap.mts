@@ -7,6 +7,8 @@ export interface Page {
 }
 
 interface CustomField {
+  /** the ActiveCampaign field id */
+  id: number;
   name: string;
   valuesMap: Readonly<Record<string, string>>;
 }
@@ -43,7 +45,8 @@ export const pageMap: PageMap = {
         telephoneNumberFieldName: 'phone_number',
         fieldMap: {
           'why_are__you_looking_into_interior_decorating?': {
-            name: 'questionaire_design_why',
+            id: 89,
+            name: 'QUESTIONNAIRE_DESIGN_WHY',
             valuesMap: {
               'i_want_to_get_hired_by_a_design_firm': 'hired',
               'i_want_to_upskill_for_my_current_job': 'upskill',
@@ -52,7 +55,8 @@ export const pageMap: PageMap = {
             },
           },
           'when_do_you_want_to_start_your_training?': {
-            name: 'questionaire_design_when',
+            id: 90,
+            name: 'QUESTIONNAIRE_DESIGN_WHEN',
             valuesMap: {
               'as_soon_as_possible': 'soon',
               'in_1-3_months': 'later',
@@ -60,7 +64,8 @@ export const pageMap: PageMap = {
             },
           },
           'are_you_ready_to_invest_$1800_in_your_training?_(payment_plans_available).': {
-            name: 'questionaire_design_ready',
+            id: 91,
+            name: 'QUESTIONNAIRE_DESIGN_READY',
             valuesMap: {
               'yes': 'yes',
               'i\'d_need_a_payment_plan': 'payment plan',
@@ -83,7 +88,8 @@ export const pageMap: PageMap = {
         telephoneNumberFieldName: 'phone',
         fieldMap: {
           'why_are_you_looking_into_event_planning?': {
-            name: 'questionaire_event_why',
+            id: 92,
+            name: 'QUESTIONNAIRE_EVENT_WHY',
             valuesMap: {
               'i_want_to_get_hired_by_an_event_management_firm': 'hired',
               'i_want_to_upskill_for_my_current_job': 'upskill',
@@ -92,7 +98,8 @@ export const pageMap: PageMap = {
             },
           },
           'when_do_you_want_to_start_your_training?': {
-            name: 'questionaire_event_when',
+            id: 93,
+            name: 'QUESTIONNAIRE_EVENT_WHEN',
             valuesMap: {
               'as_soon_as_possible': 'soon',
               'in_1-3_months': 'later',
@@ -100,7 +107,8 @@ export const pageMap: PageMap = {
             },
           },
           'are_you_ready_to_invest_$1400_in__your_training?_(payment_plans_available).': {
-            name: 'questionaire_event_ready',
+            id: 94,
+            name: 'QUESTIONNAIRE_EVENT_READY',
             valuesMap: {
               'yes': 'yes',
               'that\'s_too_expensive': 'too expensive',
@@ -127,7 +135,8 @@ export const pageMap: PageMap = {
         telephoneNumberFieldName: 'phone_number',
         fieldMap: {
           'why_are_you_looking_into_professional_dog_grooming?': {
-            name: 'questionaire_grooming_why',
+            id: 95,
+            name: 'QUESTIONNAIRE_GROOMING_WHY',
             valuesMap: {
               'i_want_to_get_hired_as_a_groomer': 'hired',
               'i_want_to_upskill_for_my_current_job': 'upskill',
@@ -136,7 +145,8 @@ export const pageMap: PageMap = {
             },
           },
           'when_do_you_want_to_start_your_training?': {
-            name: 'questionaire_grooming_when',
+            id: 96,
+            name: 'QUESTIONNAIRE_GROOMING_WHEN',
             valuesMap: {
               'as_soon_as_possible': 'soon',
               'in_1-3_months': 'later',
@@ -144,7 +154,8 @@ export const pageMap: PageMap = {
             },
           },
           'are_you_ready_to_invest_$2500_in_your_training?_(payment_plans_available).': {
-            name: 'questionaire_grooming_ready',
+            id: 97,
+            name: 'QUESTIONNAIRE_GROOMING_READY',
             valuesMap: {
               'yes': 'yes',
               'i\'d_need_a_payment_plan': 'payment plan',

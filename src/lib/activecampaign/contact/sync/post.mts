@@ -11,10 +11,17 @@ interface Contact {
   lastName?: string;
 }
 
+export interface CustomFieldValue {
+  /** the ActiveCampaign field id */
+  field: number;
+  value: string;
+}
+
 interface Fields {
   countryCode: string;
   provinceCode?: string;
   city?: string;
+  custom?: CustomFieldValue[];
 }
 
 interface Body {
@@ -24,7 +31,7 @@ interface Body {
     phone?: string;
     firstName?: string;
     lastName?: string;
-    fieldValues?: { field: number; value: string }[];
+    fieldValues?: CustomFieldValue[];
   };
 }
 
@@ -53,6 +60,9 @@ export const postContact = async (contact: Contact, fields?: Fields, signal?: Ab
       }
       if (fields.city) {
         body.contact.fieldValues.push({ field: FieldValues.CITY, value: fields.city });
+      }
+      if (fields.custom) {
+        body.contact.fieldValues.push(...fields.custom);
       }
     }
 
