@@ -4,6 +4,7 @@ import { success } from 'generic-result-type';
 import type { SchoolName } from '#src/domain/school.mjs';
 import { getContactByEmailAddress } from './activecampaign/contact/get.mjs';
 import { putContact } from './activecampaign/contact/put.mjs';
+import type { CustomFieldValue } from './activecampaign/contact/sync/post.mjs';
 import { postContact } from './activecampaign/contact/sync/post.mjs';
 import { getContactAutomations } from './activecampaign/contactAutomations/get.mjs';
 import { postContactAutomations } from './activecampaign/contactAutomations/post.mjs';
@@ -25,6 +26,7 @@ export const createContact = async (
   optionalAutomationIds?: bigint[],
   source?: Source,
   courseCode?: string,
+  customFields?: CustomFieldValue[],
 ): Promise<Result> => {
   const contact = {
     email: emailAddress,
@@ -33,7 +35,7 @@ export const createContact = async (
     phone: telephoneNumber,
   };
 
-  const fields = { countryCode, provinceCode: provinceCode ?? undefined, city: city ?? undefined };
+  const fields = { countryCode, provinceCode: provinceCode ?? undefined, city: city ?? undefined, custom: customFields };
 
   const postContactResult = await postContact(contact, fields);
 

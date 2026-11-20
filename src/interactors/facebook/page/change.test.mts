@@ -34,7 +34,8 @@ jest.mock('./pageMap.mjs', () => ({
           telephoneNumberFieldName: 'phone',
           fieldMap: {
             'why?': {
-              name: 'questionaire_why',
+              id: 89,
+              name: 'QUESTIONNAIRE_WHY',
               valuesMap: {
                 'I want to get hired': 'hired',
               },
@@ -164,7 +165,20 @@ describe('fbChange', () => {
       '+15555550123',
     );
     expect(createContactMock).toHaveBeenCalledTimes(1);
-    expect(createContactMock).toHaveBeenCalledWith('test@example.com', true, false, 'QC Event School', 'Jane', undefined, 'US', null, null, '+15555550123', [ 1n ], [ 2n ], 'Meta');
+    expect(createContactMock).toHaveBeenCalledWith('test@example.com', true, false, 'QC Event School', 'Jane', undefined, 'US', null, null, '+15555550123', [ 1n ], [ 2n ], 'Meta', undefined, [ { field: 89, value: 'hired' } ]);
+  });
+
+  it('should pass an empty custom fields array when no answers can be mapped', async () => {
+    getLeadgenMock.mockResolvedValue(success(createLeadgen({
+      field_data: [
+        { name: 'email', values: [ 'test@example.com' ] },
+        { name: 'why?', values: [ 'Something unexpected' ] },
+      ],
+    })));
+
+    await fbChange(createChange());
+
+    expect(createContactMock.mock.calls[0]?.[14]).toEqual([]);
   });
 
   it('should store the first email address but create a contact for every email address', async () => {
